@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-HK" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粵語通 Cantonese Vocabulary Learner SPA</title>
+    <meta name="description" content="Modern profile-based Cantonese vocabulary flashcard learning application with Web Speech API audio pronunciation, CSV/JSON parser, and 3D study cards.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen selection:bg-sky-500 selection:text-white">
+
+    <!-- Speech Warning Banner -->
+    <div id="speech-warning-banner" class="bg-slate-900 border-b border-slate-800 text-slate-300 px-4 py-2 text-xs flex items-center justify-between shadow-sm transition-all">
+        <div id="speech-voice-name" class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+            Checking Cantonese (zh-HK) Speech Voice...
+        </div>
+        <button id="speech-help-btn" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg border border-slate-700 transition-all">Voice Help & Setup</button>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.UIManager.switchView('dashboard')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-sky-500/20 font-cantonese">
+                    粵
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-100 tracking-tight flex items-center gap-2">
+                        粵語通 <span class="text-xs px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-md font-sans">Cantonese Learner</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400 font-sans hidden sm:block">Vocabulary Flashcards & Audio Practice</p>
+                </div>
+            </div>
+
+            <!-- Header Navigation Buttons -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="nav-dashboard-btn" class="px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-all flex items-center gap-1.5 border border-transparent hover:border-slate-700">
+                    <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Dashboard
+                </button>
+                <button id="nav-new-profile-btn" class="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 rounded-xl shadow-md shadow-sky-500/20 transition-all flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    + New Profile
+                </button>
+                <button id="nav-reset-btn" title="Reset default profiles" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl border border-slate-800 transition-all hidden md:flex">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: DASHBOARD VIEW -->
+        <!-- ========================================== -->
+        <section id="view-dashboard" class="space-y-8">
+            <!-- Hero Banner & Overview Stats -->
+            <div class="relative overflow-hidden glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl">
+                <div class="absolute -top-24 -right-24 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
+                            廣東話學習中心 • Cantonese Hub
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight font-cantonese mb-2">
+                            Cantonese Vocabulary Learner
+                        </h2>
+                        <p class="text-slate-400 text-sm max-w-xl leading-relaxed">
+                            Organize word lists into Profiles, practice flashcards with authentic Hong Kong Cantonese audio (`zh-HK`), and test your mastery.
+                        </p>
+                    </div>
+
+                    <button id="hero-create-profile-btn" onclick="window.UIManager.openCreateProfileModal()" class="self-start md:self-auto px-6 py-3.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-sky-500/25 hover:shadow-sky-500/40 transition-all flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        Create New Vocabulary Profile
+                    </button>
+                </div>
+
+                <!-- Stats Metric Bar -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-800/80">
+                    <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800/60">
+                        <span class="text-slate-400 text-xs font-medium block mb-1">Total Profiles</span>
+                        <span id="stat-total-profiles" class="text-2xl font-bold text-slate-100">0</span>
+                    </div>
+                    <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800/60">
+                        <span class="text-slate-400 text-xs font-medium block mb-1">Total Words</span>
+                        <span id="stat-total-words" class="text-2xl font-bold text-sky-400">0</span>
+                    </div>
+                    <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800/60">
+                        <span class="text-slate-400 text-xs font-medium block mb-1">Mastered Terms</span>
+                        <span id="stat-total-mastered" class="text-2xl font-bold text-emerald-400">0</span>
+                    </div>
+                    <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800/60">
+                        <span class="text-slate-400 text-xs font-medium block mb-1">Mastery Rate</span>
+                        <span id="stat-mastery-rate" class="text-2xl font-bold text-amber-400">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profiles Section Header -->
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-100 tracking-tight">Your Vocabulary Profiles</h3>
+                    <p class="text-slate-400 text-xs">Select a profile to start studying flashcards or edit list terms.</p>
+                </div>
+            </div>
+
+            <!-- Profiles Grid Container -->
+            <div id="dashboard-profiles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically Rendered by UIManager.renderDashboard() -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: PROFILE DETAIL VIEW (FLASHCARD GRID) -->
+        <!-- ========================================== -->
+        <section id="view-profile-detail" class="space-y-6 hidden">
+            <!-- Back & Header Bar -->
+            <div class="flex items-center justify-between gap-4">
+                <button onclick="window.UIManager.switchView('dashboard')" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-medium transition-all flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Back to Profiles
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button id="btn-profile-study" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-sky-500/20 transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        3D Flashcard Study
+                    </button>
+                    <button id="btn-profile-quiz" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Take Quiz
+                    </button>
+                    <button id="btn-profile-export" title="Export as JSON" class="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl border border-slate-800 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Info Banner -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                <div class="flex items-center gap-2 mb-2">
+                    <span id="profile-detail-category" class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full text-xs font-semibold uppercase tracking-wider">General</span>
+                </div>
+                <h2 id="profile-detail-title" class="text-3xl font-extrabold text-slate-100 font-cantonese mb-2">Profile Name</h2>
+                <p id="profile-detail-desc" class="text-slate-400 text-xs sm:text-sm">Profile description details go here.</p>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+                <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-2xl border border-slate-800 w-full sm:w-auto">
+                    <button data-filter="all" class="filter-tab-btn px-4 py-2 text-xs font-semibold rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/30 transition-all">All Words</button>
+                    <button data-filter="learning" class="filter-tab-btn px-4 py-2 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">Learning</button>
+                    <button data-filter="mastered" class="filter-tab-btn px-4 py-2 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">Mastered</button>
+                    <button data-filter="favorites" class="filter-tab-btn px-4 py-2 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">⭐ Favorites</button>
+                </div>
+
+                <div class="relative w-full sm:w-72">
+                    <input id="profile-search-input" type="text" placeholder="Search word, jyutping, or meaning..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 pl-9 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all">
+                    <svg class="w-4 h-4 text-slate-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                <span id="flashcard-count-badge">0 words</span>
+                <span class="text-slate-500">Click any card to open full details & audio practice</span>
+            </div>
+
+            <div id="flashcards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: 3D FLASHCARD STUDY MODE VIEW -->
+        <!-- ========================================== -->
+        <section id="view-study-mode" class="max-w-2xl mx-auto space-y-6 hidden">
+            <div class="flex items-center justify-between gap-4">
+                <button onclick="window.UIManager.switchView('profile-detail', { profileId: window.UIManager.activeProfile ? window.UIManager.activeProfile.id : null })" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-medium transition-all flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    Exit Study
+                </button>
+                <span id="study-counter-text" class="text-xs font-medium text-slate-400">Card 1 of 10</span>
+                <button id="btn-study-mastered" class="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 rounded-xl text-xs font-semibold transition-all">
+                    Mark as Mastered
+                </button>
+            </div>
+
+            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                <div id="study-progress-bar" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+
+            <div class="flip-card-perspective h-[380px] sm:h-[420px] w-full">
+                <div id="study-card-inner" class="flip-card-inner glass-card rounded-3xl border border-slate-800 shadow-2xl cursor-pointer">
+                    <div class="flip-card-front p-8 flex flex-col justify-between items-center text-center">
+                        <div class="w-full flex justify-between items-center text-xs text-slate-500">
+                            <span>FRONT</span>
+                            <span class="text-sky-400 font-medium">Click or press Space to flip ↺</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h2 id="study-front-word" class="text-5xl sm:text-6xl font-extrabold text-slate-100 font-cantonese tracking-wider">字</h2>
+                            <div>
+                                <span id="study-front-jyutping" class="jyutping-badge px-4 py-1.5 rounded-xl font-mono text-base font-semibold inline-block">jyutping</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button id="btn-study-audio-front" class="px-5 py-2.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 font-semibold text-xs transition-all inline-flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                Listen Pronunciation (zh-HK)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flip-card-back p-8 flex flex-col justify-between items-center text-center bg-slate-900/90">
+                        <div class="w-full flex justify-between items-center text-xs text-slate-500">
+                            <span>BACK (ENGLISH DEFINITION)</span>
+                            <span class="text-sky-400 font-medium">Click to flip ↺</span>
+                        </div>
+
+                        <div class="space-y-4 max-w-md">
+                            <h3 id="study-back-meaning" class="text-2xl font-bold text-slate-100">Meaning Translation</h3>
+                            <div class="p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 space-y-2">
+                                <p id="study-back-example" class="text-base font-medium text-sky-300 font-cantonese">例句 Example Sentence</p>
+                                <p id="study-back-example-meaning" class="text-xs text-slate-400">Example sentence translation</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button id="btn-study-audio-back" class="px-5 py-2.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 font-semibold text-xs transition-all inline-flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                Listen Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pt-2">
+                <button id="btn-study-prev" class="px-5 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl border border-slate-800 text-xs font-semibold transition-all flex items-center gap-2">
+                    ← Previous (Left Arrow)
+                </button>
+                <button id="btn-study-flip" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-2xl border border-slate-700 text-xs font-semibold transition-all">
+                    Flip Card (Space)
+                </button>
+                <button id="btn-study-next" class="px-5 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white rounded-2xl text-xs font-semibold transition-all shadow-md flex items-center gap-2">
+                    Next (Right Arrow) →
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: QUIZ MODE VIEW -->
+        <!-- ========================================== -->
+        <section id="view-quiz-mode" class="max-w-xl mx-auto space-y-6 hidden">
+            <div class="flex items-center justify-between gap-4">
+                <button onclick="window.UIManager.switchView('profile-detail', { profileId: window.UIManager.activeProfile ? window.UIManager.activeProfile.id : null })" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-medium transition-all flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    Exit Quiz
+                </button>
+                <span id="quiz-progress-text" class="text-xs font-medium text-slate-400">Question 1 of 10</span>
+                <span id="quiz-score-badge" class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-bold">Score: 0</span>
+            </div>
+
+            <div id="quiz-question-container" class="glass-card rounded-3xl p-8 border border-slate-800 shadow-2xl space-y-6 text-center">
+                <div class="space-y-2">
+                    <h3 id="quiz-prompt-title" class="text-4xl font-extrabold text-slate-100 font-cantonese">Word</h3>
+                    <p id="quiz-prompt-subtitle" class="text-slate-400 text-xs">Select the matching translation option.</p>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="btn-quiz-audio" class="p-3 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 text-xs font-semibold transition-all inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                        Listen Prompt
+                    </button>
+                </div>
+
+                <div id="quiz-options-grid" class="grid grid-cols-1 gap-3 pt-2">
+                </div>
+            </div>
+
+            <div id="quiz-summary-container" class="glass-card rounded-3xl p-8 border border-slate-800 shadow-2xl text-center space-y-6 hidden">
+                <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/30">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-100 mb-1">Quiz Complete!</h3>
+                    <p class="text-slate-400 text-xs mb-4">Here is your overall performance result:</p>
+                    <span id="quiz-final-score" class="text-4xl font-extrabold text-emerald-400 block">0 / 10</span>
+                </div>
+                <div class="flex items-center justify-center gap-3 pt-4">
+                    <button id="btn-quiz-retry" class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all">Try Again</button>
+                    <button id="btn-quiz-back" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition-all">Back to Profile</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- MODAL 1: CREATE NEW PROFILE & PASTE PARSER -->
+    <!-- ========================================== -->
+    <div id="modal-create-profile" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-modal w-full max-w-3xl rounded-3xl border border-slate-800 shadow-2xl overflow-hidden my-8">
+            <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-100">Create New Vocabulary Profile</h3>
+                    <p class="text-slate-400 text-xs">Enter details, paste structured text or single Cantonese words.</p>
+                </div>
+                <button id="btn-close-create-modal" class="p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800 transition-colors">✕</button>
+            </div>
+
+            <form id="form-create-profile" class="p-6 space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Profile Name *</label>
+                        <input id="input-profile-name" type="text" required placeholder="e.g. Hong Kong Shopping Terms" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Category Tag</label>
+                        <input id="input-profile-category" type="text" placeholder="e.g. Shopping, Travel, Slang" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-500 transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Short Description</label>
+                    <input id="input-profile-desc" type="text" placeholder="Brief note about this list..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-500 transition-all">
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-semibold text-slate-300">Paste Vocabulary List or Upload File</label>
+                        <div class="flex items-center gap-2">
+                            <label class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-semibold rounded-xl border border-slate-700 cursor-pointer transition-all flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Upload CSV/JSON
+                                <input id="input-file-upload" type="file" accept=".csv,.json,.txt" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Format Guide & Auto-Generate Option -->
+                    <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-slate-200">Flexible Inputs Supported:</span>
+                            <label class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold cursor-pointer">
+                                <input id="chk-auto-generate-on-parse" type="checkbox" checked class="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-0">
+                                ✨ Auto-Generate Missing Details
+                            </label>
+                        </div>
+                        <p class="text-slate-400">
+                            <strong>Option 1 (Full):</strong> <code class="font-mono text-sky-400">Word | Jyutping | Meaning | Example | Example Meaning</code><br>
+                            <strong>Option 2 (Words Only):</strong> Paste single words (e.g. <code class="font-mono text-emerald-400">好</code>, <code class="font-mono text-emerald-400">上</code>, <code class="font-mono text-emerald-400">的</code>, <code class="font-mono text-emerald-400">嗎</code>, <code class="font-mono text-emerald-400">媽</code>). Details are auto-generated!
+                        </p>
+                    </div>
+
+                    <textarea id="input-paste-text" rows="5" placeholder="Paste single Cantonese words (e.g. 好, 上, 的, 嗎, 媽) or pipe-separated lines..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3.5 font-mono text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-all"></textarea>
+                </div>
+
+                <!-- Live Parser Preview Table & Auto Generator Action Bar -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-slate-300">Parsed Live Preview</span>
+                            <button id="btn-auto-generate-details" type="button" class="px-2.5 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
+                                ✨ Auto-Generate Details Now
+                            </button>
+                        </div>
+                        <span id="parsed-items-count" class="text-sky-400 font-medium">0 items parsed</span>
+                    </div>
+                    <div class="max-h-48 overflow-y-auto rounded-xl border border-slate-800 bg-slate-900/60">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-900 sticky top-0 text-[11px] font-semibold text-slate-400 border-b border-slate-800">
+                                <tr>
+                                    <th class="py-2 px-3">Word</th>
+                                    <th class="py-2 px-3">Jyutping</th>
+                                    <th class="py-2 px-3">Meaning</th>
+                                    <th class="py-2 px-3">Example</th>
+                                    <th class="py-2 px-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parser-preview-tbody">
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-slate-500 text-xs">Paste vocabulary text or upload a file to preview parsed terms live.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+                    <button type="button" onclick="window.UIManager.closeCreateProfileModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 transition-all">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-500/20 transition-all">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 2: WORD DETAIL FLASHCARD MODAL -->
+    <!-- ========================================== -->
+    <div id="modal-detail" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-modal w-full max-w-xl rounded-3xl border border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 relative">
+            <button id="btn-close-detail-modal" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800 transition-colors">✕</button>
+
+            <div class="text-center space-y-3 pt-2">
+                <div class="flex items-center justify-center gap-3">
+                    <h2 id="modal-word" class="text-5xl font-extrabold text-slate-100 font-cantonese tracking-wider">字</h2>
+                    <button id="modal-btn-audio-word" title="Play Word Audio (zh-HK)" class="p-3 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    </button>
+                </div>
+                <div>
+                    <span id="modal-jyutping" class="jyutping-badge px-4 py-1.5 rounded-xl font-mono text-sm font-semibold inline-block">jyutping</span>
+                </div>
+            </div>
+
+            <div class="space-y-4 pt-2">
+                <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
+                    <span class="text-slate-500 text-[11px] font-semibold uppercase tracking-wider block mb-1">ENGLISH MEANING</span>
+                    <p id="modal-meaning" class="text-lg font-semibold text-slate-100">Meaning goes here</p>
+                </div>
+
+                <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 text-[11px] font-semibold uppercase tracking-wider block">EXAMPLE SENTENCE (例句)</span>
+                        <button id="modal-btn-audio-example" title="Play Example Audio" class="p-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-lg border border-sky-500/20 transition-all text-xs flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                            Play Example
+                        </button>
+                    </div>
+                    <p id="modal-example" class="text-base font-medium text-sky-300 font-cantonese">Example Sentence</p>
+                    <p id="modal-example-meaning" class="text-xs text-slate-400">Example sentence translation</p>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <button id="btn-modal-prev-word" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-all flex items-center gap-1">← Prev</button>
+                <span id="modal-word-counter" class="font-medium text-slate-500">1 of 10</span>
+                <button id="btn-modal-next-word" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-all flex items-center gap-1">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 3: VOICE SETUP HELP MODAL -->
+    <!-- ========================================== -->
+    <div id="modal-voice-help" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-modal w-full max-w-lg rounded-3xl border border-slate-800 shadow-2xl p-6 sm:p-8 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <h3 class="text-lg font-bold text-slate-100">Cantonese Audio (zh-HK) Voice Guide</h3>
+                <button id="btn-close-voice-help" class="p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800">✕</button>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                <p>
+                    This SPA strictly enforces <code class="px-1.5 py-0.5 bg-sky-500/10 text-sky-400 rounded font-mono">lang = "zh-HK"</code> in the browser's Web Speech API to prevent fallback to Mandarin standard Chinese pronunciation.
+                </p>
+
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                    <p class="font-bold text-slate-100 text-xs">How to add Cantonese voice on your OS:</p>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-400">
+                        <li><strong class="text-slate-200">Windows 10/11:</strong> Settings → Time & Language → Language → Add a Language → Search <strong class="text-sky-400">"Chinese (Traditional, Hong Kong SAR)"</strong> → Install Text-to-Speech pack.</li>
+                        <li><strong class="text-slate-200">macOS / iOS:</strong> System Settings → Accessibility → Spoken Content → System Speech Voice → Manage Voices → Search <strong class="text-sky-400">"Cantonese (Hong Kong)"</strong> (e.g. Sin-ji or HiuGaai).</li>
+                        <li><strong class="text-slate-200">Android (Chrome):</strong> Settings → Accessibility → Text-to-speech output → Preferred engine settings → Install Voice Data → <strong class="text-sky-400">Cantonese (Hong Kong)</strong>.</li>
+                    </ul>
+                </div>
+
+                <p class="text-slate-400">
+                    Once installed, refresh this page and the audio engine will automatically pair with your native Cantonese voice.
+                </p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 flex justify-end">
+                <button onclick="document.getElementById('modal-voice-help').classList.add('hidden')" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold text-xs rounded-xl shadow-md">Got It</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none max-w-sm w-full"></div>
+
+    <!-- App JavaScript File -->
+    <script src="app.js?v=4"></script>
+</body>
+</html>

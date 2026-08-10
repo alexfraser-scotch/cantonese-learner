@@ -1,0 +1,140 @@
+/* Custom Styles & Modern Aesthetic Enhancements */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+HK:wght@300;400;500;700&display=swap');
+
+:root {
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-cantonese: 'Noto Sans HK', 'PingFang HK', 'Microsoft JhengHei', 'HK Grotesk', sans-serif;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: #0f172a;
+    color: #f8fafc;
+    min-height: 100vh;
+}
+
+.font-cantonese {
+    font-family: var(--font-cantonese);
+}
+
+/* Glassmorphism effects */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+    transform: translateY(-4px);
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(56, 189, 248, 0.3);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.glass-modal {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* 3D Flashcard Flip Engine */
+.flip-card-perspective {
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flip-card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+}
+
+.flip-card-back {
+    transform: rotateY(180deg);
+}
+
+/* Soundwave Animation for Audio Playback */
+@keyframes soundwave-bar {
+    0%, 100% { height: 4px; }
+    50% { height: 18px; }
+}
+
+.soundwave-playing span {
+    display: inline-block;
+    width: 3px;
+    background-color: #38bdf8;
+    border-radius: 9999px;
+    margin: 0 1.5px;
+    animation: soundwave-bar 0.8s ease-in-out infinite;
+}
+
+.soundwave-playing span:nth-child(1) { animation-delay: 0.0s; }
+.soundwave-playing span:nth-child(2) { animation-delay: 0.2s; }
+.soundwave-playing span:nth-child(3) { animation-delay: 0.4s; }
+.soundwave-playing span:nth-child(4) { animation-delay: 0.1s; }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.4);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+}
+
+/* Jyutping Badge Styling */
+.jyutping-badge {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(129, 140, 248, 0.15));
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Tone Color Indicators */
+.tone-1 { color: #f43f5e; } /* High flat */
+.tone-2 { color: #fb923c; } /* Rising */
+.tone-3 { color: #facc15; } /* Mid flat */
+.tone-4 { color: #4ade80; } /* Low falling */
+.tone-5 { color: #38bdf8; } /* Low rising */
+.tone-6 { color: #c084fc; } /* Low flat */
+
+/* Pulse glow keyframes */
+@keyframes soft-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.pulse-glow {
+    animation: soft-pulse 3s infinite ease-in-out;
+}
