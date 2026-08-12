@@ -496,31 +496,72 @@ const DEFAULT_PROFILES = [
 ];
 
 // ==========================================
-// 2. Storage Manager (LocalStorage API)
+// 2. Storage Manager (Server API & LocalStorage Fallback)
 // ==========================================
 class StorageManager {
     static STORAGE_KEY = 'cantonese_learner_profiles_v1';
     static SETTINGS_KEY = 'cantonese_learner_settings_v1';
+    static API_URL = '/api/profiles';
+    static cachedProfiles = null;
+
+    static async syncWithServer(onSyncCallback = null) {
+        try {
+            const res = await fetch(this.API_URL);
+            if (res.ok) {
+                const profiles = await res.json();
+                if (Array.isArray(profiles) && profiles.length > 0) {
+                    this.cachedProfiles = profiles;
+                    this.saveLocalProfiles(profiles);
+                    if (onSyncCallback) onSyncCallback(profiles);
+                    return profiles;
+                }
+            }
+        } catch (e) {
+            console.warn('Unable to sync profiles from server, using local storage cache:', e);
+        }
+        return this.getProfiles();
+    }
 
     static getProfiles() {
+        if (this.cachedProfiles) return this.cachedProfiles;
         try {
             const raw = localStorage.getItem(this.STORAGE_KEY);
             if (!raw) {
-                this.saveProfiles(DEFAULT_PROFILES);
+                this.saveLocalProfiles(DEFAULT_PROFILES);
                 return DEFAULT_PROFILES;
             }
-            return JSON.parse(raw);
+            this.cachedProfiles = JSON.parse(raw);
+            return this.cachedProfiles;
         } catch (e) {
             console.error('Failed to parse localStorage profiles:', e);
             return DEFAULT_PROFILES;
         }
     }
 
-    static saveProfiles(profiles) {
+    static saveLocalProfiles(profiles) {
         try {
+            this.cachedProfiles = profiles;
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(profiles));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
+        }
+    }
+
+    static async pushToServer(payload) {
+        try {
+            const res = await fetch(this.API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.profiles) {
+                    this.saveLocalProfiles(data.profiles);
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to push profile update to server:', e);
         }
     }
 
@@ -540,7 +581,8 @@ class StorageManager {
             items: items || []
         };
         profiles.unshift(newProfile);
-        this.saveProfiles(profiles);
+        this.saveLocalProfiles(profiles);
+        this.pushToServer({ action: 'create', profile: newProfile });
         return newProfile;
     }
 
@@ -549,18 +591,21 @@ class StorageManager {
         const index = profiles.findIndex(p => p.id === updatedProfile.id);
         if (index !== -1) {
             profiles[index] = updatedProfile;
-            this.saveProfiles(profiles);
+            this.saveLocalProfiles(profiles);
+            this.pushToServer({ action: 'update', profile: updatedProfile });
         }
     }
 
     static deleteProfile(id) {
         let profiles = this.getProfiles();
         profiles = profiles.filter(p => p.id !== id);
-        this.saveProfiles(profiles);
+        this.saveLocalProfiles(profiles);
+        this.pushToServer({ action: 'delete', profileId: id });
     }
 
     static resetToDefault() {
-        this.saveProfiles(DEFAULT_PROFILES);
+        this.saveLocalProfiles(DEFAULT_PROFILES);
+        this.pushToServer({ action: 'reset' });
         return DEFAULT_PROFILES;
     }
 }
@@ -804,6 +849,7 @@ class UIManager {
         this.navResetBtn = document.getElementById('nav-reset-btn');
 
         this.renderDashboard();
+        StorageManager.syncWithServer(() => this.renderDashboard());
     }
 
     bindEvents() {
