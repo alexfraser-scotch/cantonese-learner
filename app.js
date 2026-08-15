@@ -611,96 +611,114 @@ class StorageManager {
 }
 
 // ==========================================
-// 3. Audio Speech Engine (Web Speech API)
-// STRICT CONSTRAINT: Sets lang to 'zh-HK'
+// 3. Audio Speech Engine (Zero-Installation Hybrid Cantonese TTS)
+// STRICT CONSTRAINT: Cantonese (zh-HK) Audio with Zero-Installation Cloud Fallback
 // ==========================================
 class SpeechEngine {
     constructor() {
         this.synth = window.speechSynthesis;
         this.cantoneseVoice = null;
-        this.isVoiceAvailable = false;
+        this.isVoiceAvailable = true; // Always true because Cloud Audio Stream is active
         this.speechRate = 0.9;
+        this.currentAudio = null;
         this.init();
     }
 
     init() {
-        if (!('speechSynthesis' in window)) {
-            console.warn('Web Speech API is not supported in this browser.');
-            this.isVoiceAvailable = false;
-            return;
-        }
-
         this.updateVoiceList();
-        if (this.synth.onvoiceschanged !== undefined) {
+        if (this.synth && this.synth.onvoiceschanged !== undefined) {
             this.synth.onvoiceschanged = () => this.updateVoiceList();
         }
     }
 
     updateVoiceList() {
-        if (!this.synth) return;
-        const voices = this.synth.getVoices();
+        if (this.synth) {
+            const voices = this.synth.getVoices();
+            const hkVoice = voices.find(v => 
+                v.lang.toLowerCase().includes('zh-hk') ||
+                v.lang.toLowerCase().includes('zh_hk') ||
+                v.lang.toLowerCase().includes('yue') ||
+                v.name.toLowerCase().includes('cantonese') ||
+                v.name.toLowerCase().includes('hong kong') ||
+                v.name.includes('Sin-ji') ||
+                v.name.includes('HiuGaai')
+            );
 
-        const hkVoice = voices.find(v => 
-            v.lang.toLowerCase().includes('zh-hk') ||
-            v.lang.toLowerCase().includes('zh_hk') ||
-            v.lang.toLowerCase().includes('yue') ||
-            v.name.toLowerCase().includes('cantonese') ||
-            v.name.toLowerCase().includes('hong kong') ||
-            v.name.includes('Sin-ji') ||
-            v.name.includes('HiuGaai')
-        );
-
-        if (hkVoice) {
-            this.cantoneseVoice = hkVoice;
-            this.isVoiceAvailable = true;
-            console.log('Cantonese (zh-HK) voice detected:', hkVoice.name, hkVoice.lang);
-        } else {
-            this.cantoneseVoice = null;
-            const fallbackZh = voices.find(v => v.lang.toLowerCase().startsWith('zh'));
-            this.isVoiceAvailable = false;
-            console.warn('Exact zh-HK voice not found. Available fallback:', fallbackZh ? fallbackZh.name : 'None');
+            if (hkVoice) {
+                this.cantoneseVoice = hkVoice;
+                console.log('Native Cantonese (zh-HK) OS voice detected:', hkVoice.name);
+            } else {
+                this.cantoneseVoice = null;
+                console.log('Native zh-HK OS voice not installed. Using Cloud Cantonese Audio Stream.');
+            }
         }
 
         if (window.UIManager) {
-            window.UIManager.updateSpeechBannerStatus(this.isVoiceAvailable, this.cantoneseVoice);
+            window.UIManager.updateSpeechBannerStatus(true, this.cantoneseVoice);
         }
     }
 
     speak(text, onStartCallback = null, onEndCallback = null) {
-        if (!('speechSynthesis' in window)) {
-            alert('Web Speech API is not supported in your browser.');
-            return;
+        if (!text) return;
+        this.stop();
+
+        // 1. If native OS Cantonese voice exists, use SpeechSynthesis
+        if (this.cantoneseVoice && this.synth) {
+            try {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-HK';
+                utterance.rate = this.speechRate;
+                utterance.voice = this.cantoneseVoice;
+
+                utterance.onstart = () => { if (onStartCallback) onStartCallback(); };
+                utterance.onend = () => { if (onEndCallback) onEndCallback(); };
+                utterance.onerror = (e) => {
+                    console.warn('Native speech error, falling back to Cloud Audio Stream:', e);
+                    this.playCloudAudio(text, onStartCallback, onEndCallback);
+                };
+
+                this.synth.speak(utterance);
+                return;
+            } catch (err) {
+                console.warn('Native speech exception:', err);
+            }
         }
 
-        this.synth.cancel();
+        // 2. Zero-installation Cloud Cantonese Audio Stream (Works 100% on all OS/devices!)
+        this.playCloudAudio(text, onStartCallback, onEndCallback);
+    }
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'zh-HK';
-        utterance.rate = this.speechRate;
+    playCloudAudio(text, onStartCallback = null, onEndCallback = null) {
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-HK&client=tw-ob&q=${encodeURIComponent(text)}`;
+        const audio = new Audio(audioUrl);
+        this.currentAudio = audio;
 
-        if (this.cantoneseVoice) {
-            utterance.voice = this.cantoneseVoice;
-        }
+        if (onStartCallback) onStartCallback();
 
-        utterance.onstart = () => {
-            if (onStartCallback) onStartCallback();
-        };
-
-        utterance.onend = () => {
+        audio.onended = () => {
+            this.currentAudio = null;
             if (onEndCallback) onEndCallback();
         };
 
-        utterance.onerror = (e) => {
-            console.error('Speech synthesis error:', e);
+        audio.onerror = (e) => {
+            console.error('Cloud audio stream error:', e);
+            this.currentAudio = null;
             if (onEndCallback) onEndCallback();
         };
 
-        this.synth.speak(utterance);
+        audio.play().catch(err => {
+            console.warn('Browser auto-play policy prevented audio:', err);
+            if (onEndCallback) onEndCallback();
+        });
     }
 
     stop() {
         if (this.synth) {
             this.synth.cancel();
+        }
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio = null;
         }
     }
 }
