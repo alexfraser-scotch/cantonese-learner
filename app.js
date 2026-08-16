@@ -10,132 +10,54 @@ class CantoneseDictionary {
     // Comprehensive Master Database for Cantonese Words, Numbers, Elements, Nature, Food, Daily Terms
     static DB = {
         // Numbers & Quantifiers
-        '一': { jyutping: 'jat1', meaning: 'One / Single / First', example: '祝你有愉快嘅一日！', example_meaning: 'Wish you have a pleasant day!' },
-        '二': { jyutping: 'ji6', meaning: 'Two / Second', example: '我有二個好朋友。', example_meaning: 'I have two good friends.' },
-        '三': { jyutping: 'saam1', meaning: 'Three', example: '三位請隨便入座。', example_meaning: 'Three people please take a seat freely.' },
-        '四': { jyutping: 'sei3', meaning: 'Four', example: '一年有四個季節。', example_meaning: 'A year has four seasons.' },
-        '五': { jyutping: 'ng5', meaning: 'Five', example: '星期五大家心情最開心。', example_meaning: 'Everyone is happiest on Friday.' },
-        '六': { jyutping: 'lok6', meaning: 'Six', example: '星期六我哋一齊去飲茶。', example_meaning: 'Let\'s go for dim sum together on Saturday.' },
-        '七': { jyutping: 'cat1', meaning: 'Seven', example: '一星期有七日。', example_meaning: 'A week has seven days.' },
-        '八': { jyutping: 'baat3', meaning: 'Eight / Prosperous', example: '八號風球要留喺屋企。', example_meaning: 'Stay home during Typhoon Signal No. 8.' },
-        '九': { jyutping: 'gau2', meaning: 'Nine', example: '九龍係香港重要嘅區域。', example_meaning: 'Kowloon is an important district in Hong Kong.' },
-        '十': { jyutping: 'sap6', meaning: 'Ten / Complete', example: '十分感謝你嘅熱情幫忙！', example_meaning: 'Thank you ten times / very much for your warm help!' },
-        '百': { jyutping: 'baak3', meaning: 'Hundred', example: '考試拎到一百分真開心。', example_meaning: 'Really happy to get one hundred marks in the exam.' },
-        '千': { jyutping: 'cin1', meaning: 'Thousand', example: '呢件外套要幾千蚊。', example_meaning: 'This jacket costs several thousand dollars.' },
-        '萬': { jyutping: 'maan6', meaning: 'Ten Thousand / Myriad', example: '祝你萬事如意，身體健康！', example_meaning: 'Wish you all the best and good health!' },
-        '億': { jyutping: 'jik1', meaning: 'Hundred Million', example: '香港有幾百億美元外匯儲備。', example_meaning: 'Hong Kong has hundreds of billions in foreign reserves.' },
-        '零': { jyutping: 'ling4', meaning: 'Zero / Nil', example: '氣溫跌到攝氏零度。', example_meaning: 'The temperature dropped to zero degrees Celsius.' },
-        '第一': { jyutping: 'dai6 jat1', meaning: 'First / Number 1', example: '佢喺比賽中勇奪第一名。', example_meaning: 'He won first place in the competition.' },
-        '兩': { jyutping: 'loeng5', meaning: 'Two (used with measure words)', example: '唔該畀兩杯凍檸茶我。', example_meaning: 'Please give me two iced lemon teas.' },
+        '一': { jyutping: 'jat1', meaning_zh: '一 / 數字 1', meaning: 'One / Single / First', example: '祝你有愉快嘅一日！', example_meaning: 'Wish you have a pleasant day!' },
+        '二': { jyutping: 'ji6', meaning_zh: '二 / 數字 2', meaning: 'Two / Second', example: '我有二個好朋友。', example_meaning: 'I have two good friends.' },
+        '三': { jyutping: 'saam1', meaning_zh: '三 / 數字 3', meaning: 'Three', example: '三位請隨便入座。', example_meaning: 'Three people please take a seat freely.' },
+        '四': { jyutping: 'sei3', meaning_zh: '四 / 數字 4', meaning: 'Four', example: '一年有四個季節。', example_meaning: 'A year has four seasons.' },
+        '五': { jyutping: 'ng5', meaning_zh: '五 / 數字 5', meaning: 'Five', example: '星期五大家心情最開心。', example_meaning: 'Everyone is happiest on Friday.' },
+        '六': { jyutping: 'lok6', meaning_zh: '六 / 數字 6', meaning: 'Six', example: '星期六我哋一齊去飲茶。', example_meaning: 'Let\'s go for dim sum together on Saturday.' },
+        '七': { jyutping: 'cat1', meaning_zh: '七 / 數字 7', meaning: 'Seven', example: '一星期有七日。', example_meaning: 'A week has seven days.' },
+        '八': { jyutping: 'baat3', meaning_zh: '八 / 發財', meaning: 'Eight / Prosperous', example: '八號風球要留喺屋企。', example_meaning: 'Stay home during Typhoon Signal No. 8.' },
+        '九': { jyutping: 'gau2', meaning_zh: '九 / 數字 9', meaning: 'Nine', example: '九龍係香港重要嘅區域。', example_meaning: 'Kowloon is an important district in Hong Kong.' },
+        '十': { jyutping: 'sap6', meaning_zh: '十 / 十全十美', meaning: 'Ten / Complete', example: '十分感謝你嘅熱情幫忙！', example_meaning: 'Thank you ten times / very much for your warm help!' },
+        '百': { jyutping: 'baak3', meaning_zh: '百 / 數百', meaning: 'Hundred', example: '考試拎到一百分真開心。', example_meaning: 'Really happy to get one hundred marks in the exam.' },
+        '千': { jyutping: 'cin1', meaning_zh: '千 / 數千', meaning: 'Thousand', example: '呢件外套要幾千蚊。', example_meaning: 'This jacket costs several thousand dollars.' },
+        '萬': { jyutping: 'maan6', meaning_zh: '萬 / 萬事', meaning: 'Ten Thousand / Myriad', example: '祝你萬事如意，身體健康！', example_meaning: 'Wish you all the best and good health!' },
+        '億': { jyutping: 'jik1', meaning_zh: '億 / 數億', meaning: 'Hundred Million', example: '香港有幾百億美元外匯儲備。', example_meaning: 'Hong Kong has hundreds of billions in foreign reserves.' },
+        '零': { jyutping: 'ling4', meaning_zh: '零 / 零度', meaning: 'Zero / Nil', example: '氣溫跌到攝氏零度。', example_meaning: 'The temperature dropped to zero degrees Celsius.' },
+        '第一': { jyutping: 'dai6 jat1', meaning_zh: '第一 / 冠軍', meaning: 'First / Number 1', example: '佢喺比賽中勇奪第一名。', example_meaning: 'He won first place in the competition.' },
+        '兩': { jyutping: 'loeng5', meaning_zh: '兩 / 一雙', meaning: 'Two (used with measure words)', example: '唔該畀兩杯凍檸茶我。', example_meaning: 'Please give me two iced lemon teas.' },
 
         // Elements & Nature
-        '水': { jyutping: 'seoi2', meaning: 'Water / Liquid', example: '唔該畀一杯水我。', example_meaning: 'Please give me a glass of water, thank you.' },
-        '火': { jyutping: 'fo2', meaning: 'Fire / Flame', example: '小心火燭，注意安全。', example_meaning: 'Be careful with fire, pay attention to safety.' },
-        '木': { jyutping: 'muk6', meaning: 'Wood / Tree / Timber', example: '呢張檯係用實木做嘅。', example_meaning: 'This table is made of solid wood.' },
-        '土': { jyutping: 'tou2', meaning: 'Earth / Soil / Land', example: '花園嘅土地好肥沃。', example_meaning: 'The soil in the garden is very fertile.' },
-        '金': { jyutping: 'gam1', meaning: 'Gold / Metal / Money', example: '這條金項鍊好美麗。', example_meaning: 'This gold necklace is very beautiful.' },
-        '日': { jyutping: 'jat6', meaning: 'Sun / Day', example: '祝你有愉快嘅一日！', example_meaning: 'Wish you have a pleasant day!' },
-        '月': { jyutping: 'jyut6', meaning: 'Moon / Month', example: '今晚嘅月亮好光。', example_meaning: 'The moon tonight is very bright.' },
-        '天': { jyutping: 'tin1', meaning: 'Sky / Heaven / Day', example: '今日天晴，氣溫好舒服。', example_meaning: 'Today is sunny and the temperature is comfortable.' },
-        '地': { jyutping: 'dei6', meaning: 'Ground / Earth / Place', example: '地下好滑，行路要小心。', example_meaning: 'The ground is slippery, walk carefully.' },
-        '風': { jyutping: 'fung1', meaning: 'Wind / Breeze', example: '海邊嘅海風吹得好涼爽。', example_meaning: 'The sea breeze by the shore is very refreshing.' },
-        '雨': { jyutping: 'jyu5', meaning: 'Rain', example: '出面落緊大雨，記得帶遮。', example_meaning: 'It\'s raining heavily outside, remember to bring an umbrella.' },
-        '雪': { jyutping: 'syut3', meaning: 'Snow', example: '冬天落雪嘅風景好靚。', example_meaning: 'The scenery of snowing in winter is very pretty.' },
-        '山': { jyutping: 'saan1', meaning: 'Mountain / Hill', example: '星期六我哋一齊去爬山。', example_meaning: 'We are going hiking up the mountain on Saturday.' },
-        '海': { jyutping: 'hoi2', meaning: 'Sea / Ocean', example: '香港嘅維多利亞港出名海景好靚。', example_meaning: 'Hong Kong\'s Victoria Harbour is famous for its beautiful ocean view.' },
-        '石': { jyutping: 'sek6', meaning: 'Stone / Rock', example: '沙灘上有好多五顏六色嘅石頭。', example_meaning: 'There are many colorful stones on the beach.' },
-        '光': { jyutping: 'gwong1', meaning: 'Light / Brightness', example: '陽光照進房間好溫暖。', example_meaning: 'Sunlight shining into the room is very warm.' },
-        '電': { jyutping: 'din6', meaning: 'Electricity / Lightning', example: '手提電話快要冇電喇。', example_meaning: 'The mobile phone battery is almost drained.' },
+        '水': { jyutping: 'seoi2', meaning_zh: '水 / 液體', meaning: 'Water / Liquid', image: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80', example: '唔該畀一杯水我。', example_meaning: 'Please give me a glass of water, thank you.' },
+        '火': { jyutping: 'fo2', meaning_zh: '火 / 火焰', meaning: 'Fire / Flame', image: 'https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=600&q=80', example: '小心火燭，注意安全。', example_meaning: 'Be careful with fire, pay attention to safety.' },
+        '木': { jyutping: 'muk6', meaning_zh: '木 / 木材 / 樹木', meaning: 'Wood / Tree / Timber', image: 'https://images.unsplash.com/photo-1520116468816-95b69f847357?auto=format&fit=crop&w=600&q=80', example: '呢張檯係用實木做嘅。', example_meaning: 'This table is made of solid wood.' },
+        '土': { jyutping: 'tou2', meaning_zh: '土 / 泥土 / 土地', meaning: 'Earth / Soil / Land', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=600&q=80', example: '花園嘅土地好肥沃。', example_meaning: 'The soil in the garden is very fertile.' },
+        '金': { jyutping: 'gam1', meaning_zh: '金 / 金屬 / 黃金', meaning: 'Gold / Metal / Money', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=600&q=80', example: '這條金項鍊好美麗。', example_meaning: 'This gold necklace is very beautiful.' },
+        '日': { jyutping: 'jat6', meaning_zh: '日 / 太陽 / 日子', meaning: 'Sun / Day', image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80', example: '祝你有愉快嘅一日！', example_meaning: 'Wish you have a pleasant day!' },
+        '月': { jyutping: 'jyut6', meaning_zh: '月 / 月亮 / 月份', meaning: 'Moon / Month', image: 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?auto=format&fit=crop&w=600&q=80', example: '今晚嘅月亮好光。', example_meaning: 'The moon tonight is very bright.' },
+        '天': { jyutping: 'tin1', meaning_zh: '天 / 天空 / 天氣', meaning: 'Sky / Heaven / Day', example: '今日天晴，氣溫好舒服。', example_meaning: 'Today is sunny and the temperature is comfortable.' },
+        '地': { jyutping: 'dei6', meaning_zh: '地 / 地面 / 場所', meaning: 'Ground / Earth / Place', example: '地下好滑，行路要小心。', example_meaning: 'The ground is slippery, walk carefully.' },
+        '風': { jyutping: 'fung1', meaning_zh: '風 / 風吹', meaning: 'Wind / Breeze', example: '海邊嘅海風吹得好涼爽。', example_meaning: 'The sea breeze by the shore is very refreshing.' },
+        '雨': { jyutping: 'jyu5', meaning_zh: '雨 / 雨水', meaning: 'Rain', example: '出面落緊大雨，記得帶遮。', example_meaning: 'It\'s raining heavily outside, remember to bring an umbrella.' },
+        '雪': { jyutping: 'syut3', meaning_zh: '雪 / 下雪', meaning: 'Snow', example: '冬天落雪嘅風景好靚。', example_meaning: 'The scenery of snowing in winter is very pretty.' },
+        '山': { jyutping: 'saan1', meaning_zh: '山 / 高山', meaning: 'Mountain / Hill', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80', example: '星期六我哋一齊去爬山。', example_meaning: 'We are going hiking up the mountain on Saturday.' },
+        '海': { jyutping: 'hoi2', meaning_zh: '海 / 大海 / 海洋', meaning: 'Sea / Ocean', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80', example: '香港嘅維多利亞港出名海景好靚。', example_meaning: 'Hong Kong\'s Victoria Harbour is famous for its beautiful ocean view.' },
+        '石': { jyutping: 'sek6', meaning_zh: '石 / 石頭', meaning: 'Stone / Rock', example: '沙灘上有好多五顏六色嘅石頭。', example_meaning: 'There are many colorful stones on the beach.' },
+        '光': { jyutping: 'gwong1', meaning_zh: '光 / 陽光', meaning: 'Light / Brightness', example: '陽光照進房間好溫暖。', example_meaning: 'Sunlight shining into the room is very warm.' },
+        '電': { jyutping: 'din6', meaning_zh: '電 / 電池 / 電力', meaning: 'Electricity / Lightning', example: '手提電話快要冇電喇。', example_meaning: 'The mobile phone battery is almost drained.' },
 
-        // Body Parts & People
-        '人': { jyutping: 'jan4', meaning: 'Person / People / Human', example: '香港人非常熱情好客。', example_meaning: 'Hong Kong people are very hospitable.' },
-        '口': { jyutping: 'hau2', meaning: 'Mouth / Opening', example: '張開口，等醫生睇吓。', example_meaning: 'Open your mouth and let the doctor take a look.' },
-        '目': { jyutping: 'muk6', meaning: 'Eye / Item', example: '眼睛係心靈嘅窗戶。', example_meaning: 'Eyes are the window to the soul.' },
-        '眼': { jyutping: 'ngaan5', meaning: 'Eye', example: '佢對眼好明亮。', example_meaning: 'His/Her eyes are very bright.' },
-        '耳': { jyutping: 'ji5', meaning: 'Ear', example: '戴住耳機聽音樂。', example_meaning: 'Listening to music with headphones on.' },
-        '手': { jyutping: 'sau2', meaning: 'Hand', example: '飯前要洗手。', example_meaning: 'Wash hands before meals.' },
-        '足': { jyutping: 'zuk1', meaning: 'Foot / Sufficient', example: '足夠嘅休息好重要。', example_meaning: 'Sufficient rest is very important.' },
-        '腳': { jyutping: 'goek3', meaning: 'Foot / Leg', example: '行咗歸日路，雙腳好攰。', example_meaning: 'Walked all day, my legs are very tired.' },
-        '心': { jyutping: 'sam1', meaning: 'Heart / Mind', example: '保持開心嘅心情最重要。', example_meaning: 'Keeping a happy mood is most important.' },
-        '頭': { jyutping: 'tau4', meaning: 'Head / Beginning', example: '頭痛就要多休息。', example_meaning: 'If you have a headache, take more rest.' },
+        // Food & Cha Chaan Teng
+        '蛋撻': { jyutping: 'daan6 taat3', meaning_zh: '蛋撻 / 酥皮雞蛋塔', meaning: 'Egg Tart', image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80', example: '呢間餅店嘅酥皮蛋撻好出名。', example_meaning: 'This bakery\'s puff pastry egg tarts are very famous.' },
+        '凍檸茶': { jyutping: 'dung3 ning4 caa4', meaning_zh: '凍檸茶 / 冰檸檬茶', meaning: 'Iced Lemon Tea', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80', example: '唔該要一杯凍檸茶，少甜走冰！', example_meaning: 'One iced lemon tea please, less sweet and no ice!' },
+        '菠蘿包': { jyutping: 'bo1 lo4 baau1', meaning_zh: '菠蘿包 / 港式菠蘿油', meaning: 'Pineapple Bun', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80', example: '熱菠蘿油加一杯熱奶茶最正。', example_meaning: 'Hot pineapple bun with butter plus a hot milk tea is the absolute best.' },
+        '叉燒包': { jyutping: 'caa1 siu1 baau1', meaning_zh: '叉燒包 / 港式點心包子', meaning: 'BBQ Pork Bun', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80', example: '蒸籠入面嘅叉燒包熱辣辣。', example_meaning: 'The BBQ pork buns inside the bamboo steamer are piping hot.' },
+        '點心': { jyutping: 'dim2 sam1', meaning_zh: '點心 / 飲茶點心', meaning: 'Dim Sum', image: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80', example: '星期日我們全家人去飲茶食點心。', example_meaning: 'On Sunday our whole family goes to drink tea and eat dim sum.' },
+        '埋單': { jyutping: 'maai4 daan1', meaning_zh: '埋單 / 結賬買單', meaning: 'Check / Bill please', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80', example: '夥計，唔該埋單！', example_meaning: 'Waiter, check please!' },
 
-        // High Frequency Basics & Characters
-        '好': { jyutping: 'hou2', meaning: 'Good / Fine / Very', example: '今日天氣好好。', example_meaning: 'Today\'s weather is very good.' },
-        '上': { jyutping: 'soeng5', meaning: 'Up / Above / Go up / Attend', example: '我哋一齊上車啦。', example_meaning: 'Let\'s get on the bus together.' },
-        '下': { jyutping: 'haa6', meaning: 'Down / Below / Next', example: '落樓下買少少食物。', example_meaning: 'Go downstairs to buy some food.' },
-        '左': { jyutping: 'zo2', meaning: 'Left (Direction)', example: '向左轉就到地鐵站。', example_meaning: 'Turn left and you will arrive at the MTR station.' },
-        '右': { jyutping: 'jau6', meaning: 'Right (Direction)', example: '右手邊係圖書館。', example_meaning: 'On the right-hand side is the library.' },
-        '中': { jyutping: 'zung1', meaning: 'Middle / Center / China', example: '市中心有好多商店。', example_meaning: 'There are many shops in the city center.' },
-        '大': { jyutping: 'daai6', meaning: 'Big / Large', example: '呢間公司規模好大。', example_meaning: 'This company scale is very big.' },
-        '小': { jyutping: 'siu2', meaning: 'Small / Little', example: '這隻小狗好可愛。', example_meaning: 'This small puppy is so cute.' },
-        '多': { jyutping: 'do1', meaning: 'Many / Much / More', example: '多謝你嘅熱情招待！', example_meaning: 'Thank you very much for your warm hospitality!' },
-        '少': { jyutping: 'siu2', meaning: 'Few / Less', example: '凍檸茶唔該少甜。', example_meaning: 'Iced lemon tea less sweet please.' },
-        '的': { jyutping: 'dik1', meaning: 'Possessive particle (of) / Target', example: '呢個係我嘅目的。', example_meaning: 'This is my objective.' },
-        '嗎': { jyutping: 'maa1', meaning: 'Question particle', example: '你近來身體好嗎？', example_meaning: 'How is your health recently?' },
-        '媽': { jyutping: 'maa1', meaning: 'Mother / Mom', example: '我同媽媽去買菜。', example_meaning: 'I go to buy groceries with mom.' },
-        '爸': { jyutping: 'baa1', meaning: 'Father / Dad', example: '爸爸今日放假。', example_meaning: 'Dad has a day off today.' },
-        '我': { jyutping: 'ngo5', meaning: 'I / Me', example: '我是廣東話學習者。', example_meaning: 'I am a Cantonese learner.' },
-        '你': { jyutping: 'nei5', meaning: 'You', example: '你好，很高興認識你！', example_meaning: 'Hello, nice to meet you!' },
-        '佢': { jyutping: 'heoi5', meaning: 'He / She / It', example: '佢係我嘅好朋友。', example_meaning: 'He/She is my good friend.' },
-        '哋': { jyutping: 'dei6', meaning: 'Plural suffix (we / you / they)', example: '我哋聽日一起去玩。', example_meaning: 'We will go play together tomorrow.' },
-        '係': { jyutping: 'hai6', meaning: 'To be (am / is / are) / Yes', example: '呢個係我嘅書包。', example_meaning: 'This is my backpack.' },
-        '唔': { jyutping: 'm4', meaning: 'Not / No (Negation)', example: '我唔知呢件事。', example_meaning: 'I don\'t know about this matter.' },
-        '有': { jyutping: 'jau5', meaning: 'Have / Possess / There is', example: '你有冇時間一齊食飯？', example_meaning: 'Do you have time to eat together?' },
-        '冇': { jyutping: 'mou5', meaning: 'Not have / Don\'t have / No', example: '冇問題，包喺我身上！', example_meaning: 'No problem, leave it to me!' },
-        '去': { jyutping: 'heoi3', meaning: 'Go', example: '我哋去香港旅遊。', example_meaning: 'We are going to Hong Kong for traveling.' },
-        '食': { jyutping: 'sik6', meaning: 'Eat', example: '你食咗飯未呀？', example_meaning: 'Have you eaten yet?' },
-        '飲': { jyutping: 'jam2', meaning: 'Drink', example: '星期日一齊去飲茶。', example_meaning: 'Let\'s go drink tea on Sunday.' },
-        '睇': { jyutping: 'tai2', meaning: 'Watch / Look / Read', example: '我鐘意睇電影。', example_meaning: 'I like watching movies.' },
-        '聽': { jyutping: 'ting1', meaning: 'Listen / Hear', example: '聽音樂令人放鬆。', example_meaning: 'Listening to music is relaxing.' },
-        '講': { jyutping: 'gong2', meaning: 'Speak / Talk / Say', example: '請講多一次，唔該。', example_meaning: 'Please say it once again, thank you.' },
-        '諗': { jyutping: 'nam2', meaning: 'Think / Ponder', example: '我諗緊聽日去邊度。', example_meaning: 'I\'m thinking about where to go tomorrow.' },
-        '想': { jyutping: 'soeng2', meaning: 'Want to / Wish', example: '我想學好廣東話。', example_meaning: 'I want to learn Cantonese well.' },
-        '要': { jyutping: 'jiu3', meaning: 'Need / Want / Must', example: '唔該我要一杯熱奶茶。', example_meaning: 'One hot milk tea please.' },
-        '做': { jyutping: 'zou6', meaning: 'Do / Make / Work as', example: '你今日要做咩呀？', example_meaning: 'What are you doing today?' },
-        '玩': { jyutping: 'waan2', meaning: 'Play / Have fun', example: '祝你玩得開心！', example_meaning: 'Wish you have fun!' },
-        '行': { jyutping: 'haang4', meaning: 'Walk / Go', example: '我們一齊行去地鐵站。', example_meaning: 'We walk together to the MTR station.' },
-        '走': { jyutping: 'zau2', meaning: 'Leave / Run / Go away', example: '時間不早，我要走喇。', example_meaning: 'It\'s getting late, I must leave.' },
-        '嚟': { jyutping: 'lai4', meaning: 'Come / Arrival', example: '快啲嚟呢度睇吓！', example_meaning: 'Come over here quickly to take a look!' },
-        '返': { jyutping: 'faan1', meaning: 'Return / Back', example: '我放學後就返屋企。', example_meaning: 'I return home after school.' },
-        '出': { jyutping: 'ceot1', meaning: 'Out / Exit', example: '我哋聽日出去玩。', example_meaning: 'We will go out to play tomorrow.' },
-        '入': { jyutping: 'jap6', meaning: 'Enter / In', example: '請大家快啲入嚟。', example_meaning: 'Please everyone come in quickly.' },
-        '落': { jyutping: 'lok6', meaning: 'Down / Descend / Rain', example: '出面落緊大雨。', example_meaning: 'It is raining heavily outside.' },
-        '過': { jyutping: 'gwo3', meaning: 'Pass / Cross / Exceed', example: '過幾日我就去探你。', example_meaning: 'I will visit you in a few days.' },
-        '畀': { jyutping: 'bei2', meaning: 'Give / Allow', example: '請畀我睇睇菜單。', example_meaning: 'Please give me a look at the menu.' },
-        '拎': { jyutping: 'ling1', meaning: 'Take / Carry / Pick up', example: '唔該幫我拎住呢個袋。', example_meaning: 'Please help me carry this bag.' },
-        '買': { jyutping: 'maai5', meaning: 'Buy', example: '我想買一個新手提電話。', example_meaning: 'I want to buy a new mobile phone.' },
-        '賣': { jyutping: 'maai6', meaning: 'Sell', example: '呢間舖頭賣嘅點心好正。', example_meaning: 'The dim sum sold in this shop is great.' },
-        '用': { jyutping: 'jung6', meaning: 'Use / Utility', example: '呢個應用程式好實用。', example_meaning: 'This application is very practical.' },
-        '見': { jyutping: 'gin3', meaning: 'See / Meet', example: '明天見！', example_meaning: 'See you tomorrow!' },
-        '學': { jyutping: 'hok6', meaning: 'Learn / Study', example: '學廣東話真係好有意思。', example_meaning: 'Learning Cantonese is really interesting.' },
-        '寫': { jyutping: 'se2', meaning: 'Write', example: '請寫落呢張紙度。', example_meaning: 'Please write it down on this paper.' },
-        '讀': { jyutping: 'duk6', meaning: 'Read / Study', example: '佢喺大學讀書。', example_meaning: 'He studies at university.' },
-        '開': { jyutping: 'hoi1', meaning: 'Open / Turn on / Start', example: '請幫我開門，唔該。', example_meaning: 'Please help me open the door, thank you.' },
-        '關': { jyutping: 'gwaan1', meaning: 'Close / Turn off', example: '記得關掉冷氣。', example_meaning: 'Remember to turn off the air conditioner.' },
-        '坐': { jyutping: 'co5', meaning: 'Sit / Ride (transport)', example: '請隨便坐。', example_meaning: 'Please take a seat freely.' },
-        '企': { jyutping: 'kei5', meaning: 'Stand', example: '佢企喺大門口等緊你。', example_meaning: 'He is standing at the front door waiting for you.' },
-        '瞓': { jyutping: 'fan3', meaning: 'Sleep', example: '時間好晚，快啲去瞓啦。', example_meaning: 'It\'s very late, go to sleep quickly.' },
-        '醒': { jyutping: 'sing2', meaning: 'Awake / Smart', example: '我今早七點鐘醒咗。', example_meaning: 'I woke up at 7 o\'clock this morning.' },
-        '家': { jyutping: 'gaa1', meaning: 'Family / Home', example: '歡迎嚟到我屋企！', example_meaning: 'Welcome to my home!' },
-        '年': { jyutping: 'nin4', meaning: 'Year', example: '新年快樂，萬事如意！', example_meaning: 'Happy New Year, all the best!' },
-        '時': { jyutping: 'si4', meaning: 'Time / Hour', example: '時間過得真快。', example_meaning: 'Time flies so fast.' },
-        '長': { jyutping: 'coeng4', meaning: 'Long / Length', example: '這條橋好長。', example_meaning: 'This bridge is very long.' },
-        '高': { jyutping: 'gou1', meaning: 'Tall / High', example: '香港有好多高樓大廈。', example_meaning: 'Hong Kong has many tall skyscrapers.' },
-        '新': { jyutping: 'san1', meaning: 'New / Fresh', example: '祝你新年勝舊年！', example_meaning: 'Wish you a happy and better new year!' },
-        '舊': { jyutping: 'gau6', meaning: 'Old / Former', example: '呢件舊衫好舒服。', example_meaning: 'This old clothes is very comfortable.' },
-        '快': { jyutping: 'faai3', meaning: 'Fast / Quick / Happy', example: '火車開得好快。', example_meaning: 'The train runs very fast.' },
-        '慢': { jyutping: 'maan6', meaning: 'Slow', example: '慢慢行，小心路滑。', example_meaning: 'Walk slowly, be careful of slippery roads.' },
-        '熱': { jyutping: 'jit6', meaning: 'Hot / Warm', example: '天氣好熱，想飲凍水。', example_meaning: 'The weather is hot, I want to drink cold water.' },
-        '冷': { jyutping: 'laang5', meaning: 'Cold / Chilly', example: '冬天嘅天氣好冷。', example_meaning: 'The winter weather is very cold.' },
-        '廣東話': { jyutping: 'gwong2 dung1 waa2', meaning: 'Cantonese language', example: '廣東話聽起來非常有韻味。', example_meaning: 'Cantonese sounds very melodic.' },
-        '香港': { jyutping: 'hoeng1 gong2', meaning: 'Hong Kong', example: '香港係一座美麗嘅城市。', example_meaning: 'Hong Kong is a beautiful city.' },
-        '開心': { jyutping: 'hoi1 sam1', meaning: 'Happy / Glad', example: '見到你真係好開心！', example_meaning: 'Really happy to see you!' },
-        '快樂': { jyutping: 'faai3 lok6', meaning: 'Joyful / Happy', example: '祝你生日快樂！', example_meaning: 'Wish you happy birthday!' },
-        '美麗': { jyutping: 'mei5 lai6', meaning: 'Beautiful', example: '維多利亞港嘅夜景好美麗。', example_meaning: 'Victoria Harbour\'s night view is beautiful.' },
-        '漂亮': { jyutping: 'piu1 loeng6', meaning: 'Pretty / Gorgeous', example: '呢朵花好漂亮。', example_meaning: 'This flower is very pretty.' },
-        '飲茶': { jyutping: 'jam2 caa4', meaning: 'Yum Cha / Drink tea & eat dim sum', example: '星期日我哋去飲茶啦。', example_meaning: 'Let\'s go for Yum Cha on Sunday.' },
-        '早晨': { jyutping: 'zou2 san4', meaning: 'Good morning', example: '早晨！今日精力充沛。', example_meaning: 'Good morning! Full of energy today.' },
-        '再見': { jyutping: 'zoi3 gin3', meaning: 'Goodbye', example: '聽日再見！', example_meaning: 'See you tomorrow!' }
+        // Tech & Places
+        '手提電話': { jyutping: 'sau2 tai4 din6 waa2', meaning_zh: '手提電話 / 智能手機', meaning: 'Mobile Phone / Smartphone', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80', example: '我部手提電話快要冇電喇。', example_meaning: 'My mobile phone is almost out of battery.' },
+        '香港': { jyutping: 'hoeng1 gong2', meaning_zh: '香港 / 港島九龍', meaning: 'Hong Kong', image: 'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80', example: '香港係一座美麗嘅城市。', example_meaning: 'Hong Kong is a beautiful city.' }
     };
 
     // Master Character Jyutping Map covering Hundreds of Common Chinese Characters
@@ -219,6 +141,16 @@ class CantoneseDictionary {
                 item.meaning = entry.meaning;
                 isGenerated = true;
             }
+            if (force || !item.meaning_zh || item.meaning_zh.trim() === '') {
+                item.meaning_zh = entry.meaning_zh || `${w} (${entry.meaning.split('/')[0].trim()})`;
+                isGenerated = true;
+            }
+            if (force || !item.image) {
+                if (entry.image) {
+                    item.image = entry.image;
+                    isGenerated = true;
+                }
+            }
             if (force || !item.example || item.example.trim() === '' || item.example.includes('呢個詞語「')) {
                 item.example = entry.example;
                 isGenerated = true;
@@ -236,6 +168,10 @@ class CantoneseDictionary {
                 }
                 if (force || !item.meaning || item.meaning.trim() === '' || item.meaning.includes('(Cantonese term)')) {
                     item.meaning = this.NUMBER_MAP[w];
+                    isGenerated = true;
+                }
+                if (force || !item.meaning_zh || item.meaning_zh.trim() === '') {
+                    item.meaning_zh = `數字 ${w}`;
                     isGenerated = true;
                 }
                 if (force || !item.example || item.example.trim() === '' || item.example.includes('呢個詞語「')) {
@@ -259,6 +195,11 @@ class CantoneseDictionary {
 
                 if (force || !item.meaning || item.meaning.trim() === '' || item.meaning.includes('(Cantonese term)')) {
                     item.meaning = `${w} (Vocabulary term)`;
+                    isGenerated = true;
+                }
+
+                if (force || !item.meaning_zh || item.meaning_zh.trim() === '') {
+                    item.meaning_zh = `${w} (粵語詞彙)`;
                     isGenerated = true;
                 }
 
@@ -1068,8 +1009,14 @@ class UIManager {
             card.innerHTML = `
                 <div>
                     <div class="flex items-start justify-between gap-3 mb-3">
-                        <span class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full text-xs font-semibold uppercase tracking-wider">${this.escapeHTML(p.category || 'General')}</span>
-                        <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-2.5 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full text-[11px] font-semibold uppercase tracking-wider">${this.escapeHTML(p.category || 'General')}</span>
+                            <span class="px-2 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded-full text-[11px] font-semibold">${this.escapeHTML(p.difficulty || 'Beginner')}</span>
+                        </div>
+                        <div class="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                            <button onclick="event.stopPropagation(); window.UIManager.likeProfile('${p.id}')" title="Upvote Community Deck" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                                👍 ${p.likes || 0}
+                            </button>
                             <button onclick="event.stopPropagation(); window.UIManager.exportProfileJSON('${p.id}')" title="Export Profile as JSON" class="p-1.5 text-slate-400 hover:text-sky-400 hover:bg-slate-800 rounded-lg transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             </button>
@@ -1078,7 +1025,11 @@ class UIManager {
                             </button>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-100 group-hover:text-sky-300 transition-colors mb-2 font-cantonese">${this.escapeHTML(p.name)}</h3>
+                    <h3 class="text-xl font-bold text-slate-100 group-hover:text-sky-300 transition-colors mb-1 font-cantonese">${this.escapeHTML(p.name)}</h3>
+                    <div class="text-[11px] text-slate-400 mb-2 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <span>Created by <strong class="text-slate-300 font-medium">${this.escapeHTML(p.author || 'Cantonese Community')}</strong></span>
+                    </div>
                     <p class="text-slate-400 text-xs line-clamp-2 mb-4 leading-relaxed">${this.escapeHTML(p.description || 'No description provided.')}</p>
                 </div>
 
@@ -1182,6 +1133,7 @@ class UIManager {
                 i.word.toLowerCase().includes(q) ||
                 i.jyutping.toLowerCase().includes(q) ||
                 i.meaning.toLowerCase().includes(q) ||
+                (i.meaning_zh && i.meaning_zh.toLowerCase().includes(q)) ||
                 (i.example && i.example.toLowerCase().includes(q))
             );
         }
@@ -1200,10 +1152,17 @@ class UIManager {
         items.forEach((item, index) => {
             const realIndex = this.activeProfile.items.findIndex(orig => orig.id === item.id);
 
+            const imageMarkup = item.image ? `
+                <div class="w-full h-36 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800/80 shadow-md">
+                    <img src="${this.escapeHTML(item.image)}" alt="${this.escapeHTML(item.word)}" class="w-full h-full object-cover">
+                </div>
+            ` : '';
+
             const card = document.createElement('div');
-            card.className = 'glass-card glass-card-hover rounded-2xl p-5 flex flex-col justify-between border border-slate-800/80 relative group';
+            card.className = 'glass-card glass-card-hover rounded-2xl p-5 flex flex-col justify-between border border-slate-800/80 relative group cursor-pointer';
             card.innerHTML = `
                 <div>
+                    ${imageMarkup}
                     <div class="flex items-center justify-between gap-2 mb-3">
                         <button onclick="event.stopPropagation(); window.UIManager.toggleMastered('${item.id}')" title="Toggle Mastered Status" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg border transition-all ${item.mastered ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'}">
                             ${item.mastered ? '✓ Mastered' : 'Learning'}
@@ -1218,7 +1177,7 @@ class UIManager {
                         </div>
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-1">
                         <h4 class="text-3xl font-extrabold text-slate-100 font-cantonese tracking-wide group-hover:text-sky-300 transition-colors">${this.escapeHTML(item.word)}</h4>
                     </div>
 
@@ -1226,7 +1185,10 @@ class UIManager {
                         <span class="jyutping-badge inline-block px-3 py-1 rounded-lg text-xs font-mono font-semibold">${this.escapeHTML(item.jyutping)}</span>
                     </div>
 
-                    <p class="text-slate-300 text-sm font-medium mb-3 line-clamp-2">${this.escapeHTML(item.meaning)}</p>
+                    <div class="space-y-1 mb-3">
+                        <p class="text-sky-300 text-xs font-bold font-cantonese truncate">🇨🇳 中文: ${this.escapeHTML(item.meaning_zh || item.word)}</p>
+                        <p class="text-slate-300 text-xs font-medium truncate">🇬🇧 EN: ${this.escapeHTML(item.meaning)}</p>
+                    </div>
                 </div>
 
                 <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
@@ -1250,7 +1212,23 @@ class UIManager {
 
         document.getElementById('modal-word').textContent = item.word;
         document.getElementById('modal-jyutping').textContent = item.jyutping;
-        document.getElementById('modal-meaning').textContent = item.meaning;
+        
+        const meaningZhElem = document.getElementById('modal-meaning-zh');
+        if (meaningZhElem) meaningZhElem.textContent = item.meaning_zh || item.word;
+
+        const meaningEnElem = document.getElementById('modal-meaning-en');
+        if (meaningEnElem) meaningEnElem.textContent = item.meaning || 'Meaning translation';
+
+        // Image Handling
+        const imgContainer = document.getElementById('modal-image-container');
+        const imgElem = document.getElementById('modal-image');
+        if (item.image && imgContainer && imgElem) {
+            imgElem.src = item.image;
+            imgContainer.classList.remove('hidden');
+        } else if (imgContainer) {
+            imgContainer.classList.add('hidden');
+        }
+
         document.getElementById('modal-example').textContent = item.example || 'No example sentence provided.';
         document.getElementById('modal-example-meaning').textContent = item.example_meaning || '';
 
@@ -1353,7 +1331,21 @@ class UIManager {
         document.getElementById('study-front-word').textContent = item.word;
         document.getElementById('study-front-jyutping').textContent = item.jyutping;
 
-        document.getElementById('study-back-meaning').textContent = item.meaning;
+        const studyImgContainer = document.getElementById('study-front-image-container');
+        const studyImgElem = document.getElementById('study-front-image');
+        if (item.image && studyImgContainer && studyImgElem) {
+            studyImgElem.src = item.image;
+            studyImgContainer.classList.remove('hidden');
+        } else if (studyImgContainer) {
+            studyImgContainer.classList.add('hidden');
+        }
+
+        const backZhElem = document.getElementById('study-back-meaning-zh');
+        if (backZhElem) backZhElem.textContent = item.meaning_zh || item.word;
+
+        const backEnElem = document.getElementById('study-back-meaning-en');
+        if (backEnElem) backEnElem.textContent = item.meaning || 'English Definition';
+
         document.getElementById('study-back-example').textContent = item.example || '';
         document.getElementById('study-back-example-meaning').textContent = item.example_meaning || '';
 
@@ -1666,6 +1658,36 @@ class UIManager {
         this.closeCreateProfileModal();
         this.showToast(`Profile "${name}" created successfully!`, 'success');
         this.switchView('profile-detail', { profileId: newProf.id });
+    }
+
+    async likeProfile(profileId) {
+        try {
+            const res = await fetch('/api/profiles/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profileId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const profiles = StorageManager.getProfiles();
+                const profile = profiles.find(p => p.id === profileId);
+                if (profile) {
+                    profile.likes = data.likes;
+                    StorageManager.saveProfiles(profiles);
+                }
+                this.showToast('Upvoted community deck! 👍', 'success');
+                this.renderDashboard();
+            }
+        } catch (e) {
+            console.error('Error upvoting deck:', e);
+            const profiles = StorageManager.getProfiles();
+            const profile = profiles.find(p => p.id === profileId);
+            if (profile) {
+                profile.likes = (profile.likes || 0) + 1;
+                StorageManager.saveProfiles(profiles);
+                this.renderDashboard();
+            }
+        }
     }
 
     exportProfileJSON(profileId) {
