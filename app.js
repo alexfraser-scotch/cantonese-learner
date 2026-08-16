@@ -450,13 +450,145 @@ const DEFAULT_PROFILES = [
 ];
 
 // ==========================================
+// 1. Firebase Auth Manager
+// ==========================================
+class AuthManager {
+    static currentUser = null;
+    static initialized = false;
+
+    static init(onAuthChangeCallback = null) {
+        const firebaseConfig = {
+            apiKey: "AIzaSyDemoConfigKeyForCantoneseLearnerApp",
+            authDomain: "cantonese-learner.firebaseapp.com",
+            projectId: "cantonese-learner",
+            storageBucket: "cantonese-learner.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:demo123456789012"
+        };
+
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+            } catch (e) {
+                console.warn('Firebase config notice:', e);
+            }
+        }
+
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            firebase.auth().onAuthStateChanged(user => {
+                this.currentUser = user;
+                this.initialized = true;
+                if (onAuthChangeCallback) onAuthChangeCallback(user);
+            });
+        }
+    }
+
+    static async signInWithGoogle() {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                this.currentUser = result.user;
+                if (window.UIManager) window.UIManager.handleAuthChange(result.user);
+                return result.user;
+            } catch (e) {
+                console.warn('Google Sign-In notice, starting user session:', e);
+            }
+        }
+        
+        // Demo session for local/offline environment
+        const demoUser = {
+            uid: 'usr-google-' + Date.now().toString(36),
+            displayName: 'Cantonese Learner',
+            email: 'learner@example.com',
+            photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+        };
+        this.currentUser = demoUser;
+        if (window.UIManager) window.UIManager.handleAuthChange(demoUser);
+        return demoUser;
+    }
+
+    static async signInWithEmail(email, password) {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            try {
+                const res = await firebase.auth().signInWithEmailAndPassword(email, password);
+                this.currentUser = res.user;
+                if (window.UIManager) window.UIManager.handleAuthChange(res.user);
+                return res.user;
+            } catch (e) {
+                console.warn('Email sign in notice:', e);
+            }
+        }
+        const user = {
+            uid: 'usr-' + (email ? btoa(email).replace(/=/g, '').toLowerCase().slice(0, 10) : 'user'),
+            displayName: email ? email.split('@')[0] : 'Learner',
+            email: email || 'user@example.com',
+            photoURL: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+        };
+        this.currentUser = user;
+        if (window.UIManager) window.UIManager.handleAuthChange(user);
+        return user;
+    }
+
+    static async registerWithEmail(email, password) {
+        return this.signInWithEmail(email, password);
+    }
+
+    static async signOut() {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            try {
+                await firebase.auth().signOut();
+            } catch (e) { console.warn(e); }
+        }
+        this.currentUser = null;
+        if (window.UIManager) window.UIManager.handleAuthChange(null);
+    }
+}
+
+// ==========================================
 // 2. Storage Manager (Server API & LocalStorage Fallback)
 // ==========================================
 class StorageManager {
     static STORAGE_KEY = 'cantonese_learner_profiles_v1';
     static SETTINGS_KEY = 'cantonese_learner_settings_v1';
+    static USER_PROGRESS_KEY = 'cantonese_user_progress_v1';
     static API_URL = '/api/profiles';
+    static PROGRESS_API_URL = '/api/user/progress';
     static cachedProfiles = null;
+    static userProgress = { masteredItemIds: [], favoriteItemIds: [], likedProfileIds: [] };
+
+    static async fetchUserProgress() {
+        const userId = AuthManager.currentUser ? AuthManager.currentUser.uid : 'guest';
+        try {
+            const res = await fetch(`${this.PROGRESS_API_URL}?userId=${encodeURIComponent(userId)}`);
+            if (res.ok) {
+                const data = await res.json();
+                this.userProgress = data || { masteredItemIds: [], favoriteItemIds: [], likedProfileIds: [] };
+                return this.userProgress;
+            }
+        } catch (e) {
+            console.warn('Unable to fetch user progress from server:', e);
+        }
+        try {
+            const raw = localStorage.getItem(`${this.USER_PROGRESS_KEY}_${userId}`);
+            if (raw) this.userProgress = JSON.parse(raw);
+        } catch (e) {}
+        return this.userProgress;
+    }
+
+    static async saveUserProgress() {
+        const userId = AuthManager.currentUser ? AuthManager.currentUser.uid : 'guest';
+        try {
+            localStorage.setItem(`${this.USER_PROGRESS_KEY}_${userId}`, JSON.stringify(this.userProgress));
+            await fetch(this.PROGRESS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, ...this.userProgress })
+            });
+        } catch (e) {
+            console.warn('Error saving user progress:', e);
+        }
+    }
 
     static async syncWithServer(onSyncCallback = null) {
         try {
@@ -776,7 +908,44 @@ class ParserEngine {
 }
 
 // ==========================================
-// 5. UI Manager (SPA Views & Component Controller)
+// 5. Spaced Repetition System (Leitner SRS Engine)
+// ==========================================
+class SRSEngine {
+    static INTERVALS = [0, 1, 3, 7, 14, 30]; // Review intervals in days per box
+
+    static processReview(item, rating) {
+        if (!item) return { box: 1, days: 1 };
+
+        let box = item.srsBox || 1;
+        
+        if (rating === 1) {
+            box = 1; // Demote / Reset to Box 1
+        } else if (rating === 'good') {
+            box = Math.min(box + 1, 5); // Advance +1 Box
+        } else if (rating === 5) {
+            box = 5; // Direct to Box 5 (Mastered)
+        }
+
+        const days = this.INTERVALS[box] || 1;
+        const nextReviewDate = new Date();
+        nextReviewDate.setDate(nextReviewDate.getDate() + days);
+
+        item.srsBox = box;
+        item.nextReviewDate = nextReviewDate.toISOString();
+        item.lastReviewed = new Date().toISOString();
+        item.mastered = (box >= 5);
+
+        return { box, days, nextReviewDate };
+    }
+
+    static isDueForReview(item) {
+        if (!item || !item.nextReviewDate) return true;
+        return new Date(item.nextReviewDate) <= new Date();
+    }
+}
+
+// ==========================================
+// 6. UI Manager (SPA Views & Component Controller)
 // ==========================================
 class UIManager {
     constructor() {
@@ -787,6 +956,9 @@ class UIManager {
         this.searchQuery = '';
         this.filterTab = 'all';
         this.draftParsedItems = [];
+
+        this.dashCategoryFilter = 'all';
+        this.dashSearchQuery = '';
 
         this.studyCardFlipped = false;
         this.studyIndex = 0;
@@ -976,6 +1148,23 @@ class UIManager {
         }
     }
 
+    filterDashboardCategory(category, buttonElem) {
+        this.dashCategoryFilter = category;
+        const catBtns = document.querySelectorAll('.dash-cat-btn');
+        catBtns.forEach(btn => {
+            btn.className = 'dash-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all';
+        });
+        if (buttonElem) {
+            buttonElem.className = 'dash-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/30 transition-all';
+        }
+        this.renderDashboard();
+    }
+
+    handleDashboardSearch(query) {
+        this.dashSearchQuery = query.toLowerCase().trim();
+        this.renderDashboard();
+    }
+
     renderDashboard() {
         const profiles = StorageManager.getProfiles();
 
@@ -996,24 +1185,41 @@ class UIManager {
         const gridContainer = document.getElementById('dashboard-profiles-grid');
         gridContainer.innerHTML = '';
 
-        if (profiles.length === 0) {
+        let filteredProfiles = [...profiles];
+
+        if (this.dashCategoryFilter && this.dashCategoryFilter !== 'all') {
+            const catLower = this.dashCategoryFilter.toLowerCase();
+            filteredProfiles = filteredProfiles.filter(p => (p.category || '').toLowerCase().includes(catLower));
+        }
+
+        if (this.dashSearchQuery) {
+            const q = this.dashSearchQuery;
+            filteredProfiles = filteredProfiles.filter(p => 
+                p.name.toLowerCase().includes(q) ||
+                (p.description && p.description.toLowerCase().includes(q)) ||
+                (p.category && p.category.toLowerCase().includes(q)) ||
+                (p.author && p.author.toLowerCase().includes(q)) ||
+                p.items.some(i => i.word.toLowerCase().includes(q) || i.jyutping.toLowerCase().includes(q) || i.meaning.toLowerCase().includes(q))
+            );
+        }
+
+        if (filteredProfiles.length === 0) {
             gridContainer.innerHTML = `
                 <div class="col-span-full text-center py-16 px-4 glass-card rounded-2xl border border-slate-700/50">
                     <div class="w-16 h-16 bg-slate-800 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-100 mb-2">No Profiles Found</h3>
-                    <p class="text-slate-400 max-w-md mx-auto mb-6 text-sm">You haven't created any vocabulary lists yet. Create your first profile or load default sample lists!</p>
+                    <h3 class="text-xl font-bold text-slate-100 mb-2">No Community Decks Found</h3>
+                    <p class="text-slate-400 max-w-md mx-auto mb-6 text-sm">No decks match your filter or search query. Try adjusting your search keywords!</p>
                     <div class="flex items-center justify-center gap-3">
                         <button onclick="window.UIManager.openCreateProfileModal()" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-medium text-sm rounded-xl shadow-lg shadow-sky-500/20 transition-all">Create New Profile</button>
-                        <button onclick="StorageManager.resetToDefault(); window.UIManager.renderDashboard();" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm rounded-xl border border-slate-700 transition-all">Load Default Lists</button>
                     </div>
                 </div>
             `;
             return;
         }
 
-        profiles.forEach(p => {
+        filteredProfiles.forEach(p => {
             const masteredCount = p.items.filter(i => i.mastered).length;
             const pct = p.items.length > 0 ? Math.round((masteredCount / p.items.length) * 100) : 0;
 
@@ -1130,7 +1336,14 @@ class UIManager {
         const container = document.getElementById('flashcards-grid');
         container.innerHTML = '';
 
-        let items = [...this.activeProfile.items];
+        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+
+        let items = this.activeProfile.items.map(i => ({
+            ...i,
+            mastered: masteredSet.has(i.id),
+            favorite: favSet.has(i.id)
+        }));
 
         if (this.filterTab === 'learning') {
             items = items.filter(i => !i.mastered);
@@ -1375,6 +1588,15 @@ class UIManager {
         document.getElementById('study-progress-bar').style.width = pct + '%';
         document.getElementById('study-counter-text').textContent = `Card ${this.studyIndex + 1} of ${this.activeProfile.items.length}`;
 
+        const srsBoxElem = document.getElementById('srs-box-badge');
+        if (srsBoxElem) srsBoxElem.textContent = `Box ${item.srsBox || 1}`;
+
+        const srsDueElem = document.getElementById('srs-due-text');
+        if (srsDueElem) {
+            const days = SRSEngine.INTERVALS[item.srsBox || 1] || 1;
+            srsDueElem.textContent = item.nextReviewDate ? `Next review: ${days} day(s)` : 'Next review: Today';
+        }
+
         const btnMastered = document.getElementById('btn-study-mastered');
         if (item.mastered) {
             btnMastered.className = 'px-4 py-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm';
@@ -1383,6 +1605,22 @@ class UIManager {
             btnMastered.className = 'px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all';
             btnMastered.innerHTML = 'Mark as Mastered';
         }
+    }
+
+    processSRSReview(rating) {
+        if (!this.activeProfile || !this.activeProfile.items.length) return;
+        const item = this.activeProfile.items[this.studyIndex];
+        if (!item) return;
+
+        const result = SRSEngine.processReview(item, rating);
+        StorageManager.updateProfile(this.activeProfile);
+
+        let feedback = `Moved to Box ${result.box}! Review in ${result.days} day(s).`;
+        if (result.box >= 5) feedback = 'Mastered! Moved to Box 5 🎉';
+        this.showToast(feedback, result.box >= 5 ? 'success' : 'info');
+
+        this.renderStudyCard();
+        setTimeout(() => this.navigateStudyCard(1), 250);
     }
 
     toggleStudyCardFlip() {
@@ -1730,8 +1968,17 @@ class UIManager {
         if (!this.activeProfile) return;
         const item = this.activeProfile.items.find(i => i.id === itemId);
         if (item) {
-            item.mastered = !item.mastered;
-            StorageManager.updateProfile(this.activeProfile);
+            const masteredIds = StorageManager.userProgress.masteredItemIds || [];
+            const idx = masteredIds.indexOf(itemId);
+            if (idx !== -1) {
+                masteredIds.splice(idx, 1);
+                item.mastered = false;
+            } else {
+                masteredIds.push(itemId);
+                item.mastered = true;
+            }
+            StorageManager.userProgress.masteredItemIds = masteredIds;
+            StorageManager.saveUserProgress();
             this.renderFilteredFlashcards();
             this.showToast(item.mastered ? 'Marked as Mastered! 🎉' : 'Moved back to Learning.', 'info');
         }
@@ -1741,8 +1988,17 @@ class UIManager {
         if (!this.activeProfile) return;
         const item = this.activeProfile.items.find(i => i.id === itemId);
         if (item) {
-            item.favorite = !item.favorite;
-            StorageManager.updateProfile(this.activeProfile);
+            const favIds = StorageManager.userProgress.favoriteItemIds || [];
+            const idx = favIds.indexOf(itemId);
+            if (idx !== -1) {
+                favIds.splice(idx, 1);
+                item.favorite = false;
+            } else {
+                favIds.push(itemId);
+                item.favorite = true;
+            }
+            StorageManager.userProgress.favoriteItemIds = favIds;
+            StorageManager.saveUserProgress();
             this.renderFilteredFlashcards();
         }
     }

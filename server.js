@@ -301,6 +301,33 @@ function writeProfiles(profiles) {
     }
 }
 
+const USER_PROGRESS_FILE = path.join(DATA_DIR, 'user_progress.json');
+
+function readUserProgressMap() {
+    ensureDataFile();
+    if (!fs.existsSync(USER_PROGRESS_FILE)) {
+        fs.writeFileSync(USER_PROGRESS_FILE, JSON.stringify({}, null, 2), 'utf-8');
+    }
+    try {
+        const raw = fs.readFileSync(USER_PROGRESS_FILE, 'utf-8');
+        return JSON.parse(raw);
+    } catch (e) {
+        console.error('Error reading user progress file:', e);
+        return {};
+    }
+}
+
+function writeUserProgressMap(map) {
+    ensureDataFile();
+    try {
+        fs.writeFileSync(USER_PROGRESS_FILE, JSON.stringify(map, null, 2), 'utf-8');
+        return true;
+    } catch (e) {
+        console.error('Error writing user progress file:', e);
+        return false;
+    }
+}
+
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
@@ -326,6 +353,43 @@ const server = http.createServer((req, res) => {
 
     const urlParts = req.url.split('?');
     const pathName = urlParts[0];
+
+    // ==========================================
+    // API ENDPOINT: USER PROGRESS (/api/user/progress)
+    // ==========================================
+    if (pathName === '/api/user/progress') {
+        if (req.method === 'GET') {
+            const queryParams = new URLSearchParams(urlParts[1] || '');
+            const userId = queryParams.get('userId') || 'anonymous';
+            const progressMap = readUserProgressMap();
+            const userProgress = progressMap[userId] || { masteredItemIds: [], favoriteItemIds: [], likedProfileIds: [] };
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify(userProgress));
+            return;
+        } else if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body);
+                    const userId = data.userId || 'anonymous';
+                    const progressMap = readUserProgressMap();
+                    progressMap[userId] = {
+                        masteredItemIds: data.masteredItemIds || [],
+                        favoriteItemIds: data.favoriteItemIds || [],
+                        likedProfileIds: data.likedProfileIds || []
+                    };
+                    writeUserProgressMap(progressMap);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, progress: progressMap[userId] }));
+                } catch (err) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+    }
 
     // ==========================================
     // API ENDPOINT: LIKE COMMUNITY DECK
