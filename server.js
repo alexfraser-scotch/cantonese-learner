@@ -226,11 +226,64 @@ function ensureDataFile() {
     }
 }
 
+const IMAGE_MAP = {
+    '你好': 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+    '多謝': 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80',
+    '唔該': 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80',
+    '早晨': 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
+    '再見': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+    '食咗飯未？': 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+    '冇問題': 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
+    '呢個幾多錢？': 'https://images.unsplash.com/photo-1556742049-0a675659850e?auto=format&fit=crop&w=600&q=80',
+    '凍檸茶': 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
+    '蛋撻': 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80',
+    '點心': 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80',
+    '埋單': 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80',
+    '菠蘿包': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80',
+    '叉燒包': 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80',
+    '手提電話': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80',
+    '網絡': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
+    '應用程式': 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80',
+    '充電器': 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80'
+};
+
+const MEANING_ZH_MAP = {
+    '你好': '你好 / 招呼問候',
+    '多謝': '多謝 / 感謝致謝',
+    '唔該': '唔該 / 勞煩客氣',
+    '早晨': '早晨 / 早上好',
+    '再見': '再見 / 告別告辭',
+    '食咗飯未？': '食飯未 / 日常問候',
+    '冇問題': '冇問題 / 沒關係',
+    '呢個幾多錢？': '多少錢 / 詢問價格',
+    '凍檸茶': '凍檸茶 / 冰檸檬茶',
+    '蛋撻': '蛋撻 / 酥皮雞蛋塔',
+    '點心': '點心 / 飲茶點心',
+    '埋單': '埋單 / 結賬買單',
+    '菠蘿包': '菠蘿包 / 港式菠蘿油',
+    '叉燒包': '叉燒包 / 港式點心包子',
+    '手提電話': '手提電話 / 智能手機',
+    '網絡': '網絡 / 互聯網',
+    '應用程式': '應用程式 / 手機App',
+    '充電器': '充電器 / 行動電源'
+};
+
 function readProfiles() {
     ensureDataFile();
     try {
         const raw = fs.readFileSync(PROFILES_FILE, 'utf-8');
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        return parsed.map((p, idx) => ({
+            author: p.author || 'Cantonese Community',
+            difficulty: p.difficulty || (idx % 2 === 0 ? 'Beginner' : 'Intermediate'),
+            likes: typeof p.likes === 'number' ? p.likes : 12 + idx * 5,
+            ...p,
+            items: (p.items || []).map(item => ({
+                ...item,
+                meaning_zh: item.meaning_zh || MEANING_ZH_MAP[item.word] || `${item.word} (廣東話詞彙)`,
+                image: item.image || IMAGE_MAP[item.word] || `https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80`
+            }))
+        }));
     } catch (e) {
         console.error('Error reading profiles file:', e);
         return DEFAULT_PROFILES;
@@ -275,6 +328,34 @@ const server = http.createServer((req, res) => {
     const pathName = urlParts[0];
 
     // ==========================================
+    // API ENDPOINT: LIKE COMMUNITY DECK
+    // ==========================================
+    if (pathName === '/api/profiles/like' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const currentProfiles = readProfiles();
+                const profile = currentProfiles.find(p => p.id === data.profileId);
+                if (profile) {
+                    profile.likes = (profile.likes || 0) + 1;
+                    writeProfiles(currentProfiles);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, likes: profile.likes, profileId: profile.id }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Profile not found' }));
+                }
+            } catch (err) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+            }
+        });
+        return;
+    }
+
+    // ==========================================
     // API ENDPOINTS FOR SHARED PUBLIC PROFILES
     // ==========================================
     if (pathName === '/api/profiles') {
@@ -294,6 +375,9 @@ const server = http.createServer((req, res) => {
                     if (Array.isArray(data)) {
                         currentProfiles = data;
                     } else if (data.action === 'create' && data.profile) {
+                        if (!data.profile.author) data.profile.author = 'Community Learner';
+                        if (!data.profile.likes) data.profile.likes = 1;
+                        if (!data.profile.difficulty) data.profile.difficulty = 'Beginner';
                         currentProfiles.unshift(data.profile);
                     } else if (data.action === 'update' && data.profile) {
                         const idx = currentProfiles.findIndex(p => p.id === data.profile.id);
@@ -304,6 +388,9 @@ const server = http.createServer((req, res) => {
                     } else if (data.action === 'reset') {
                         currentProfiles = DEFAULT_PROFILES;
                     } else if (data.name && data.items) {
+                        if (!data.author) data.author = 'Community Learner';
+                        if (!data.likes) data.likes = 1;
+                        if (!data.difficulty) data.difficulty = 'Beginner';
                         currentProfiles.unshift(data);
                     }
 
@@ -350,6 +437,17 @@ const server = http.createServer((req, res) => {
     });
 });
 
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+    server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = {
+    server,
+    ensureDataFile,
+    readProfiles,
+    writeProfiles,
+    DEFAULT_PROFILES
+};
+
