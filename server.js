@@ -454,7 +454,15 @@ const server = http.createServer((req, res) => {
             req.on('data', chunk => { body += chunk.toString(); });
             req.on('end', () => {
                 try {
-                    const data = JSON.parse(body);
+                    let data = JSON.parse(body);
+                    if (data && data.data && typeof data.data === 'string') {
+                        try {
+                            const decoded = Buffer.from(data.data, 'base64').toString('utf-8');
+                            data = JSON.parse(decoded);
+                        } catch (b64Err) {
+                            console.warn('Failed to parse base64 payload:', b64Err);
+                        }
+                    }
                     let currentProfiles = readProfiles();
 
                     if (Array.isArray(data)) {

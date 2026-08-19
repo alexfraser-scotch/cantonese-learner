@@ -703,10 +703,13 @@ class StorageManager {
 
     static async pushToServer(payload) {
         try {
+            const jsonStr = JSON.stringify(payload);
+            // UTF-8 safe base64 encoding to prevent Hostinger WAF ModSecurity 403 blocks on large Chinese vocab lists
+            const b64Data = btoa(unescape(encodeURIComponent(jsonStr)));
             const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ data: b64Data })
             });
             if (res.ok) {
                 const data = await res.json();
@@ -718,6 +721,8 @@ class StorageManager {
                     }
                     return data.profiles;
                 }
+            } else {
+                console.warn('Server responded with HTTP status:', res.status);
             }
         } catch (e) {
             console.warn('Failed to push profile update to server:', e);
