@@ -711,6 +711,7 @@ class StorageManager {
             if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.profiles) {
+                    this.cachedProfiles = data.profiles;
                     this.saveLocalProfiles(data.profiles);
                     if (window.UIManager && window.UIManager.currentView === 'dashboard') {
                         window.UIManager.renderDashboard();
@@ -740,14 +741,14 @@ class StorageManager {
         const localProfiles = this.getProfiles();
 
         if (Array.isArray(serverProfiles) && serverProfiles.length > 0) {
-            // Smart Merge: preserve local profiles created on this device that haven't reached server yet
+            // Upload any pending local drafts created on this device that have not reached server
             const serverIds = new Set(serverProfiles.map(p => p.id));
-            const unsyncedProfiles = localProfiles.filter(p => !serverIds.has(p.id));
+            const unsyncedDrafts = localProfiles.filter(p => p.isLocalDraft && !serverIds.has(p.id));
 
-            for (const unsynced of unsyncedProfiles) {
-                console.log('Uploading unsynced local profile to server:', unsynced.name);
-                await this.pushToServer({ action: 'create', profile: unsynced });
-                serverProfiles.unshift(unsynced);
+            for (const draft of unsyncedDrafts) {
+                delete draft.isLocalDraft;
+                const result = await this.pushToServer({ action: 'create', profile: draft });
+                if (result) serverProfiles = result;
             }
 
             this.cachedProfiles = serverProfiles;
@@ -776,6 +777,7 @@ class StorageManager {
             difficulty: 'Beginner',
             likes: 1,
             createdAt: new Date().toISOString(),
+            isLocalDraft: true,
             items: items || []
         };
 
@@ -783,8 +785,12 @@ class StorageManager {
         profiles.unshift(newProfile);
         this.saveLocalProfiles(profiles);
 
-        // Await server upload to guarantee server persistence!
-        await this.pushToServer({ action: 'create', profile: newProfile });
+        // Upload to server and wait for confirmation
+        const updatedServerList = await this.pushToServer({ action: 'create', profile: newProfile });
+        if (updatedServerList) {
+            delete newProfile.isLocalDraft;
+        }
+
         return newProfile;
     }
 

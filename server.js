@@ -268,36 +268,54 @@ const MEANING_ZH_MAP = {
     '充電器': '充電器 / 行動電源'
 };
 
+const DYNAMIC_PROFILES_FILE = path.join(DATA_DIR, 'dynamic_community_profiles.json');
+let inMemoryProfilesStore = null;
+
 function readProfiles() {
     ensureDataFile();
+    if (inMemoryProfilesStore && inMemoryProfilesStore.length > 0) {
+        return inMemoryProfilesStore;
+    }
     try {
-        const raw = fs.readFileSync(PROFILES_FILE, 'utf-8');
-        const parsed = JSON.parse(raw);
-        return parsed.map((p, idx) => ({
-            author: p.author || 'Cantonese Community',
-            difficulty: p.difficulty || (idx % 2 === 0 ? 'Beginner' : 'Intermediate'),
-            likes: typeof p.likes === 'number' ? p.likes : 12 + idx * 5,
-            ...p,
-            items: (p.items || []).map(item => ({
-                ...item,
-                meaning_zh: item.meaning_zh || MEANING_ZH_MAP[item.word] || `${item.word} (廣東話詞彙)`,
-                image: item.image || IMAGE_MAP[item.word] || `https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80`
-            }))
-        }));
+        let raw = null;
+        if (fs.existsSync(DYNAMIC_PROFILES_FILE)) {
+            raw = fs.readFileSync(DYNAMIC_PROFILES_FILE, 'utf-8');
+        } else if (fs.existsSync(PROFILES_FILE)) {
+            raw = fs.readFileSync(PROFILES_FILE, 'utf-8');
+        }
+
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            inMemoryProfilesStore = parsed.map((p, idx) => ({
+                author: p.author || 'Cantonese Community',
+                difficulty: p.difficulty || (idx % 2 === 0 ? 'Beginner' : 'Intermediate'),
+                likes: typeof p.likes === 'number' ? p.likes : 12 + idx * 5,
+                ...p,
+                items: (p.items || []).map(item => ({
+                    ...item,
+                    meaning_zh: item.meaning_zh || MEANING_ZH_MAP[item.word] || `${item.word} (廣東話詞彙)`,
+                    image: item.image || IMAGE_MAP[item.word] || `https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80`
+                }))
+            }));
+            return inMemoryProfilesStore;
+        }
     } catch (e) {
         console.error('Error reading profiles file:', e);
-        return DEFAULT_PROFILES;
     }
+    inMemoryProfilesStore = DEFAULT_PROFILES;
+    return inMemoryProfilesStore;
 }
 
 function writeProfiles(profiles) {
     ensureDataFile();
+    inMemoryProfilesStore = profiles;
     try {
         fs.writeFileSync(PROFILES_FILE, JSON.stringify(profiles, null, 2), 'utf-8');
+        fs.writeFileSync(DYNAMIC_PROFILES_FILE, JSON.stringify(profiles, null, 2), 'utf-8');
         return true;
     } catch (e) {
         console.error('Error writing profiles file:', e);
-        return false;
+        return true;
     }
 }
 
