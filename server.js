@@ -423,6 +423,9 @@ const server = http.createServer((req, res) => {
     // API ENDPOINTS FOR SHARED PUBLIC PROFILES
     // ==========================================
     if (pathName === '/api/profiles') {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         if (req.method === 'GET') {
             const profiles = readProfiles();
             res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -442,7 +445,12 @@ const server = http.createServer((req, res) => {
                         if (!data.profile.author) data.profile.author = 'Community Learner';
                         if (!data.profile.likes) data.profile.likes = 1;
                         if (!data.profile.difficulty) data.profile.difficulty = 'Beginner';
-                        currentProfiles.unshift(data.profile);
+                        const existingIdx = currentProfiles.findIndex(p => p.id === data.profile.id);
+                        if (existingIdx !== -1) {
+                            currentProfiles[existingIdx] = data.profile;
+                        } else {
+                            currentProfiles.unshift(data.profile);
+                        }
                     } else if (data.action === 'update' && data.profile) {
                         const idx = currentProfiles.findIndex(p => p.id === data.profile.id);
                         if (idx !== -1) currentProfiles[idx] = data.profile;
@@ -455,7 +463,12 @@ const server = http.createServer((req, res) => {
                         if (!data.author) data.author = 'Community Learner';
                         if (!data.likes) data.likes = 1;
                         if (!data.difficulty) data.difficulty = 'Beginner';
-                        currentProfiles.unshift(data);
+                        const existingIdx = currentProfiles.findIndex(p => p.id === data.id);
+                        if (existingIdx !== -1) {
+                            currentProfiles[existingIdx] = data;
+                        } else {
+                            currentProfiles.unshift(data);
+                        }
                     }
 
                     writeProfiles(currentProfiles);

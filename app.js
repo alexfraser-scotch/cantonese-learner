@@ -703,7 +703,7 @@ class StorageManager {
 
     static async pushToServer(payload) {
         try {
-            const res = await fetch(this.API_URL, {
+            const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -712,11 +712,45 @@ class StorageManager {
                 const data = await res.json();
                 if (data.success && data.profiles) {
                     this.saveLocalProfiles(data.profiles);
+                    if (window.UIManager && window.UIManager.currentView === 'dashboard') {
+                        window.UIManager.renderDashboard();
+                    }
                 }
             }
         } catch (e) {
             console.warn('Failed to push profile update to server:', e);
         }
+    }
+
+    static async syncWithServer(onSyncCallback = null) {
+        try {
+            const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
+                headers: { 'Cache-Control': 'no-cache' }
+            });
+            if (res.ok) {
+                const profiles = await res.json();
+                if (Array.isArray(profiles) && profiles.length > 0) {
+                    this.cachedProfiles = profiles;
+                    this.saveLocalProfiles(profiles);
+                    if (onSyncCallback) onSyncCallback(profiles);
+                    return profiles;
+                }
+            }
+        } catch (e) {
+            console.warn('Unable to sync profiles from server, using local storage cache:', e);
+        }
+        return this.getProfiles();
+    }
+
+    static startAutoSync(intervalMs = 10000) {
+        if (this.syncInterval) clearInterval(this.syncInterval);
+        this.syncInterval = setInterval(() => {
+            this.syncWithServer((profiles) => {
+                if (window.UIManager && window.UIManager.currentView === 'dashboard') {
+                    window.UIManager.renderDashboard();
+                }
+            });
+        }, intervalMs);
     }
 
     static getProfileById(id) {
@@ -726,11 +760,15 @@ class StorageManager {
 
     static createProfile(name, category, description, items) {
         const profiles = this.getProfiles();
+        const authorName = AuthManager.currentUser ? (AuthManager.currentUser.displayName || (AuthManager.currentUser.email ? AuthManager.currentUser.email.split('@')[0] : 'Learner')) : 'Community Learner';
         const newProfile = {
             id: 'prof-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
             name: name || 'Untitled Profile',
             category: category || 'General',
             description: description || '',
+            author: authorName,
+            difficulty: 'Beginner',
+            likes: 1,
             createdAt: new Date().toISOString(),
             items: items || []
         };
@@ -1169,10 +1207,12 @@ class UIManager {
         this.navDashboardBtn = document.getElementById('nav-dashboard-btn');
         this.navNewProfileBtn = document.getElementById('nav-new-profile-btn');
         this.heroCreateProfileBtn = document.getElementById('hero-create-profile-btn');
+        this.navSyncBtn = document.getElementById('nav-sync-btn');
         this.navResetBtn = document.getElementById('nav-reset-btn');
 
         this.renderDashboard();
         StorageManager.syncWithServer(() => this.renderDashboard());
+        StorageManager.startAutoSync(10000);
     }
 
     bindEvents() {
@@ -1184,6 +1224,13 @@ class UIManager {
         }
         if (this.heroCreateProfileBtn) {
             this.heroCreateProfileBtn.addEventListener('click', () => this.openCreateProfileModal());
+        }
+        if (this.navSyncBtn) {
+            this.navSyncBtn.addEventListener('click', async () => {
+                this.showToast('Syncing latest community decks...', 'info');
+                await StorageManager.syncWithServer(() => this.renderDashboard());
+                this.showToast('Community decks synced!', 'success');
+            });
         }
         if (this.navResetBtn) {
             this.navResetBtn.addEventListener('click', () => {
