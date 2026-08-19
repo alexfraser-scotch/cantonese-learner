@@ -742,17 +742,6 @@ class StorageManager {
         return this.getProfiles();
     }
 
-    static startAutoSync(intervalMs = 10000) {
-        if (this.syncInterval) clearInterval(this.syncInterval);
-        this.syncInterval = setInterval(() => {
-            this.syncWithServer((profiles) => {
-                if (window.UIManager && window.UIManager.currentView === 'dashboard') {
-                    window.UIManager.renderDashboard();
-                }
-            });
-        }, intervalMs);
-    }
-
     static getProfileById(id) {
         const profiles = this.getProfiles();
         return profiles.find(p => p.id === id);
@@ -1212,7 +1201,6 @@ class UIManager {
 
         this.renderDashboard();
         StorageManager.syncWithServer(() => this.renderDashboard());
-        StorageManager.startAutoSync(10000);
     }
 
     bindEvents() {
