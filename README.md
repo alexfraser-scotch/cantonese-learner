@@ -14,7 +14,8 @@ An interactive, open-source Cantonese Vocabulary Learning application featuring 
 - 🎯 **Cantonese Tone Ear Training Quiz:** Interactive listening drills to practice distinguishing the 6 Cantonese pitch contours (Tone 1 – Tone 6).
 - 🧠 **Leitner Spaced Repetition (SRS):** Smart 5-box memory retention algorithm (1, 3, 7, 14, 30 days) with review ratings (🔴 Again, 🟡 Good, 🟢 Easy).
 - 🎵 **Cantonese 6-Tone Pronunciation Chart:** Interactive audio pitch guide covering all 6 Jyutping tones (詩 `si1`, 史 `si2`, 試 `si3`, 時 `si4`, 市 `si5`, 事 `si6`).
-- 🔊 **Web Speech & Audio Synthesis:** Hear native-style Cantonese pronunciation using browser SpeechSynthesis (`zh-HK`) with customized voice fallback.
+- 🎙️ **Voice Recording & Audio Comparison:** Live microphone recording using HTML5 `MediaRecorder` API allowing learners to record their own Cantonese pronunciation and compare it against native TTS audio.
+- 📊 **SRS Retention Analytics Bar:** Dashboard stats bar visualizing card distribution across Leitner Box 1–5 retention tiers and tracking cards due for review today.
 - 🌐 **Crowdsourced Deck & Profile Sharing:** Public community REST API allowing users to create, upvote (👍), upload, and share custom Cantonese vocabulary decks.
 - 🎯 **Mastery & Favoriting System:** Track your learning progress with card completion toggles and favorite quick-lists.
 - ⚡ **Lightweight & Dependency-Free:** Built with vanilla modern JavaScript, HTML5/CSS3, and native Node.js HTTP API server.

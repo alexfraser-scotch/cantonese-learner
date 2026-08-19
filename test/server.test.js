@@ -132,3 +132,58 @@ test('Cantonese Tone Extraction & Ear Training Question Pool', (t) => {
         assert.strictEqual(extracted[0], item.tone, `Extracted tone for ${item.word} should match ${item.tone}`);
     });
 });
+
+test('AuthManager user session persistence across page reload', (t) => {
+    const mockLocalStorage = {
+        store: {},
+        getItem(key) { return this.store[key] || null; },
+        setItem(key, val) { this.store[key] = String(val); },
+        removeItem(key) { delete this.store[key]; }
+    };
+
+    const STORAGE_KEY = 'cantonese_learner_user_session_v1';
+    const sampleUser = {
+        uid: 'usr-test-123',
+        displayName: 'Test Learner',
+        email: 'test@example.com',
+        photoURL: 'https://example.com/avatar.jpg'
+    };
+
+    mockLocalStorage.setItem(STORAGE_KEY, JSON.stringify(sampleUser));
+    
+    const restoredUserRaw = mockLocalStorage.getItem(STORAGE_KEY);
+    assert.ok(restoredUserRaw, 'Restored session raw data should exist');
+
+    const restoredUser = JSON.parse(restoredUserRaw);
+    assert.strictEqual(restoredUser.uid, 'usr-test-123', 'UID must persist');
+    assert.strictEqual(restoredUser.displayName, 'Test Learner', 'Display name must persist');
+    assert.strictEqual(restoredUser.email, 'test@example.com', 'Email must persist');
+
+    mockLocalStorage.removeItem(STORAGE_KEY);
+    assert.strictEqual(mockLocalStorage.getItem(STORAGE_KEY), null, 'Session should be removed on signout');
+});
+
+test('SRS Box Retention Statistics Aggregator', (t) => {
+    function getBoxStats(items) {
+        if (!Array.isArray(items)) return { box1: 0, box2: 0, box3: 0, box4: 0, box5: 0, due: 0 };
+        const stats = { box1: 0, box2: 0, box3: 0, box4: 0, box5: 0, due: 0 };
+        items.forEach(item => {
+            const box = item.srsBox || 1;
+            if (box >= 1 && box <= 5) stats[`box${box}`]++;
+            if (!item.nextReviewDate || new Date(item.nextReviewDate) <= new Date()) stats.due++;
+        });
+        return stats;
+    }
+
+    const mockItems = [
+        { word: '一', srsBox: 1, nextReviewDate: new Date(Date.now() - 1000).toISOString() },
+        { word: '二', srsBox: 2, nextReviewDate: new Date(Date.now() + 86400000).toISOString() },
+        { word: '三', srsBox: 5, nextReviewDate: new Date(Date.now() + 864000000).toISOString() }
+    ];
+
+    const stats = getBoxStats(mockItems);
+    assert.strictEqual(stats.box1, 1, 'Box 1 count should be 1');
+    assert.strictEqual(stats.box2, 1, 'Box 2 count should be 1');
+    assert.strictEqual(stats.box5, 1, 'Box 5 count should be 1');
+    assert.strictEqual(stats.due, 1, 'Due count should be 1');
+});

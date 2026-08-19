@@ -162,6 +162,24 @@
                         <span id="stat-mastery-rate" class="text-2xl font-bold text-amber-400">0%</span>
                     </div>
                 </div>
+
+                <!-- Spaced Repetition (SRS 5-Box) Analytics Bar -->
+                <div class="mt-4 p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-xl text-lg">🧠</span>
+                        <div>
+                            <span class="text-xs font-bold text-slate-200 block">Leitner SRS Memory Retention</span>
+                            <span class="text-[11px] text-slate-400">Card distribution across memory retention boxes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 text-xs font-mono font-bold">
+                        <span class="px-2.5 py-1 bg-rose-500/10 text-rose-300 border border-rose-500/20 rounded-lg" title="Box 1 (Review Daily)">Box 1: <span id="srs-box1-count">0</span></span>
+                        <span class="px-2.5 py-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-lg" title="Box 2-4 (Learning)">Box 2-4: <span id="srs-box24-count">0</span></span>
+                        <span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 rounded-lg" title="Box 5 (Mastered)">Box 5: <span id="srs-box5-count">0</span></span>
+                        <span id="srs-due-badge" class="px-3 py-1 bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded-lg">0 Due Today</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Profiles Section Header & Community Filter Toolbar -->
@@ -643,6 +661,26 @@
                     <p id="modal-example" class="text-base font-medium text-sky-300 font-cantonese">Example Sentence</p>
                     <p id="modal-example-meaning" class="text-xs text-slate-400">Example sentence translation</p>
                 </div>
+
+                <!-- Voice Recorder & Audio Comparison Widget -->
+                <div class="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-emerald-400 text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 016 0v6a3 3 0 01-3 3z"/></svg>
+                            Voice Practice & Audio Comparison (MediaRecorder)
+                        </span>
+                        <span id="recording-status-badge" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-400 rounded-md font-mono">Ready</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="btn-record-voice" onclick="window.UIManager.toggleVoiceRecording()" class="flex-1 py-2 px-3 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                            🎙️ Record My Voice
+                        </button>
+                        <button id="btn-play-recording" onclick="window.UIManager.playUserRecording()" disabled class="flex-1 py-2 px-3 bg-slate-800 text-slate-500 border border-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed">
+                            ▶️ Play Recording
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
@@ -850,6 +888,6 @@
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none max-w-sm w-full"></div>
 
     <!-- App JavaScript File -->
-    <script src="app.js?v=11"></script>
+    <script src="app.js?v=12"></script>
 </body>
 </html>

@@ -455,8 +455,62 @@ const DEFAULT_PROFILES = [
 class AuthManager {
     static currentUser = null;
     static initialized = false;
+    static STORAGE_KEY = 'cantonese_learner_user_session_v1';
+
+    static saveSession(user) {
+        try {
+            if (user) {
+                const sessionUser = {
+                    uid: user.uid,
+                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Learner'),
+                    email: user.email || '',
+                    photoURL: user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+                };
+                const val = JSON.stringify(sessionUser);
+                localStorage.setItem(this.STORAGE_KEY, val);
+                sessionStorage.setItem(this.STORAGE_KEY, val);
+            }
+        } catch (e) {
+            console.warn('Failed to save user session:', e);
+        }
+    }
+
+    static clearSession() {
+        try {
+            localStorage.removeItem(this.STORAGE_KEY);
+            sessionStorage.removeItem(this.STORAGE_KEY);
+        } catch (e) {
+            console.warn('Failed to clear user session:', e);
+        }
+    }
+
+    static loadSession() {
+        try {
+            const savedUser = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
+            if (savedUser) {
+                this.currentUser = JSON.parse(savedUser);
+                return this.currentUser;
+            }
+        } catch (e) {
+            console.warn('Failed to load user session:', e);
+        }
+        return null;
+    }
 
     static init(onAuthChangeCallback = null) {
+        const saved = this.loadSession();
+
+        if (this.initialized) {
+            if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser || saved);
+            return;
+        }
+
+        this.initialized = true;
+
+        if (saved && onAuthChangeCallback) {
+            onAuthChangeCallback(saved);
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyDemoConfigKeyForCantoneseLearnerApp",
             authDomain: "cantonese-learner.firebaseapp.com",
@@ -476,9 +530,18 @@ class AuthManager {
 
         if (typeof firebase !== 'undefined' && firebase.auth) {
             firebase.auth().onAuthStateChanged(user => {
-                this.currentUser = user;
-                this.initialized = true;
-                if (onAuthChangeCallback) onAuthChangeCallback(user);
+                if (user) {
+                    this.currentUser = user;
+                    this.saveSession(user);
+                } else {
+                    const existingSession = this.loadSession();
+                    if (existingSession) {
+                        this.currentUser = existingSession;
+                    } else {
+                        this.currentUser = null;
+                    }
+                }
+                if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser);
             });
         }
     }
@@ -489,6 +552,7 @@ class AuthManager {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await firebase.auth().signInWithPopup(provider);
                 this.currentUser = result.user;
+                this.saveSession(result.user);
                 if (window.UIManager) window.UIManager.handleAuthChange(result.user);
                 return result.user;
             } catch (e) {
@@ -504,6 +568,7 @@ class AuthManager {
             photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
         };
         this.currentUser = demoUser;
+        this.saveSession(demoUser);
         if (window.UIManager) window.UIManager.handleAuthChange(demoUser);
         return demoUser;
     }
@@ -513,6 +578,7 @@ class AuthManager {
             try {
                 const res = await firebase.auth().signInWithEmailAndPassword(email, password);
                 this.currentUser = res.user;
+                this.saveSession(res.user);
                 if (window.UIManager) window.UIManager.handleAuthChange(res.user);
                 return res.user;
             } catch (e) {
@@ -526,6 +592,7 @@ class AuthManager {
             photoURL: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
         };
         this.currentUser = user;
+        this.saveSession(user);
         if (window.UIManager) window.UIManager.handleAuthChange(user);
         return user;
     }
@@ -541,6 +608,7 @@ class AuthManager {
             } catch (e) { console.warn(e); }
         }
         this.currentUser = null;
+        this.clearSession();
         if (window.UIManager) window.UIManager.handleAuthChange(null);
     }
 }
@@ -969,6 +1037,80 @@ class SRSEngine {
         if (!item || !item.nextReviewDate) return true;
         return new Date(item.nextReviewDate) <= new Date();
     }
+
+    static getBoxStats(items) {
+        if (!Array.isArray(items)) return { box1: 0, box2: 0, box3: 0, box4: 0, box5: 0, due: 0 };
+        const stats = { box1: 0, box2: 0, box3: 0, box4: 0, box5: 0, due: 0 };
+        items.forEach(item => {
+            const box = item.srsBox || 1;
+            if (box >= 1 && box <= 5) stats[`box${box}`]++;
+            if (this.isDueForReview(item)) stats.due++;
+        });
+        return stats;
+    }
+}
+
+// ==========================================
+// 5.5 Voice Recorder Engine (MediaRecorder API)
+// ==========================================
+class VoiceRecorderEngine {
+    constructor() {
+        this.mediaRecorder = null;
+        this.audioChunks = [];
+        this.recordedAudioUrl = null;
+        this.isRecording = false;
+    }
+
+    async startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.mediaRecorder = new MediaRecorder(stream);
+            this.audioChunks = [];
+
+            this.mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                    this.audioChunks.push(e.data);
+                }
+            };
+
+            this.mediaRecorder.start();
+            this.isRecording = true;
+            return true;
+        } catch (err) {
+            console.error('Microphone recording error:', err);
+            return false;
+        }
+    }
+
+    stopRecording() {
+        return new Promise((resolve) => {
+            if (!this.mediaRecorder || !this.isRecording) {
+                resolve(null);
+                return;
+            }
+
+            this.mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                this.recordedAudioUrl = URL.createObjectURL(audioBlob);
+                this.isRecording = false;
+
+                if (this.mediaRecorder.stream) {
+                    this.mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                }
+
+                resolve(this.recordedAudioUrl);
+            };
+
+            this.mediaRecorder.stop();
+        });
+    }
+
+    playRecording() {
+        if (this.recordedAudioUrl) {
+            const audio = new Audio(this.recordedAudioUrl);
+            audio.play();
+        }
+    }
 }
 
 // ==========================================
@@ -998,6 +1140,7 @@ class UIManager {
             isFinished: false
         };
 
+        AuthManager.init((user) => this.handleAuthChange(user));
         this.initDOM();
         this.bindEvents();
     }
@@ -1101,9 +1244,6 @@ class UIManager {
                 }
             });
         }
-
-        // Init Firebase Auth listener
-        AuthManager.init((user) => this.handleAuthChange(user));
 
         const speechHelpBtn = document.getElementById('speech-help-btn');
         if (speechHelpBtn) {
@@ -1270,15 +1410,28 @@ class UIManager {
         let totalWords = 0;
         let totalMastered = 0;
 
+        let allItems = [];
         profiles.forEach(p => {
             totalWords += p.items.length;
             totalMastered += p.items.filter(i => i.mastered).length;
+            allItems.push(...p.items);
         });
 
         document.getElementById('stat-total-profiles').textContent = totalProfiles;
         document.getElementById('stat-total-words').textContent = totalWords;
         document.getElementById('stat-total-mastered').textContent = totalMastered;
         document.getElementById('stat-mastery-rate').textContent = totalWords > 0 ? Math.round((totalMastered / totalWords) * 100) + '%' : '0%';
+
+        const srsStats = SRSEngine.getBoxStats(allItems);
+        const box1Elem = document.getElementById('srs-box1-count');
+        const box24Elem = document.getElementById('srs-box24-count');
+        const box5Elem = document.getElementById('srs-box5-count');
+        const dueElem = document.getElementById('srs-due-badge');
+
+        if (box1Elem) box1Elem.textContent = srsStats.box1;
+        if (box24Elem) box24Elem.textContent = srsStats.box2 + srsStats.box3 + srsStats.box4;
+        if (box5Elem) box5Elem.textContent = srsStats.box5;
+        if (dueElem) dueElem.textContent = `${srsStats.due} Due Today`;
 
         const gridContainer = document.getElementById('dashboard-profiles-grid');
         gridContainer.innerHTML = '';
@@ -2265,6 +2418,56 @@ class UIManager {
         await StorageManager.fetchUserProgress();
         this.renderDashboard();
         if (this.activeProfile) this.renderFilteredFlashcards();
+    }
+
+    // ==========================================
+    // Voice Recorder Practice Methods
+    // ==========================================
+    async toggleVoiceRecording() {
+        if (!this.voiceRecorder) this.voiceRecorder = new VoiceRecorderEngine();
+
+        const btnRecord = document.getElementById('btn-record-voice');
+        const btnPlay = document.getElementById('btn-play-recording');
+        const badge = document.getElementById('recording-status-badge');
+
+        if (!this.voiceRecorder.isRecording) {
+            const started = await this.voiceRecorder.startRecording();
+            if (started) {
+                if (btnRecord) {
+                    btnRecord.className = 'flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-500 text-white border border-rose-500 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 animate-pulse';
+                    btnRecord.innerHTML = '⏹️ Stop Recording';
+                }
+                if (badge) {
+                    badge.className = 'text-[10px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-md font-mono font-bold';
+                    badge.textContent = '● Recording...';
+                }
+                this.showToast('Speak now... Recording your voice!', 'info');
+            } else {
+                this.showToast('Microphone access denied or unavailable in this browser.', 'error');
+            }
+        } else {
+            const audioUrl = await this.voiceRecorder.stopRecording();
+            if (btnRecord) {
+                btnRecord.className = 'flex-1 py-2 px-3 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5';
+                btnRecord.innerHTML = '🎙️ Record My Voice';
+            }
+            if (badge) {
+                badge.className = 'text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-md font-mono font-bold';
+                badge.textContent = '✓ Recorded';
+            }
+            if (btnPlay) {
+                btnPlay.disabled = false;
+                btnPlay.className = 'flex-1 py-2 px-3 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer opacity-100';
+            }
+            this.showToast('Recording saved! Click "Play Recording" to listen.', 'success');
+        }
+    }
+
+    playUserRecording() {
+        if (this.voiceRecorder && this.voiceRecorder.recordedAudioUrl) {
+            this.voiceRecorder.playRecording();
+            this.showToast('Playing your voice recording...', 'info');
+        }
     }
 
     showToast(msg, type = 'info') {
