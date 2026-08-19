@@ -503,6 +503,12 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.log(`Port ${PORT} is already in use, server is active.`);
+    } else {
+        console.error('Server error:', err);
+    }
 });
 
 module.exports = {

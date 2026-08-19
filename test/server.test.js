@@ -91,3 +91,44 @@ test('Spaced Repetition System (Leitner 5-Box SRS) intervals', (t) => {
     assert.strictEqual(res.days, 30, 'Interval for Box 5 should be 30 days');
     assert.strictEqual(testItem.mastered, true, 'Item should be marked as mastered');
 });
+
+test('Open-source governance templates verification', (t) => {
+    const rootDir = path.join(__dirname, '..');
+    const licenseFile = path.join(rootDir, 'LICENSE');
+    const readmeFile = path.join(rootDir, 'README.md');
+    const bugTemplate = path.join(rootDir, '.github', 'ISSUE_TEMPLATE', 'bug_report.md');
+    const featureTemplate = path.join(rootDir, '.github', 'ISSUE_TEMPLATE', 'feature_request.md');
+    const prTemplate = path.join(rootDir, '.github', 'PULL_REQUEST_TEMPLATE.md');
+
+    assert.strictEqual(fs.existsSync(licenseFile), true, 'LICENSE file should exist');
+    assert.strictEqual(fs.existsSync(readmeFile), true, 'README.md should exist');
+    assert.strictEqual(fs.existsSync(bugTemplate), true, 'Bug report issue template should exist');
+    assert.strictEqual(fs.existsSync(featureTemplate), true, 'Feature request issue template should exist');
+    assert.strictEqual(fs.existsSync(prTemplate), true, 'PR template should exist');
+});
+
+test('Cantonese Tone Extraction & Ear Training Question Pool', (t) => {
+    function extractTones(jyutpingStr) {
+        if (!jyutpingStr) return [];
+        const matches = jyutpingStr.match(/[1-6]/g);
+        return matches ? matches.map(Number) : [];
+    }
+
+    assert.deepStrictEqual(extractTones('si1'), [1], 'si1 should extract tone 1');
+    assert.deepStrictEqual(extractTones('nei5 hou2'), [5, 2], 'nei5 hou2 should extract tones [5, 2]');
+    assert.deepStrictEqual(extractTones('sik6 zo2 faan6 mei6'), [6, 2, 6, 6], 'sik6 zo2 faan6 mei6 should extract tones [6, 2, 6, 6]');
+
+    const tonePool = [
+        { word: '詩', jyutping: 'si1', tone: 1 },
+        { word: '史', jyutping: 'si2', tone: 2 },
+        { word: '試', jyutping: 'si3', tone: 3 },
+        { word: '時', jyutping: 'si4', tone: 4 },
+        { word: '市', jyutping: 'si5', tone: 5 },
+        { word: '事', jyutping: 'si6', tone: 6 }
+    ];
+
+    tonePool.forEach((item) => {
+        const extracted = extractTones(item.jyutping);
+        assert.strictEqual(extracted[0], item.tone, `Extracted tone for ${item.word} should match ${item.tone}`);
+    });
+});

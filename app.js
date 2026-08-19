@@ -1007,12 +1007,21 @@ class UIManager {
         this.viewProfileDetail = document.getElementById('view-profile-detail');
         this.viewStudyMode = document.getElementById('view-study-mode');
         this.viewQuizMode = document.getElementById('view-quiz-mode');
+        this.viewToneQuiz = document.getElementById('view-tone-quiz');
 
         this.speechWarningBanner = document.getElementById('speech-warning-banner');
         this.modalCreateProfile = document.getElementById('modal-create-profile');
         this.modalDetail = document.getElementById('modal-detail');
         this.modalVoiceHelp = document.getElementById('modal-voice-help');
         this.toastContainer = document.getElementById('toast-container');
+
+        this.modalAuth = document.getElementById('modal-auth');
+        this.btnOpenAuth = document.getElementById('btn-open-auth-modal');
+        this.btnCloseAuth = document.getElementById('btn-close-auth-modal');
+        this.btnGoogleSignin = document.getElementById('btn-google-signin');
+        this.btnUserSignout = document.getElementById('btn-user-signout');
+        this.formEmailAuth = document.getElementById('form-email-auth');
+        this.btnAuthRegister = document.getElementById('btn-auth-register');
 
         this.navDashboardBtn = document.getElementById('nav-dashboard-btn');
         this.navNewProfileBtn = document.getElementById('nav-new-profile-btn');
@@ -1042,6 +1051,59 @@ class UIManager {
                 }
             });
         }
+
+        // Auth UI Bindings
+        if (this.btnOpenAuth) {
+            this.btnOpenAuth.addEventListener('click', () => this.openAuthModal());
+        }
+        if (this.btnCloseAuth) {
+            this.btnCloseAuth.addEventListener('click', () => this.closeAuthModal());
+        }
+        if (this.btnGoogleSignin) {
+            this.btnGoogleSignin.addEventListener('click', async () => {
+                const user = await AuthManager.signInWithGoogle();
+                if (user) {
+                    this.closeAuthModal();
+                    this.showToast(`Welcome, ${user.displayName || 'Learner'}! 👋`, 'success');
+                }
+            });
+        }
+        if (this.btnUserSignout) {
+            this.btnUserSignout.addEventListener('click', async () => {
+                await AuthManager.signOut();
+                this.showToast('Signed out successfully.', 'info');
+            });
+        }
+        if (this.formEmailAuth) {
+            this.formEmailAuth.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('input-auth-email').value;
+                const password = document.getElementById('input-auth-password').value;
+                const user = await AuthManager.signInWithEmail(email, password);
+                if (user) {
+                    this.closeAuthModal();
+                    this.showToast(`Welcome back, ${user.displayName || 'Learner'}! 👋`, 'success');
+                }
+            });
+        }
+        if (this.btnAuthRegister) {
+            this.btnAuthRegister.addEventListener('click', async () => {
+                const email = document.getElementById('input-auth-email').value;
+                const password = document.getElementById('input-auth-password').value;
+                if (!email || !password) {
+                    this.showToast('Please enter an email and password to register.', 'warning');
+                    return;
+                }
+                const user = await AuthManager.registerWithEmail(email, password);
+                if (user) {
+                    this.closeAuthModal();
+                    this.showToast(`Registered successfully! Welcome ${user.displayName}! 🎉`, 'success');
+                }
+            });
+        }
+
+        // Init Firebase Auth listener
+        AuthManager.init((user) => this.handleAuthChange(user));
 
         const speechHelpBtn = document.getElementById('speech-help-btn');
         if (speechHelpBtn) {
@@ -1128,6 +1190,7 @@ class UIManager {
         this.viewProfileDetail.classList.add('hidden');
         this.viewStudyMode.classList.add('hidden');
         this.viewQuizMode.classList.add('hidden');
+        if (this.viewToneQuiz) this.viewToneQuiz.classList.add('hidden');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -1160,6 +1223,9 @@ class UIManager {
                 this.showToast('Need at least 2 vocabulary items to generate a quiz.', 'warning');
                 this.switchView('profile-detail', { profileId: params.profileId });
             }
+        } else if (targetView === 'tone-quiz') {
+            this.initToneQuizMode();
+            if (this.viewToneQuiz) this.viewToneQuiz.classList.remove('hidden');
         }
     }
 
@@ -2064,6 +2130,141 @@ class UIManager {
         document.getElementById('btn-close-voice-help').onclick = () => {
             this.modalVoiceHelp.classList.add('hidden');
         };
+    }
+
+    openTonesGuideModal() {
+        const modal = document.getElementById('modal-tones-guide');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    closeTonesGuideModal() {
+        const modal = document.getElementById('modal-tones-guide');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    // ==========================================
+    // Tone Ear Training Quiz Handlers
+    // ==========================================
+    initToneQuizMode() {
+        const pool = [
+            { word: '詩', jyutping: 'si1', tone: 1, toneName: '陰平 (High Level 55)' },
+            { word: '史', jyutping: 'si2', tone: 2, toneName: '陰上 (High Rising 25)' },
+            { word: '試', jyutping: 'si3', tone: 3, toneName: '陰去 (Mid Level 33)' },
+            { word: '時', jyutping: 'si4', tone: 4, toneName: '陽平 (Low Falling 21)' },
+            { word: '市', jyutping: 'si5', tone: 5, toneName: '陽上 (Low Rising 23)' },
+            { word: '事', jyutping: 'si6', tone: 6, toneName: '陽去 (Low Level 22)' },
+            { word: '你好', jyutping: 'nei5 hou2', tone: 5, toneName: '陽上 (Low Rising 23)' },
+            { word: '多謝', jyutping: 'do1 ze6', tone: 1, toneName: '陰平 (High Level 55)' },
+            { word: '唔該', jyutping: 'm4 goi1', tone: 4, toneName: '陽平 (Low Falling 21)' },
+            { word: '食飯', jyutping: 'sik6 faan6', tone: 6, toneName: '陽去 (Low Level 22)' }
+        ];
+
+        const shuffled = pool.sort(() => 0.5 - Math.random());
+        this.toneQuizState = {
+            questions: shuffled.slice(0, 10),
+            currentIndex: 0,
+            score: 0,
+            isFinished: false
+        };
+
+        this.renderToneQuizQuestion();
+    }
+
+    renderToneQuizQuestion() {
+        const card = document.getElementById('tone-quiz-card');
+        const summary = document.getElementById('tone-quiz-summary');
+        if (!card || !summary) return;
+
+        if (this.toneQuizState.isFinished) {
+            card.classList.add('hidden');
+            summary.classList.remove('hidden');
+
+            const pct = Math.round((this.toneQuizState.score / this.toneQuizState.questions.length) * 100);
+            document.getElementById('tone-quiz-final-score').textContent = `${this.toneQuizState.score} / ${this.toneQuizState.questions.length} (${pct}%)`;
+            return;
+        }
+
+        card.classList.remove('hidden');
+        summary.classList.add('hidden');
+
+        const q = this.toneQuizState.questions[this.toneQuizState.currentIndex];
+
+        document.getElementById('tone-quiz-progress').textContent = `Tone Drill ${this.toneQuizState.currentIndex + 1} of ${this.toneQuizState.questions.length}`;
+        document.getElementById('tone-quiz-score-badge').textContent = `Score: ${this.toneQuizState.score}`;
+        document.getElementById('tone-quiz-word-prompt').textContent = `Listen: "${q.word}"`;
+
+        const btnAudio = document.getElementById('btn-play-tone-audio');
+        if (btnAudio) {
+            btnAudio.onclick = () => this.playAudioText(`${q.word}`, 'btn-play-tone-audio');
+        }
+
+        setTimeout(() => this.playAudioText(`${q.word}`, 'btn-play-tone-audio'), 200);
+
+        const btns = document.querySelectorAll('.tone-quiz-btn');
+        btns.forEach(b => {
+            b.disabled = false;
+            b.className = 'tone-quiz-btn p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition-all group';
+        });
+    }
+
+    answerToneQuiz(selectedTone, clickedBtn) {
+        const q = this.toneQuizState.questions[this.toneQuizState.currentIndex];
+        const isCorrect = selectedTone === q.tone;
+
+        const btns = document.querySelectorAll('.tone-quiz-btn');
+        btns.forEach(b => b.disabled = true);
+
+        if (isCorrect) {
+            this.toneQuizState.score++;
+            clickedBtn.className = 'tone-quiz-btn p-4 bg-emerald-500/20 text-emerald-300 border-2 border-emerald-500 rounded-2xl text-left transition-all font-bold';
+            this.showToast(`Correct! Tone ${q.tone} (${q.toneName}) 🎉`, 'success');
+        } else {
+            clickedBtn.className = 'tone-quiz-btn p-4 bg-rose-500/20 text-rose-300 border-2 border-rose-500 rounded-2xl text-left transition-all font-bold';
+            this.showToast(`Incorrect! It was Tone ${q.tone} (${q.toneName}).`, 'error');
+        }
+
+        setTimeout(() => {
+            this.toneQuizState.currentIndex++;
+            if (this.toneQuizState.currentIndex >= this.toneQuizState.questions.length) {
+                this.toneQuizState.isFinished = true;
+            }
+            this.renderToneQuizQuestion();
+        }, 1200);
+    }
+
+    openAuthModal() {
+        if (this.modalAuth) {
+            this.modalAuth.classList.remove('hidden');
+        }
+    }
+
+    closeAuthModal() {
+        if (this.modalAuth) {
+            this.modalAuth.classList.add('hidden');
+        }
+    }
+
+    async handleAuthChange(user) {
+        const btnOpenAuth = document.getElementById('btn-open-auth-modal');
+        const userMenu = document.getElementById('user-profile-menu');
+        const userAvatarImg = document.getElementById('user-avatar-img');
+        const userDisplayName = document.getElementById('user-display-name');
+        const userEmailText = document.getElementById('user-email-text');
+
+        if (user) {
+            if (btnOpenAuth) btnOpenAuth.classList.add('hidden');
+            if (userMenu) userMenu.classList.remove('hidden');
+            if (userAvatarImg) userAvatarImg.src = user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+            if (userDisplayName) userDisplayName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'Learner');
+            if (userEmailText) userEmailText.textContent = user.email || '';
+        } else {
+            if (btnOpenAuth) btnOpenAuth.classList.remove('hidden');
+            if (userMenu) userMenu.classList.add('hidden');
+        }
+
+        await StorageManager.fetchUserProgress();
+        this.renderDashboard();
+        if (this.activeProfile) this.renderFilteredFlashcards();
     }
 
     showToast(msg, type = 'info') {
