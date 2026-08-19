@@ -471,9 +471,14 @@ const server = http.createServer((req, res) => {
                         }
                     }
 
-                    writeProfiles(currentProfiles);
-                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-                    res.end(JSON.stringify({ success: true, profiles: currentProfiles }));
+                    const saved = writeProfiles(currentProfiles);
+                    if (saved) {
+                        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: true, profiles: currentProfiles }));
+                    } else {
+                        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Failed to write profiles to disk' }));
+                    }
                 } catch (err) {
                     res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
                     res.end(JSON.stringify({ success: false, error: 'Invalid JSON body' }));

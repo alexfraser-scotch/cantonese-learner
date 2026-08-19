@@ -715,31 +715,48 @@ class StorageManager {
                     if (window.UIManager && window.UIManager.currentView === 'dashboard') {
                         window.UIManager.renderDashboard();
                     }
+                    return data.profiles;
                 }
             }
         } catch (e) {
             console.warn('Failed to push profile update to server:', e);
         }
+        return null;
     }
 
     static async syncWithServer(onSyncCallback = null) {
+        let serverProfiles = null;
         try {
             const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
                 headers: { 'Cache-Control': 'no-cache' }
             });
             if (res.ok) {
-                const profiles = await res.json();
-                if (Array.isArray(profiles) && profiles.length > 0) {
-                    this.cachedProfiles = profiles;
-                    this.saveLocalProfiles(profiles);
-                    if (onSyncCallback) onSyncCallback(profiles);
-                    return profiles;
-                }
+                serverProfiles = await res.json();
             }
         } catch (e) {
             console.warn('Unable to sync profiles from server, using local storage cache:', e);
         }
-        return this.getProfiles();
+
+        const localProfiles = this.getProfiles();
+
+        if (Array.isArray(serverProfiles) && serverProfiles.length > 0) {
+            // Smart Merge: preserve local profiles created on this device that haven't reached server yet
+            const serverIds = new Set(serverProfiles.map(p => p.id));
+            const unsyncedProfiles = localProfiles.filter(p => !serverIds.has(p.id));
+
+            for (const unsynced of unsyncedProfiles) {
+                console.log('Uploading unsynced local profile to server:', unsynced.name);
+                await this.pushToServer({ action: 'create', profile: unsynced });
+                serverProfiles.unshift(unsynced);
+            }
+
+            this.cachedProfiles = serverProfiles;
+            this.saveLocalProfiles(serverProfiles);
+            if (onSyncCallback) onSyncCallback(serverProfiles);
+            return serverProfiles;
+        }
+
+        return localProfiles;
     }
 
     static getProfileById(id) {
@@ -747,7 +764,7 @@ class StorageManager {
         return profiles.find(p => p.id === id);
     }
 
-    static createProfile(name, category, description, items) {
+    static async createProfile(name, category, description, items) {
         const profiles = this.getProfiles();
         const authorName = AuthManager.currentUser ? (AuthManager.currentUser.displayName || (AuthManager.currentUser.email ? AuthManager.currentUser.email.split('@')[0] : 'Learner')) : 'Community Learner';
         const newProfile = {
@@ -761,9 +778,13 @@ class StorageManager {
             createdAt: new Date().toISOString(),
             items: items || []
         };
+
+        // Save locally first
         profiles.unshift(newProfile);
         this.saveLocalProfiles(profiles);
-        this.pushToServer({ action: 'create', profile: newProfile });
+
+        // Await server upload to guarantee server persistence!
+        await this.pushToServer({ action: 'create', profile: newProfile });
         return newProfile;
     }
 
@@ -2198,7 +2219,7 @@ class UIManager {
         this.renderLiveParserTable();
     }
 
-    handleSaveNewProfile(e) {
+    async handleSaveNewProfile(e) {
         e.preventDefault();
 
         const name = document.getElementById('input-profile-name').value.trim();
@@ -2215,9 +2236,11 @@ class UIManager {
             return;
         }
 
-        const newProf = StorageManager.createProfile(name, category, desc, this.draftParsedItems);
+        this.showToast('Uploading profile to community...', 'info');
+
+        const newProf = await StorageManager.createProfile(name, category, desc, this.draftParsedItems);
         this.closeCreateProfileModal();
-        this.showToast(`Profile "${name}" created successfully!`, 'success');
+        this.showToast(`✨ Profile "${name}" published successfully!`, 'success');
         this.switchView('profile-detail', { profileId: newProf.id });
     }
 
