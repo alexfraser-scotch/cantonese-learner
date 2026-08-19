@@ -741,13 +741,14 @@ class StorageManager {
         const localProfiles = this.getProfiles();
 
         if (Array.isArray(serverProfiles) && serverProfiles.length > 0) {
-            // Upload any pending local drafts created on this device that have not reached server
+            // Auto-upload any local custom profiles (such as d2) that exist locally but are missing on the server
             const serverIds = new Set(serverProfiles.map(p => p.id));
-            const unsyncedDrafts = localProfiles.filter(p => p.isLocalDraft && !serverIds.has(p.id));
+            const unsyncedProfiles = localProfiles.filter(p => !serverIds.has(p.id));
 
-            for (const draft of unsyncedDrafts) {
-                delete draft.isLocalDraft;
-                const result = await this.pushToServer({ action: 'create', profile: draft });
+            for (const profile of unsyncedProfiles) {
+                console.log('Uploading local profile to server:', profile.name);
+                delete profile.isLocalDraft;
+                const result = await this.pushToServer({ action: 'create', profile });
                 if (result) serverProfiles = result;
             }
 
