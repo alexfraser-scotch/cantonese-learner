@@ -2429,6 +2429,7 @@ class UIManager {
             } catch (e) {}
             this.showToast('Upvoted community deck! 👍', 'success');
             this.renderDashboard();
+        }
     }
 
     exportProfileJSON(profileId) {
