@@ -130,7 +130,51 @@ class CantoneseDictionary {
     static getTopicImage(word, meaning = '') {
         const text = `${word} ${meaning}`.toLowerCase();
 
-        // 1. Specific Household & Daily Life Topics
+        // 1. Family & People Topics
+        if (text.includes('爸爸') || text.includes('父親') || text.includes('father') || text.includes('dad') || text.includes('daddy')) {
+            return 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('媽媽') || text.includes('母親') || text.includes('mother') || text.includes('mom') || text.includes('mommy')) {
+            return 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('哥哥') || text.includes('兄長') || text.includes('elder brother') || text.includes('brother')) {
+            return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('姐姐') || text.includes('姊姊') || text.includes('elder sister') || text.includes('sister')) {
+            return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('弟弟') || text.includes('胞弟') || text.includes('younger brother')) {
+            return 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('妹妹') || text.includes('胞妹') || text.includes('younger sister')) {
+            return 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('爺爺') || text.includes('祖父') || text.includes('公公') || text.includes('grandfather') || text.includes('grandpa')) {
+            return 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('嫲嫲') || text.includes('婆婆') || text.includes('祖母') || text.includes('grandmother') || text.includes('grandma')) {
+            return 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('家庭') || text.includes('家人') || text.includes('屋企人') || text.includes('family')) {
+            return 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('朋友') || text.includes('friend')) {
+            return 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('老師') || text.includes('先生') || text.includes('teacher')) {
+            return 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('學生') || text.includes('student')) {
+            return 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('醫生') || text.includes('doctor')) {
+            return 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('護士') || text.includes('nurse')) {
+            return 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // 2. Household & Daily Life Topics
         if (text.includes('廁所') || text.includes('洗手間') || text.includes('bathroom') || text.includes('toilet') || text.includes('restroom')) {
             return 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80';
         }
@@ -172,6 +216,27 @@ class CantoneseDictionary {
         }
         if (text.includes('飯') || text.includes('食') || text.includes('food') || text.includes('eat') || text.includes('meal')) {
             return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('茶') || text.includes('tea')) {
+            return 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('車') || text.includes('car')) {
+            return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('巴士') || text.includes('bus')) {
+            return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('書') || text.includes('book')) {
+            return 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('電話') || text.includes('phone')) {
+            return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('電腦') || text.includes('computer')) {
+            return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('錢') || text.includes('money')) {
+            return 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=600&q=80';
         }
 
         // 2. Curated Deterministic Unsplash High-Res Pool
@@ -905,9 +970,26 @@ class StorageManager {
 
     static enrichProfileItems(profiles) {
         if (!Array.isArray(profiles)) return profiles;
+        const genericFallbacks = [
+            'photo-1516589178581-6cd7833ae3b2',
+            'photo-1507525428034-b723cf961d3e',
+            'photo-1464822759023-fed622ff2c3b',
+            'photo-1506970845246-18f21d533b20',
+            'photo-1541696432-82c6da8ce7bf',
+            'photo-1512941937669-90a1b58e7e9c',
+            'photo-1451187580459-43490279c0fa'
+        ];
+
         profiles.forEach(p => {
             if (Array.isArray(p.items)) {
                 p.items.forEach(item => {
+                    const isGenericFallback = item.image && genericFallbacks.some(f => item.image.includes(f));
+                    const topicImg = CantoneseDictionary.getTopicImage(item.word, item.meaning || item.meaning_zh);
+                    const isNewSpecificTopic = topicImg && !genericFallbacks.some(f => topicImg.includes(f));
+
+                    if (!item.image || (isGenericFallback && isNewSpecificTopic)) {
+                        item.image = topicImg;
+                    }
                     CantoneseDictionary.enrichItem(item);
                 });
             }
@@ -1604,6 +1686,36 @@ class UIManager {
             btnCloseDetailModal.addEventListener('click', () => this.closeDetailModal());
         }
 
+        const btnModalToggleEdit = document.getElementById('btn-modal-toggle-edit');
+        if (btnModalToggleEdit) {
+            btnModalToggleEdit.addEventListener('click', () => this.toggleModalEditMode());
+        }
+
+        const btnModalCancelEdit = document.getElementById('btn-modal-cancel-edit');
+        if (btnModalCancelEdit) {
+            btnModalCancelEdit.addEventListener('click', () => this.closeModalEditMode());
+        }
+
+        const btnModalSaveEdit = document.getElementById('btn-modal-save-edit');
+        if (btnModalSaveEdit) {
+            btnModalSaveEdit.addEventListener('click', () => this.saveModalWordEdit());
+        }
+
+        const btnModalAutoPick = document.getElementById('btn-modal-auto-pick-image');
+        if (btnModalAutoPick) {
+            btnModalAutoPick.addEventListener('click', () => this.autoPickModalEditImage());
+        }
+
+        const btnModalClearImage = document.getElementById('btn-modal-clear-image');
+        if (btnModalClearImage) {
+            btnModalClearImage.addEventListener('click', () => this.clearModalEditImage());
+        }
+
+        const inputModalEditImage = document.getElementById('input-modal-edit-image');
+        if (inputModalEditImage) {
+            inputModalEditImage.addEventListener('input', () => this.updateModalEditImagePreview());
+        }
+
         const btnModalPrevWord = document.getElementById('btn-modal-prev-word');
         if (btnModalPrevWord) {
             btnModalPrevWord.addEventListener('click', () => this.navigateDetailModal(-1));
@@ -2043,11 +2155,169 @@ class UIManager {
 
         document.getElementById('modal-word-counter').textContent = `${index + 1} of ${this.activeProfile.items.length}`;
 
+        this.closeModalEditMode();
         this.modalDetail.classList.remove('hidden');
+    }
+
+    toggleModalEditMode() {
+        const editContainer = document.getElementById('modal-edit-container');
+        if (editContainer && !editContainer.classList.contains('hidden')) {
+            this.closeModalEditMode();
+        } else {
+            this.openModalEditMode();
+        }
+    }
+
+    openModalEditMode() {
+        if (!this.activeProfile || this.activeWordIndex < 0 || this.activeWordIndex >= this.activeProfile.items.length) return;
+        const item = this.activeProfile.items[this.activeWordIndex];
+
+        const viewContainer = document.getElementById('modal-view-container');
+        const editContainer = document.getElementById('modal-edit-container');
+        const toggleBtn = document.getElementById('btn-modal-toggle-edit');
+
+        if (viewContainer) viewContainer.classList.add('hidden');
+        if (editContainer) editContainer.classList.remove('hidden');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '👁️ View Mode';
+            toggleBtn.classList.replace('text-sky-400', 'text-amber-400');
+        }
+
+        // Populate edit input fields
+        const inputWord = document.getElementById('input-modal-edit-word');
+        if (inputWord) inputWord.value = item.word || '';
+
+        const inputJyutping = document.getElementById('input-modal-edit-jyutping');
+        if (inputJyutping) inputJyutping.value = item.jyutping || '';
+
+        const inputMeaningZh = document.getElementById('input-modal-edit-meaning-zh');
+        if (inputMeaningZh) inputMeaningZh.value = item.meaning_zh || item.word || '';
+
+        const inputMeaningEn = document.getElementById('input-modal-edit-meaning-en');
+        if (inputMeaningEn) inputMeaningEn.value = item.meaning || '';
+
+        const inputImage = document.getElementById('input-modal-edit-image');
+        if (inputImage) inputImage.value = item.image || '';
+
+        const inputExample = document.getElementById('input-modal-edit-example');
+        if (inputExample) inputExample.value = item.example || '';
+
+        const inputExampleMeaning = document.getElementById('input-modal-edit-example-meaning');
+        if (inputExampleMeaning) inputExampleMeaning.value = item.example_meaning || '';
+
+        this.updateModalEditImagePreview();
+    }
+
+    closeModalEditMode() {
+        const viewContainer = document.getElementById('modal-view-container');
+        const editContainer = document.getElementById('modal-edit-container');
+        const toggleBtn = document.getElementById('btn-modal-toggle-edit');
+
+        if (viewContainer) viewContainer.classList.remove('hidden');
+        if (editContainer) editContainer.classList.add('hidden');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '✏️ Edit Word / Picture';
+            toggleBtn.classList.replace('text-amber-400', 'text-sky-400');
+        }
+    }
+
+    updateModalEditImagePreview() {
+        const imgInput = document.getElementById('input-modal-edit-image');
+        const previewImg = document.getElementById('modal-edit-image-preview');
+        const noImgText = document.getElementById('modal-edit-no-image-text');
+        const url = imgInput ? imgInput.value.trim() : '';
+
+        if (url && previewImg && noImgText) {
+            previewImg.onload = () => {
+                previewImg.classList.remove('hidden');
+                noImgText.classList.add('hidden');
+            };
+            previewImg.onerror = () => {
+                previewImg.classList.add('hidden');
+                noImgText.classList.remove('hidden');
+            };
+            previewImg.src = url;
+            if (previewImg.complete && previewImg.naturalWidth > 0) {
+                previewImg.classList.remove('hidden');
+                noImgText.classList.add('hidden');
+            }
+        } else if (previewImg && noImgText) {
+            previewImg.classList.add('hidden');
+            noImgText.classList.remove('hidden');
+        }
+    }
+
+    autoPickModalEditImage() {
+        const inputWord = document.getElementById('input-modal-edit-word');
+        const inputEn = document.getElementById('input-modal-edit-meaning-en');
+        const inputZh = document.getElementById('input-modal-edit-meaning-zh');
+        
+        const word = inputWord ? inputWord.value.trim() : '';
+        const meaning = (inputEn ? inputEn.value.trim() : '') || (inputZh ? inputZh.value.trim() : '');
+
+        if (!word) {
+            this.showToast('Please enter a Cantonese word first.', 'warning');
+            return;
+        }
+
+        const pickedUrl = CantoneseDictionary.getTopicImage(word, meaning);
+        const imgInput = document.getElementById('input-modal-edit-image');
+        if (imgInput) {
+            imgInput.value = pickedUrl;
+            this.updateModalEditImagePreview();
+            this.showToast('🪄 Image suggested based on Cantonese topic!', 'info');
+        }
+    }
+
+    clearModalEditImage() {
+        const imgInput = document.getElementById('input-modal-edit-image');
+        if (imgInput) {
+            imgInput.value = '';
+            this.updateModalEditImagePreview();
+            this.showToast('Picture removed from this word.', 'info');
+        }
+    }
+
+    saveModalWordEdit() {
+        if (!this.activeProfile || this.activeWordIndex < 0 || this.activeWordIndex >= this.activeProfile.items.length) return;
+        const item = this.activeProfile.items[this.activeWordIndex];
+
+        const word = (document.getElementById('input-modal-edit-word') || {}).value || '';
+        const jyutping = (document.getElementById('input-modal-edit-jyutping') || {}).value || '';
+        const meaningZh = (document.getElementById('input-modal-edit-meaning-zh') || {}).value || '';
+        const meaningEn = (document.getElementById('input-modal-edit-meaning-en') || {}).value || '';
+        const image = (document.getElementById('input-modal-edit-image') || {}).value || '';
+        const example = (document.getElementById('input-modal-edit-example') || {}).value || '';
+        const exampleMeaning = (document.getElementById('input-modal-edit-example-meaning') || {}).value || '';
+
+        if (!word.trim()) {
+            this.showToast('Cantonese word cannot be empty.', 'warning');
+            return;
+        }
+
+        item.word = word.trim();
+        item.jyutping = jyutping.trim() || CantoneseDictionary.getJyutping(item.word);
+        item.meaning_zh = meaningZh.trim();
+        item.meaning = meaningEn.trim();
+        item.image = image.trim();
+        item.example = example.trim();
+        item.example_meaning = exampleMeaning.trim();
+
+        // Persist update in profile & cloud database
+        StorageManager.updateProfile(this.activeProfile);
+        this.showToast(`Saved changes for "${item.word}"! 🎉`, 'success');
+
+        this.closeModalEditMode();
+        this.openDetailModal(this.activeWordIndex);
+
+        if (this.currentView === 'profile-detail') {
+            this.renderProfileDetail();
+        }
     }
 
     closeDetailModal() {
         if (this.modalDetail) {
+            this.closeModalEditMode();
             this.modalDetail.classList.add('hidden');
             this.speechEngine.stop();
         }

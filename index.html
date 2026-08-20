@@ -637,76 +637,160 @@
     <!-- MODAL 2: WORD DETAIL FLASHCARD MODAL -->
     <!-- ========================================== -->
     <div id="modal-detail" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
-        <div class="glass-modal w-full max-w-xl rounded-3xl border border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 relative">
-            <button id="btn-close-detail-modal" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800 transition-colors">✕</button>
+        <div class="glass-modal w-full max-w-xl rounded-3xl border border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 relative max-h-[90vh] overflow-y-auto">
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button id="btn-modal-toggle-edit" title="Edit Word & Picture" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-sky-400 hover:text-sky-300 rounded-xl border border-slate-700/80 text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
+                    ✏️ Edit Word / Picture
+                </button>
+                <button id="btn-close-detail-modal" class="p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800 transition-colors">✕</button>
+            </div>
 
-            <div class="text-center space-y-3 pt-2">
-                <div class="flex items-center justify-center gap-3">
-                    <h2 id="modal-word" class="text-5xl font-extrabold text-slate-100 font-cantonese tracking-wider">字</h2>
-                    <button id="modal-btn-audio-word" title="Play Word Audio (zh-HK)" class="p-3 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-                    </button>
+            <!-- VIEW MODE CONTAINER -->
+            <div id="modal-view-container" class="space-y-6">
+                <div class="text-center space-y-3 pt-2">
+                    <div class="flex items-center justify-center gap-3">
+                        <h2 id="modal-word" class="text-5xl font-extrabold text-slate-100 font-cantonese tracking-wider">字</h2>
+                        <button id="modal-btn-audio-word" title="Play Word Audio (zh-HK)" class="p-3 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                        </button>
+                    </div>
+                    <div>
+                        <span id="modal-jyutping" class="jyutping-badge px-4 py-1.5 rounded-xl font-mono text-sm font-semibold inline-block">jyutping</span>
+                    </div>
                 </div>
-                <div>
-                    <span id="modal-jyutping" class="jyutping-badge px-4 py-1.5 rounded-xl font-mono text-sm font-semibold inline-block">jyutping</span>
+
+                <div class="space-y-4 pt-2">
+                    <!-- Word Image Illustration -->
+                    <div id="modal-image-container" class="w-full h-40 sm:h-48 rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hidden relative shadow-lg">
+                        <img id="modal-image" src="" alt="Vocabulary Illustration" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
+                            <span class="text-sky-400 text-[11px] font-semibold uppercase tracking-wider block mb-1">CHINESE MEANING (中文解釋)</span>
+                            <p id="modal-meaning-zh" class="text-base font-bold text-slate-100 font-cantonese">中文解釋</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
+                            <span class="text-indigo-400 text-[11px] font-semibold uppercase tracking-wider block mb-1">ENGLISH MEANING (英文釋義)</span>
+                            <p id="modal-meaning-en" class="text-base font-bold text-slate-100">English Definition</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-500 text-[11px] font-semibold uppercase tracking-wider block">EXAMPLE SENTENCE (例句)</span>
+                            <button id="modal-btn-audio-example" title="Play Example Audio" class="p-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-lg border border-sky-500/20 transition-all text-xs flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                Play Example
+                            </button>
+                        </div>
+                        <p id="modal-example" class="text-base font-medium text-sky-300 font-cantonese">Example Sentence</p>
+                        <p id="modal-example-meaning" class="text-xs text-slate-400">Example sentence translation</p>
+                    </div>
+
+                    <!-- Voice Recorder & Audio Comparison Widget -->
+                    <div class="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-emerald-400 text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 016 0v6a3 3 0 01-3 3z"/></svg>
+                                Voice Practice & Audio Comparison (MediaRecorder)
+                            </span>
+                            <span id="recording-status-badge" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-400 rounded-md font-mono">Ready</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button id="btn-record-voice" onclick="window.UIManager.toggleVoiceRecording()" class="flex-1 py-2 px-3 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                                🎙️ Record My Voice
+                            </button>
+                            <button id="btn-play-recording" onclick="window.UIManager.playUserRecording()" disabled class="flex-1 py-2 px-3 bg-slate-800 text-slate-500 border border-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed">
+                                ▶️ Play Recording
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                    <button id="btn-modal-prev-word" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-all flex items-center gap-1">← Prev</button>
+                    <span id="modal-word-counter" class="font-medium text-slate-500">1 of 10</span>
+                    <button id="btn-modal-next-word" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-all flex items-center gap-1">Next →</button>
                 </div>
             </div>
 
-            <div class="space-y-4 pt-2">
-                <!-- Word Image Illustration -->
-                <div id="modal-image-container" class="w-full h-40 sm:h-48 rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hidden relative shadow-lg">
-                    <img id="modal-image" src="" alt="Vocabulary Illustration" class="w-full h-full object-cover">
+            <!-- EDIT MODE CONTAINER -->
+            <div id="modal-edit-container" class="hidden space-y-4 pt-2">
+                <div class="border-b border-slate-800 pb-3">
+                    <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <span>✏️</span> Edit Word & Picture Details
+                    </h3>
+                    <p class="text-xs text-slate-400">Update Cantonese word, Jyutping, English/Chinese definitions, or custom picture.</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
-                        <span class="text-sky-400 text-[11px] font-semibold uppercase tracking-wider block mb-1">CHINESE MEANING (中文解釋)</span>
-                        <p id="modal-meaning-zh" class="text-base font-bold text-slate-100 font-cantonese">中文解釋</p>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cantonese Word (漢字)</label>
+                        <input type="text" id="input-modal-edit-word" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-100 font-cantonese focus:outline-none focus:border-sky-500 font-bold">
                     </div>
-
-                    <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
-                        <span class="text-indigo-400 text-[11px] font-semibold uppercase tracking-wider block mb-1">ENGLISH MEANING (英文釋義)</span>
-                        <p id="modal-meaning-en" class="text-base font-bold text-slate-100">English Definition</p>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Jyutping Pronunciation</label>
+                        <input type="text" id="input-modal-edit-jyutping" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm font-mono text-sky-400 focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
 
-                <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 space-y-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Chinese Meaning (中文解釋)</label>
+                        <input type="text" id="input-modal-edit-meaning-zh" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 font-cantonese focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">English Meaning (英文釋義)</label>
+                        <input type="text" id="input-modal-edit-meaning-en" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+
+                <!-- Picture URL with Live Preview & Quick Actions -->
+                <div class="p-3.5 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-2.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 text-[11px] font-semibold uppercase tracking-wider block">EXAMPLE SENTENCE (例句)</span>
-                        <button id="modal-btn-audio-example" title="Play Example Audio" class="p-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-lg border border-sky-500/20 transition-all text-xs flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-                            Play Example
-                        </button>
+                        <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                            <span>🖼️</span> Picture / Illustration URL
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <button id="btn-modal-auto-pick-image" type="button" class="px-2.5 py-1 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
+                                🪄 Auto-Pick Image
+                            </button>
+                            <button id="btn-modal-clear-image" type="button" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg text-[11px] font-semibold transition-all">
+                                Clear
+                            </button>
+                        </div>
                     </div>
-                    <p id="modal-example" class="text-base font-medium text-sky-300 font-cantonese">Example Sentence</p>
-                    <p id="modal-example-meaning" class="text-xs text-slate-400">Example sentence translation</p>
-                </div>
-
-                <!-- Voice Recorder & Audio Comparison Widget -->
-                <div class="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-emerald-400 text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 016 0v6a3 3 0 01-3 3z"/></svg>
-                            Voice Practice & Audio Comparison (MediaRecorder)
-                        </span>
-                        <span id="recording-status-badge" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-400 rounded-md font-mono">Ready</span>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <button id="btn-record-voice" onclick="window.UIManager.toggleVoiceRecording()" class="flex-1 py-2 px-3 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
-                            🎙️ Record My Voice
-                        </button>
-                        <button id="btn-play-recording" onclick="window.UIManager.playUserRecording()" disabled class="flex-1 py-2 px-3 bg-slate-800 text-slate-500 border border-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed">
-                            ▶️ Play Recording
-                        </button>
+                    
+                    <div class="flex items-center gap-3">
+                        <div id="modal-edit-image-preview-box" class="w-14 h-14 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0 flex items-center justify-center">
+                            <img id="modal-edit-image-preview" src="" alt="preview" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden')">
+                            <span id="modal-edit-no-image-text" class="text-[10px] text-slate-600 font-mono text-center">No Pic</span>
+                        </div>
+                        <input type="text" id="input-modal-edit-image" placeholder="Paste custom image URL (https://...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
-            </div>
 
-            <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <button id="btn-modal-prev-word" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-all flex items-center gap-1">← Prev</button>
-                <span id="modal-word-counter" class="font-medium text-slate-500">1 of 10</span>
-                <button id="btn-modal-next-word" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-all flex items-center gap-1">Next →</button>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Example Sentence (粵語例句)</label>
+                    <input type="text" id="input-modal-edit-example" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 font-cantonese focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Example Translation (例句翻譯)</label>
+                    <input type="text" id="input-modal-edit-example-meaning" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-300 focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+                    <button id="btn-modal-cancel-edit" type="button" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl border border-slate-700 transition-all">
+                        Cancel
+                    </button>
+                    <button id="btn-modal-save-edit" type="button" class="px-5 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all flex items-center gap-1.5">
+                        💾 Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -910,6 +994,6 @@
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- App JavaScript File -->
-    <script src="app.js?v=27"></script>
+    <script src="app.js?v=28"></script>
 </body>
 </html>
