@@ -1344,9 +1344,21 @@ class UIManager {
             isFinished: false
         };
 
-        AuthManager.init((user) => this.handleAuthChange(user));
+        try {
+            AuthManager.init((user) => this.handleAuthChange(user));
+        } catch (e) {
+            console.warn('AuthManager init error:', e);
+        }
+
         this.initDOM();
         this.bindEvents();
+
+        try {
+            this.renderDashboard();
+            StorageManager.syncWithServer(() => this.renderDashboard());
+        } catch (e) {
+            console.warn('Initial dashboard render/sync error:', e);
+        }
     }
 
     initDOM() {
@@ -1375,9 +1387,6 @@ class UIManager {
         this.heroCreateProfileBtn = document.getElementById('hero-create-profile-btn');
         this.navSyncBtn = document.getElementById('nav-sync-btn');
         this.navResetBtn = document.getElementById('nav-reset-btn');
-
-        this.renderDashboard();
-        StorageManager.syncWithServer(() => this.renderDashboard());
     }
 
     bindEvents() {
