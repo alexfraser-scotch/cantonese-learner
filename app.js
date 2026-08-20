@@ -740,6 +740,29 @@ class StorageManager {
         } catch (e) {}
     }
 
+    static formatForSupabase(p) {
+        return {
+            id: p.id,
+            name: p.name || 'Untitled Profile',
+            category: p.category || 'General',
+            description: p.description || '',
+            author: p.author || 'Cantonese Community',
+            author_id: p.author_id || null,
+            difficulty: p.difficulty || 'Beginner',
+            likes: typeof p.likes === 'number' ? p.likes : 1,
+            created_at: p.created_at || p.createdAt || new Date().toISOString(),
+            items: p.items || []
+        };
+    }
+
+    static formatFromSupabase(p) {
+        return {
+            ...p,
+            createdAt: p.created_at || p.createdAt || new Date().toISOString(),
+            items: Array.isArray(p.items) ? p.items : []
+        };
+    }
+
     static async syncWithServer(onSyncCallback = null) {
         this.initSupabase();
 
@@ -753,16 +776,8 @@ class StorageManager {
                     .select('*')
                     .order('created_at', { ascending: false });
 
-                if (data && !error) {
-                    if (data.length === 0) {
-                        console.log('Seeding default profiles into empty Supabase table...');
-                        for (const p of DEFAULT_PROFILES) {
-                            await this.supabaseClient.from('profiles').insert([p]);
-                        }
-                        serverProfiles = DEFAULT_PROFILES;
-                    } else {
-                        serverProfiles = data;
-                    }
+                if (data && !error && data.length > 0) {
+                    serverProfiles = data.map(p => this.formatFromSupabase(p));
                 }
             } catch (e) {
                 console.warn('Supabase sync error:', e);
@@ -770,13 +785,16 @@ class StorageManager {
         }
 
         // 2. Fallback to Node server if Supabase did not return profiles
-        if (!serverProfiles) {
+        if (!serverProfiles || serverProfiles.length === 0) {
             try {
                 const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
                     headers: { 'Cache-Control': 'no-cache' }
                 });
                 if (res.ok) {
-                    serverProfiles = await res.json();
+                    const fallbackData = await res.json();
+                    if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+                        serverProfiles = fallbackData;
+                    }
                 }
             } catch (e) {
                 console.warn('Unable to sync profiles from Node server:', e);
@@ -794,7 +812,9 @@ class StorageManager {
                 console.log('Uploading local profile to Supabase:', profile.name);
                 delete profile.isLocalDraft;
                 if (this.supabaseClient) {
-                    await this.supabaseClient.from('profiles').insert([profile]);
+                    try {
+                        await this.supabaseClient.from('profiles').insert([this.formatForSupabase(profile)]);
+                    } catch (e) {}
                 }
                 await this.pushToServer({ action: 'create', profile });
                 serverProfiles.unshift(profile);
@@ -810,14 +830,21 @@ class StorageManager {
     }
 
     static getProfiles() {
-        if (this.cachedProfiles) return this.cachedProfiles;
+        if (this.cachedProfiles && Array.isArray(this.cachedProfiles) && this.cachedProfiles.length > 0) {
+            return this.cachedProfiles;
+        }
         try {
             const raw = localStorage.getItem(this.STORAGE_KEY);
             if (!raw) {
                 this.saveLocalProfiles(DEFAULT_PROFILES);
                 return DEFAULT_PROFILES;
             }
-            this.cachedProfiles = JSON.parse(raw);
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed) || parsed.length === 0) {
+                this.saveLocalProfiles(DEFAULT_PROFILES);
+                return DEFAULT_PROFILES;
+            }
+            this.cachedProfiles = parsed;
             return this.cachedProfiles;
         } catch (e) {
             console.error('Failed to parse localStorage profiles:', e);
@@ -883,7 +910,7 @@ class StorageManager {
         // Insert into Supabase Postgres
         if (this.supabaseClient) {
             try {
-                const { error } = await this.supabaseClient.from('profiles').insert([newProfile]);
+                const { error } = await this.supabaseClient.from('profiles').insert([this.formatForSupabase(newProfile)]);
                 if (error) console.warn('Supabase createProfile error:', error);
                 else console.log('⚡ Profile created successfully in Supabase Postgres!');
             } catch (e) {
@@ -906,7 +933,7 @@ class StorageManager {
             this.saveLocalProfiles(profiles);
             if (this.supabaseClient) {
                 try {
-                    await this.supabaseClient.from('profiles').upsert(updatedProfile);
+                    await this.supabaseClient.from('profiles').upsert(this.formatForSupabase(updatedProfile));
                 } catch (e) {}
             }
             this.pushToServer({ action: 'update', profile: updatedProfile });
@@ -927,7 +954,15 @@ class StorageManager {
     }
 
     static async resetToDefault() {
+        this.initSupabase();
         this.saveLocalProfiles(DEFAULT_PROFILES);
+        if (this.supabaseClient) {
+            try {
+                for (const p of DEFAULT_PROFILES) {
+                    await this.supabaseClient.from('profiles').upsert(this.formatForSupabase(p));
+                }
+            } catch (e) {}
+        }
         this.pushToServer({ action: 'reset' });
         return DEFAULT_PROFILES;
     }
