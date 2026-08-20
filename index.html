@@ -586,10 +586,13 @@
                 <!-- Live Parser Preview Table & Auto Generator Action Bar -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-xs">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-semibold text-slate-300">Parsed Live Preview</span>
                             <button id="btn-auto-generate-details" type="button" class="px-2.5 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
-                                ✨ Auto-Generate Details & Pictures Now
+                                ✨ Auto-Generate Details & Pictures
+                            </button>
+                            <button id="btn-auto-generate-pictures-only" type="button" class="px-2.5 py-1 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
+                                🖼️ Auto-Generate Pictures Only
                             </button>
                         </div>
                         <span id="parsed-items-count" class="text-sky-400 font-medium">0 items parsed</span>
@@ -907,6 +910,6 @@
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- App JavaScript File -->
-    <script src="app.js?v=25"></script>
+    <script src="app.js?v=26"></script>
 </body>
 </html>
