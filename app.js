@@ -625,8 +625,72 @@ class StorageManager {
     static cachedProfiles = null;
     static userProgress = { masteredItemIds: [], favoriteItemIds: [], likedProfileIds: [] };
 
+    // Supabase Cloud Data Store & Realtime Sync
+    static SUPABASE_URL = 'https://mdesdqrfqgjiuqaoninw.supabase.co';
+    static SUPABASE_KEY = 'sb_publishable_yvbiFZQU7ISu9HGDruaeRA_0PQaM3lM';
+    static supabaseClient = null;
+    static realtimeChannel = null;
+
+    static initSupabase() {
+        if (window.supabase && !this.supabaseClient) {
+            try {
+                this.supabaseClient = window.supabase.createClient(this.SUPABASE_URL, this.SUPABASE_KEY);
+                console.log('⚡ Supabase Client initialized successfully!');
+                this.setupRealtimeSubscription();
+            } catch (e) {
+                console.warn('Failed to initialize Supabase client:', e);
+            }
+        }
+    }
+
+    static setupRealtimeSubscription() {
+        if (!this.supabaseClient || this.realtimeChannel) return;
+        try {
+            this.realtimeChannel = this.supabaseClient
+                .channel('public:profiles')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
+                    console.log('⚡ Realtime deck update from Supabase:', payload);
+                    this.syncWithServer(() => {
+                        if (window.UIManager && window.UIManager.currentView === 'dashboard') {
+                            window.UIManager.renderDashboard();
+                        }
+                    });
+                })
+                .subscribe((status) => {
+                    console.log('⚡ Supabase Realtime Subscription status:', status);
+                });
+        } catch (e) {
+            console.warn('Supabase Realtime subscription error:', e);
+        }
+    }
+
     static async fetchUserProgress() {
         const userId = AuthManager.currentUser ? AuthManager.currentUser.uid : 'guest';
+        this.initSupabase();
+
+        // 1. Try Supabase Postgres user_progress table
+        if (this.supabaseClient) {
+            try {
+                const { data, error } = await this.supabaseClient
+                    .from('user_progress')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .single();
+                if (data && !error) {
+                    this.userProgress = {
+                        masteredItemIds: data.mastered_item_ids || [],
+                        favoriteItemIds: data.favorite_item_ids || [],
+                        likedProfileIds: data.liked_profile_ids || []
+                    };
+                    localStorage.setItem(`${this.USER_PROGRESS_KEY}_${userId}`, JSON.stringify(this.userProgress));
+                    return this.userProgress;
+                }
+            } catch (e) {
+                console.warn('Supabase fetchUserProgress error:', e);
+            }
+        }
+
+        // 2. Fallback to Node server API / LocalStorage
         try {
             const res = await fetch(`${this.PROGRESS_API_URL}?userId=${encodeURIComponent(userId)}`);
             if (res.ok) {
@@ -634,9 +698,8 @@ class StorageManager {
                 this.userProgress = data || { masteredItemIds: [], favoriteItemIds: [], likedProfileIds: [] };
                 return this.userProgress;
             }
-        } catch (e) {
-            console.warn('Unable to fetch user progress from server:', e);
-        }
+        } catch (e) {}
+
         try {
             const raw = localStorage.getItem(`${this.USER_PROGRESS_KEY}_${userId}`);
             if (raw) this.userProgress = JSON.parse(raw);
@@ -646,34 +709,104 @@ class StorageManager {
 
     static async saveUserProgress() {
         const userId = AuthManager.currentUser ? AuthManager.currentUser.uid : 'guest';
+        this.initSupabase();
+
         try {
             localStorage.setItem(`${this.USER_PROGRESS_KEY}_${userId}`, JSON.stringify(this.userProgress));
+        } catch (e) {}
+
+        // Save to Supabase
+        if (this.supabaseClient) {
+            try {
+                await this.supabaseClient.from('user_progress').upsert({
+                    user_id: userId,
+                    mastered_item_ids: this.userProgress.masteredItemIds,
+                    favorite_item_ids: this.userProgress.favoriteItemIds,
+                    liked_profile_ids: this.userProgress.likedProfileIds,
+                    updated_at: new Date().toISOString()
+                });
+            } catch (e) {
+                console.warn('Supabase saveUserProgress error:', e);
+            }
+        }
+
+        // Fallback save to Node API
+        try {
             await fetch(this.PROGRESS_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, ...this.userProgress })
             });
-        } catch (e) {
-            console.warn('Error saving user progress:', e);
-        }
+        } catch (e) {}
     }
 
     static async syncWithServer(onSyncCallback = null) {
-        try {
-            const res = await fetch(this.API_URL);
-            if (res.ok) {
-                const profiles = await res.json();
-                if (Array.isArray(profiles) && profiles.length > 0) {
-                    this.cachedProfiles = profiles;
-                    this.saveLocalProfiles(profiles);
-                    if (onSyncCallback) onSyncCallback(profiles);
-                    return profiles;
+        this.initSupabase();
+
+        let serverProfiles = null;
+
+        // 1. Fetch from Supabase Postgres first!
+        if (this.supabaseClient) {
+            try {
+                const { data, error } = await this.supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (data && !error) {
+                    if (data.length === 0) {
+                        console.log('Seeding default profiles into empty Supabase table...');
+                        for (const p of DEFAULT_PROFILES) {
+                            await this.supabaseClient.from('profiles').insert([p]);
+                        }
+                        serverProfiles = DEFAULT_PROFILES;
+                    } else {
+                        serverProfiles = data;
+                    }
                 }
+            } catch (e) {
+                console.warn('Supabase sync error:', e);
             }
-        } catch (e) {
-            console.warn('Unable to sync profiles from server, using local storage cache:', e);
         }
-        return this.getProfiles();
+
+        // 2. Fallback to Node server if Supabase did not return profiles
+        if (!serverProfiles) {
+            try {
+                const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                if (res.ok) {
+                    serverProfiles = await res.json();
+                }
+            } catch (e) {
+                console.warn('Unable to sync profiles from Node server:', e);
+            }
+        }
+
+        const localProfiles = this.getProfiles();
+
+        if (Array.isArray(serverProfiles) && serverProfiles.length > 0) {
+            // Upload any local custom profiles missing from server to Supabase
+            const serverIds = new Set(serverProfiles.map(p => p.id));
+            const unsyncedProfiles = localProfiles.filter(p => !serverIds.has(p.id));
+
+            for (const profile of unsyncedProfiles) {
+                console.log('Uploading local profile to Supabase:', profile.name);
+                delete profile.isLocalDraft;
+                if (this.supabaseClient) {
+                    await this.supabaseClient.from('profiles').insert([profile]);
+                }
+                await this.pushToServer({ action: 'create', profile });
+                serverProfiles.unshift(profile);
+            }
+
+            this.cachedProfiles = serverProfiles;
+            this.saveLocalProfiles(serverProfiles);
+            if (onSyncCallback) onSyncCallback(serverProfiles);
+            return serverProfiles;
+        }
+
+        return localProfiles;
     }
 
     static getProfiles() {
@@ -704,7 +837,6 @@ class StorageManager {
     static async pushToServer(payload) {
         try {
             const jsonStr = JSON.stringify(payload);
-            // UTF-8 safe base64 encoding to prevent Hostinger WAF ModSecurity 403 blocks on large Chinese vocab lists
             const b64Data = btoa(unescape(encodeURIComponent(jsonStr)));
             const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
                 method: 'POST',
@@ -714,56 +846,11 @@ class StorageManager {
             if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.profiles) {
-                    this.cachedProfiles = data.profiles;
-                    this.saveLocalProfiles(data.profiles);
-                    if (window.UIManager && window.UIManager.currentView === 'dashboard') {
-                        window.UIManager.renderDashboard();
-                    }
                     return data.profiles;
                 }
-            } else {
-                console.warn('Server responded with HTTP status:', res.status);
             }
-        } catch (e) {
-            console.warn('Failed to push profile update to server:', e);
-        }
+        } catch (e) {}
         return null;
-    }
-
-    static async syncWithServer(onSyncCallback = null) {
-        let serverProfiles = null;
-        try {
-            const res = await fetch(`${this.API_URL}?t=${Date.now()}`, {
-                headers: { 'Cache-Control': 'no-cache' }
-            });
-            if (res.ok) {
-                serverProfiles = await res.json();
-            }
-        } catch (e) {
-            console.warn('Unable to sync profiles from server, using local storage cache:', e);
-        }
-
-        const localProfiles = this.getProfiles();
-
-        if (Array.isArray(serverProfiles) && serverProfiles.length > 0) {
-            // Auto-upload any local custom profiles (such as d2) that exist locally but are missing on the server
-            const serverIds = new Set(serverProfiles.map(p => p.id));
-            const unsyncedProfiles = localProfiles.filter(p => !serverIds.has(p.id));
-
-            for (const profile of unsyncedProfiles) {
-                console.log('Uploading local profile to server:', profile.name);
-                delete profile.isLocalDraft;
-                const result = await this.pushToServer({ action: 'create', profile });
-                if (result) serverProfiles = result;
-            }
-
-            this.cachedProfiles = serverProfiles;
-            this.saveLocalProfiles(serverProfiles);
-            if (onSyncCallback) onSyncCallback(serverProfiles);
-            return serverProfiles;
-        }
-
-        return localProfiles;
     }
 
     static getProfileById(id) {
@@ -772,6 +859,8 @@ class StorageManager {
     }
 
     static async createProfile(name, category, description, items) {
+        this.initSupabase();
+
         const profiles = this.getProfiles();
         const authorName = AuthManager.currentUser ? (AuthManager.currentUser.displayName || (AuthManager.currentUser.email ? AuthManager.currentUser.email.split('@')[0] : 'Learner')) : 'Community Learner';
         const newProfile = {
@@ -782,42 +871,62 @@ class StorageManager {
             author: authorName,
             difficulty: 'Beginner',
             likes: 1,
+            created_at: new Date().toISOString(),
             createdAt: new Date().toISOString(),
-            isLocalDraft: true,
             items: items || []
         };
 
-        // Save locally first
+        // Save locally
         profiles.unshift(newProfile);
         this.saveLocalProfiles(profiles);
 
-        // Upload to server and wait for confirmation
-        const updatedServerList = await this.pushToServer({ action: 'create', profile: newProfile });
-        if (updatedServerList) {
-            delete newProfile.isLocalDraft;
+        // Insert into Supabase Postgres
+        if (this.supabaseClient) {
+            try {
+                const { error } = await this.supabaseClient.from('profiles').insert([newProfile]);
+                if (error) console.warn('Supabase createProfile error:', error);
+                else console.log('⚡ Profile created successfully in Supabase Postgres!');
+            } catch (e) {
+                console.warn('Supabase insert failed:', e);
+            }
         }
+
+        // Fallback upload to Node server
+        await this.pushToServer({ action: 'create', profile: newProfile });
 
         return newProfile;
     }
 
-    static updateProfile(updatedProfile) {
+    static async updateProfile(updatedProfile) {
+        this.initSupabase();
         const profiles = this.getProfiles();
         const index = profiles.findIndex(p => p.id === updatedProfile.id);
         if (index !== -1) {
             profiles[index] = updatedProfile;
             this.saveLocalProfiles(profiles);
+            if (this.supabaseClient) {
+                try {
+                    await this.supabaseClient.from('profiles').upsert(updatedProfile);
+                } catch (e) {}
+            }
             this.pushToServer({ action: 'update', profile: updatedProfile });
         }
     }
 
-    static deleteProfile(id) {
+    static async deleteProfile(id) {
+        this.initSupabase();
         let profiles = this.getProfiles();
         profiles = profiles.filter(p => p.id !== id);
         this.saveLocalProfiles(profiles);
+        if (this.supabaseClient) {
+            try {
+                await this.supabaseClient.from('profiles').delete().eq('id', id);
+            } catch (e) {}
+        }
         this.pushToServer({ action: 'delete', profileId: id });
     }
 
-    static resetToDefault() {
+    static async resetToDefault() {
         this.saveLocalProfiles(DEFAULT_PROFILES);
         this.pushToServer({ action: 'reset' });
         return DEFAULT_PROFILES;
@@ -2257,33 +2366,25 @@ class UIManager {
     }
 
     async likeProfile(profileId) {
-        try {
-            const res = await fetch('/api/profiles/like', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ profileId })
-            });
-            const data = await res.json();
-            if (data.success) {
-                const profiles = StorageManager.getProfiles();
-                const profile = profiles.find(p => p.id === profileId);
-                if (profile) {
-                    profile.likes = data.likes;
-                    StorageManager.saveProfiles(profiles);
-                }
-                this.showToast('Upvoted community deck! 👍', 'success');
-                this.renderDashboard();
+        const profiles = StorageManager.getProfiles();
+        const profile = profiles.find(p => p.id === profileId);
+        if (profile) {
+            profile.likes = (profile.likes || 0) + 1;
+            StorageManager.saveLocalProfiles(profiles);
+            if (StorageManager.supabaseClient) {
+                try {
+                    await StorageManager.supabaseClient.from('profiles').update({ likes: profile.likes }).eq('id', profileId);
+                } catch (e) {}
             }
-        } catch (e) {
-            console.error('Error upvoting deck:', e);
-            const profiles = StorageManager.getProfiles();
-            const profile = profiles.find(p => p.id === profileId);
-            if (profile) {
-                profile.likes = (profile.likes || 0) + 1;
-                StorageManager.saveProfiles(profiles);
-                this.renderDashboard();
-            }
-        }
+            try {
+                await fetch('/api/profiles/like', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ profileId })
+                });
+            } catch (e) {}
+            this.showToast('Upvoted community deck! 👍', 'success');
+            this.renderDashboard();
     }
 
     exportProfileJSON(profileId) {
