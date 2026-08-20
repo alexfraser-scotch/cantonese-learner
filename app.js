@@ -127,6 +127,71 @@ class CantoneseDictionary {
         '兩': 'Two (Pair)'
     };
 
+    static getTopicImage(word, meaning = '') {
+        const text = `${word} ${meaning}`.toLowerCase();
+
+        // 1. Specific Household & Daily Life Topics
+        if (text.includes('廁所') || text.includes('洗手間') || text.includes('bathroom') || text.includes('toilet') || text.includes('restroom')) {
+            return 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('椅子') || text.includes('chair') || text.includes('seat')) {
+            return 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('睡房') || text.includes('bedroom')) {
+            return 'https://images.unsplash.com/photo-1540518614846-7ede433c5163?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('房間') || text.includes('room')) {
+            return 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('客廳') || text.includes('living room')) {
+            return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('廚房') || text.includes('kitchen')) {
+            return 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('門口') || text.includes('門') || text.includes('door')) {
+            return 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('窗口') || text.includes('窗') || text.includes('window')) {
+            return 'https://images.unsplash.com/photo-1509644851169-2acc08aa25b5?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('衣服') || text.includes('衣物') || text.includes('clothes') || text.includes('clothing')) {
+            return 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('褲子') || text.includes('長褲') || text.includes('trousers') || text.includes('pants')) {
+            return 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('鞋子') || text.includes('鞋') || text.includes('shoes')) {
+            return 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('帽子') || text.includes('cap') || text.includes('hat')) {
+            return 'https://images.unsplash.com/photo-1521369984125-658257002015?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('水') || text.includes('water') || text.includes('drink')) {
+            return 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('飯') || text.includes('食') || text.includes('food') || text.includes('eat') || text.includes('meal')) {
+            return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // 2. Curated Deterministic Unsplash High-Res Pool
+        const fallbackPool = [
+            'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
+        ];
+        let hash = 0;
+        for (let i = 0; i < word.length; i++) {
+            hash = (hash << 5) - hash + word.charCodeAt(i);
+            hash |= 0;
+        }
+        return fallbackPool[Math.abs(hash) % fallbackPool.length];
+    }
+
     /**
      * Looks up or generates missing details for a given Cantonese word item.
      * @param {Object} item - { word, jyutping, meaning, example, example_meaning }
@@ -161,10 +226,8 @@ class CantoneseDictionary {
                 isGenerated = true;
             }
             if (force || !item.image) {
-                if (entry.image) {
-                    item.image = entry.image;
-                    isGenerated = true;
-                }
+                item.image = entry.image || this.getTopicImage(w, item.meaning || item.meaning_zh);
+                isGenerated = true;
             }
             if (force || !item.example || item.example.trim() === '' || item.example.includes('呢個詞語「')) {
                 item.example = entry.example;
@@ -187,6 +250,10 @@ class CantoneseDictionary {
                 }
                 if (force || !item.meaning_zh || item.meaning_zh.trim() === '') {
                     item.meaning_zh = `數字 ${w}`;
+                    isGenerated = true;
+                }
+                if (force || !item.image) {
+                    item.image = this.getTopicImage(w, item.meaning || item.meaning_zh);
                     isGenerated = true;
                 }
                 if (force || !item.example || item.example.trim() === '' || item.example.includes('呢個詞語「')) {
@@ -215,6 +282,11 @@ class CantoneseDictionary {
 
                 if (force || !item.meaning_zh || item.meaning_zh.trim() === '') {
                     item.meaning_zh = `${w} (粵語詞彙)`;
+                    isGenerated = true;
+                }
+
+                if (force || !item.image) {
+                    item.image = this.getTopicImage(w, item.meaning || item.meaning_zh);
                     isGenerated = true;
                 }
 
@@ -831,26 +903,38 @@ class StorageManager {
         return localProfiles;
     }
 
+    static enrichProfileItems(profiles) {
+        if (!Array.isArray(profiles)) return profiles;
+        profiles.forEach(p => {
+            if (Array.isArray(p.items)) {
+                p.items.forEach(item => {
+                    CantoneseDB.enrichItem(item);
+                });
+            }
+        });
+        return profiles;
+    }
+
     static getProfiles() {
         if (this.cachedProfiles && Array.isArray(this.cachedProfiles) && this.cachedProfiles.length > 0) {
-            return this.cachedProfiles;
+            return this.enrichProfileItems(this.cachedProfiles);
         }
         try {
             const raw = localStorage.getItem(this.STORAGE_KEY);
             if (!raw) {
                 this.saveLocalProfiles(DEFAULT_PROFILES);
-                return DEFAULT_PROFILES;
+                return this.enrichProfileItems(DEFAULT_PROFILES);
             }
             const parsed = JSON.parse(raw);
             if (!Array.isArray(parsed) || parsed.length === 0) {
                 this.saveLocalProfiles(DEFAULT_PROFILES);
-                return DEFAULT_PROFILES;
+                return this.enrichProfileItems(DEFAULT_PROFILES);
             }
-            this.cachedProfiles = parsed;
+            this.cachedProfiles = this.enrichProfileItems(parsed);
             return this.cachedProfiles;
         } catch (e) {
             console.error('Failed to parse localStorage profiles:', e);
-            return DEFAULT_PROFILES;
+            return this.enrichProfileItems(DEFAULT_PROFILES);
         }
     }
 
