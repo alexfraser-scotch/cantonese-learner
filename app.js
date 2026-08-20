@@ -908,7 +908,7 @@ class StorageManager {
         profiles.forEach(p => {
             if (Array.isArray(p.items)) {
                 p.items.forEach(item => {
-                    CantoneseDB.enrichItem(item);
+                    CantoneseDictionary.enrichItem(item);
                 });
             }
         });
@@ -1097,7 +1097,7 @@ class SpeechEngine {
             }
         }
 
-        if (window.UIManager) {
+        if (window.UIManager && typeof window.UIManager.updateSpeechBannerStatus === 'function') {
             window.UIManager.updateSpeechBannerStatus(true, this.cantoneseVoice);
         }
     }
