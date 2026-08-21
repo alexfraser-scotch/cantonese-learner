@@ -357,8 +357,16 @@ const MIME_TYPES = {
     '.svg': 'image/svg+xml'
 };
 
+// Process Guards to ensure zero-downtime stability
+process.on('uncaughtException', (err) => {
+    console.error('Server Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Server Unhandled Rejection:', reason);
+});
+
 const server = http.createServer((req, res) => {
-    // Set CORS headers
+    // Enable CORS for cross-origin requests
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -371,6 +379,13 @@ const server = http.createServer((req, res) => {
 
     const urlParts = req.url.split('?');
     const pathName = urlParts[0];
+
+    // Health check endpoints for cloud load balancers and Hostinger App Runner
+    if (pathName === '/health' || pathName === '/_health' || pathName === '/api/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));
+        return;
+    }
 
     // ==========================================
     // API ENDPOINT: USER PROGRESS (/api/user/progress)
@@ -545,17 +560,15 @@ const server = http.createServer((req, res) => {
     });
 });
 
-if (require.main === module) {
-    server.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`Port ${PORT} is already in use, server is active.`);
-        } else {
-            console.error('Server error:', err);
-        }
-    });
-}
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.log(`Port ${PORT} is already in use, server is active.`);
+    } else {
+        console.error('Server error:', err);
+    }
+});
 
 module.exports = {
     server,
