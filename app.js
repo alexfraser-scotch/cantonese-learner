@@ -589,7 +589,7 @@ const DEFAULT_PROFILES = [
 ];
 
 // ==========================================
-// 1. Firebase Auth Manager
+// 1. Supabase Auth Manager
 // ==========================================
 class AuthManager {
     static currentUser = null;
@@ -600,14 +600,15 @@ class AuthManager {
         try {
             if (user) {
                 const sessionUser = {
-                    uid: user.uid,
-                    displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Learner'),
+                    uid: user.id || user.uid,
+                    displayName: (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || (user.email ? user.email.split('@')[0] : 'Learner'),
                     email: user.email || '',
-                    photoURL: user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+                    photoURL: (user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
                 };
                 const val = JSON.stringify(sessionUser);
                 localStorage.setItem(this.STORAGE_KEY, val);
                 sessionStorage.setItem(this.STORAGE_KEY, val);
+                this.currentUser = sessionUser;
             }
         } catch (e) {
             console.warn('Failed to save user session:', e);
@@ -636,7 +637,8 @@ class AuthManager {
         return null;
     }
 
-    static init(onAuthChangeCallback = null) {
+    static async init(onAuthChangeCallback = null) {
+        StorageManager.initSupabase();
         const saved = this.loadSession();
 
         if (this.initialized) {
@@ -650,105 +652,121 @@ class AuthManager {
             onAuthChangeCallback(saved);
         }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDemoConfigKeyForCantoneseLearnerApp",
-            authDomain: "cantonese-learner.firebaseapp.com",
-            projectId: "cantonese-learner",
-            storageBucket: "cantonese-learner.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:demo123456789012"
-        };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+        if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
             try {
-                firebase.initializeApp(firebaseConfig);
-            } catch (e) {
-                console.warn('Firebase config notice:', e);
-            }
-        }
-
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-            firebase.auth().onAuthStateChanged(user => {
-                if (user) {
-                    this.currentUser = user;
-                    this.saveSession(user);
-                } else {
-                    const existingSession = this.loadSession();
-                    if (existingSession) {
-                        this.currentUser = existingSession;
-                    } else {
-                        this.currentUser = null;
-                    }
+                // 1. Restore active session
+                const { data: { session } } = await StorageManager.supabaseClient.auth.getSession();
+                if (session && session.user) {
+                    this.saveSession(session.user);
+                    if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser);
                 }
-                if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser);
-            });
-        }
-    }
 
-    static async signInWithGoogle() {
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await firebase.auth().signInWithPopup(provider);
-                this.currentUser = result.user;
-                this.saveSession(result.user);
-                if (window.UIManager) window.UIManager.handleAuthChange(result.user);
-                return result.user;
+                // 2. Real-time auth state listener
+                StorageManager.supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                    if (session && session.user) {
+                        this.saveSession(session.user);
+                        if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser);
+                    } else if (event === 'SIGNED_OUT') {
+                        this.currentUser = null;
+                        this.clearSession();
+                        if (onAuthChangeCallback) onAuthChangeCallback(null);
+                    }
+                });
             } catch (e) {
-                console.warn('Google Sign-In notice, starting user session:', e);
+                console.warn('Supabase auth getSession notice:', e);
             }
         }
-        
-        // Demo session for local/offline environment
-        const demoUser = {
-            uid: 'usr-google-' + Date.now().toString(36),
-            displayName: 'Cantonese Learner',
-            email: 'learner@example.com',
-            photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
-        };
-        this.currentUser = demoUser;
-        this.saveSession(demoUser);
-        if (window.UIManager) window.UIManager.handleAuthChange(demoUser);
-        return demoUser;
-    }
-
-    static async signInWithEmail(email, password) {
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-            try {
-                const res = await firebase.auth().signInWithEmailAndPassword(email, password);
-                this.currentUser = res.user;
-                this.saveSession(res.user);
-                if (window.UIManager) window.UIManager.handleAuthChange(res.user);
-                return res.user;
-            } catch (e) {
-                console.warn('Email sign in notice:', e);
-            }
-        }
-        const user = {
-            uid: 'usr-' + (email ? btoa(email).replace(/=/g, '').toLowerCase().slice(0, 10) : 'user'),
-            displayName: email ? email.split('@')[0] : 'Learner',
-            email: email || 'user@example.com',
-            photoURL: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
-        };
-        this.currentUser = user;
-        this.saveSession(user);
-        if (window.UIManager) window.UIManager.handleAuthChange(user);
-        return user;
     }
 
     static async registerWithEmail(email, password) {
-        return this.signInWithEmail(email, password);
+        StorageManager.initSupabase();
+        if (!email || !password) throw new Error('Please provide both email and password.');
+        if (password.length < 6) throw new Error('Password must be at least 6 characters.');
+
+        if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
+            const { data, error } = await StorageManager.supabaseClient.auth.signUp({
+                email: email.trim(),
+                password: password
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            if (data && data.user) {
+                this.saveSession(data.user);
+                await StorageManager.fetchUserProgress();
+                if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
+                    window.UIManager.handleAuthChange(this.currentUser);
+                }
+                return data.user;
+            }
+        }
+
+        throw new Error('Supabase authentication client is not available.');
+    }
+
+    static async signInWithEmail(email, password) {
+        StorageManager.initSupabase();
+        if (!email || !password) throw new Error('Please enter both email and password.');
+
+        if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
+            const { data, error } = await StorageManager.supabaseClient.auth.signInWithPassword({
+                email: email.trim(),
+                password: password
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            if (data && data.user) {
+                this.saveSession(data.user);
+                await StorageManager.fetchUserProgress();
+                if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
+                    window.UIManager.handleAuthChange(this.currentUser);
+                }
+                return data.user;
+            }
+        }
+
+        throw new Error('Supabase authentication client is not available.');
+    }
+
+    static async signInWithGoogle() {
+        StorageManager.initSupabase();
+        if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
+            try {
+                const { data, error } = await StorageManager.supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin
+                    }
+                });
+                if (error) throw error;
+                return data;
+            } catch (e) {
+                console.warn('Supabase Google OAuth notice:', e);
+                throw new Error(e.message || 'Google OAuth is not configured in Supabase console.');
+            }
+        }
+        throw new Error('Supabase authentication client is not available.');
     }
 
     static async signOut() {
-        if (typeof firebase !== 'undefined' && firebase.auth) {
+        StorageManager.initSupabase();
+        if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
             try {
-                await firebase.auth().signOut();
-            } catch (e) { console.warn(e); }
+                await StorageManager.supabaseClient.auth.signOut();
+            } catch (e) {
+                console.warn('Supabase signOut error:', e);
+            }
         }
         this.currentUser = null;
         this.clearSession();
-        if (window.UIManager) window.UIManager.handleAuthChange(null);
+        if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
+            window.UIManager.handleAuthChange(null);
+        }
     }
 }
 
@@ -807,6 +825,12 @@ class StorageManager {
         const userId = AuthManager.currentUser ? AuthManager.currentUser.uid : 'guest';
         this.initSupabase();
 
+        let guestProgress = { masteredItemIds: [], favoriteItemIds: [], likedProfileIds: [] };
+        try {
+            const guestRaw = localStorage.getItem(`${this.USER_PROGRESS_KEY}_guest`) || localStorage.getItem(this.USER_PROGRESS_KEY);
+            if (guestRaw) guestProgress = JSON.parse(guestRaw);
+        } catch (e) {}
+
         // 1. Try Supabase Postgres user_progress table
         if (this.supabaseClient) {
             try {
@@ -816,12 +840,21 @@ class StorageManager {
                     .eq('user_id', userId)
                     .single();
                 if (data && !error) {
+                    // Merge guest progress into cloud profile seamlessly
+                    const masteredUnion = Array.from(new Set([...(data.mastered_item_ids || []), ...(guestProgress.masteredItemIds || [])]));
+                    const favUnion = Array.from(new Set([...(data.favorite_item_ids || []), ...(guestProgress.favoriteItemIds || [])]));
+                    const likedUnion = Array.from(new Set([...(data.liked_profile_ids || []), ...(guestProgress.likedProfileIds || [])]));
+
                     this.userProgress = {
-                        masteredItemIds: data.mastered_item_ids || [],
-                        favoriteItemIds: data.favorite_item_ids || [],
-                        likedProfileIds: data.liked_profile_ids || []
+                        masteredItemIds: masteredUnion,
+                        favoriteItemIds: favUnion,
+                        likedProfileIds: likedUnion
                     };
                     localStorage.setItem(`${this.USER_PROGRESS_KEY}_${userId}`, JSON.stringify(this.userProgress));
+
+                    if (userId !== 'guest' && (guestProgress.masteredItemIds.length > 0 || guestProgress.favoriteItemIds.length > 0)) {
+                        await this.saveUserProgress();
+                    }
                     return this.userProgress;
                 }
             } catch (e) {
@@ -841,7 +874,12 @@ class StorageManager {
 
         try {
             const raw = localStorage.getItem(`${this.USER_PROGRESS_KEY}_${userId}`);
-            if (raw) this.userProgress = JSON.parse(raw);
+            if (raw) {
+                this.userProgress = JSON.parse(raw);
+            } else if (userId !== 'guest') {
+                this.userProgress = guestProgress;
+                await this.saveUserProgress();
+            }
         } catch (e) {}
         return this.userProgress;
     }
@@ -1497,6 +1535,7 @@ class UIManager {
         this.searchQuery = '';
         this.filterTab = 'all';
         this.draftParsedItems = [];
+        this.authMode = 'signin';
 
         this.dashCategoryFilter = 'all';
         this.dashSearchQuery = '';
@@ -1591,45 +1630,105 @@ class UIManager {
         if (this.btnCloseAuth) {
             this.btnCloseAuth.addEventListener('click', () => this.closeAuthModal());
         }
-        if (this.btnGoogleSignin) {
-            this.btnGoogleSignin.addEventListener('click', async () => {
-                const user = await AuthManager.signInWithGoogle();
-                if (user) {
-                    this.closeAuthModal();
-                    this.showToast(`Welcome, ${user.displayName || 'Learner'}! 👋`, 'success');
+
+        const tabSignIn = document.getElementById('tab-auth-signin');
+        if (tabSignIn) {
+            tabSignIn.addEventListener('click', () => this.setAuthMode('signin'));
+        }
+
+        const tabRegister = document.getElementById('tab-auth-register');
+        if (tabRegister) {
+            tabRegister.addEventListener('click', () => this.setAuthMode('register'));
+        }
+
+        const btnGoogleSignin = document.getElementById('btn-google-signin');
+        if (btnGoogleSignin) {
+            btnGoogleSignin.addEventListener('click', async () => {
+                const errorAlert = document.getElementById('auth-error-alert');
+                const errorMsg = document.getElementById('auth-error-message');
+                if (errorAlert) errorAlert.classList.add('hidden');
+
+                try {
+                    await AuthManager.signInWithGoogle();
+                } catch (err) {
+                    if (errorAlert && errorMsg) {
+                        errorMsg.textContent = err.message || 'Google sign-in error';
+                        errorAlert.classList.remove('hidden');
+                    }
+                    this.showToast(err.message || 'Google sign-in error', 'warning');
                 }
             });
         }
+
         if (this.btnUserSignout) {
             this.btnUserSignout.addEventListener('click', async () => {
                 await AuthManager.signOut();
                 this.showToast('Signed out successfully.', 'info');
             });
         }
-        if (this.formEmailAuth) {
-            this.formEmailAuth.addEventListener('submit', async (e) => {
+
+        const formEmailAuth = document.getElementById('form-email-auth');
+        if (formEmailAuth) {
+            formEmailAuth.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('input-auth-email').value;
-                const password = document.getElementById('input-auth-password').value;
-                const user = await AuthManager.signInWithEmail(email, password);
-                if (user) {
-                    this.closeAuthModal();
-                    this.showToast(`Welcome back, ${user.displayName || 'Learner'}! 👋`, 'success');
-                }
-            });
-        }
-        if (this.btnAuthRegister) {
-            this.btnAuthRegister.addEventListener('click', async () => {
-                const email = document.getElementById('input-auth-email').value;
-                const password = document.getElementById('input-auth-password').value;
+                const emailInput = document.getElementById('input-auth-email');
+                const passwordInput = document.getElementById('input-auth-password');
+                const submitBtn = document.getElementById('btn-auth-submit');
+                const submitLabel = document.getElementById('btn-auth-submit-label');
+                const errorAlert = document.getElementById('auth-error-alert');
+                const errorMsg = document.getElementById('auth-error-message');
+
+                if (errorAlert) errorAlert.classList.add('hidden');
+
+                const email = emailInput ? emailInput.value.trim() : '';
+                const password = passwordInput ? passwordInput.value : '';
+
                 if (!email || !password) {
-                    this.showToast('Please enter an email and password to register.', 'warning');
+                    if (errorAlert && errorMsg) {
+                        errorMsg.textContent = 'Please enter both your email address and password.';
+                        errorAlert.classList.remove('hidden');
+                    }
                     return;
                 }
-                const user = await AuthManager.registerWithEmail(email, password);
-                if (user) {
-                    this.closeAuthModal();
-                    this.showToast(`Registered successfully! Welcome ${user.displayName}! 🎉`, 'success');
+
+                if (this.authMode === 'register' && password.length < 6) {
+                    if (errorAlert && errorMsg) {
+                        errorMsg.textContent = 'Password must be at least 6 characters long.';
+                        errorAlert.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                const origText = submitLabel ? submitLabel.textContent : 'Submit';
+                if (submitLabel) submitLabel.textContent = this.authMode === 'register' ? 'Creating account...' : 'Signing in...';
+                if (submitBtn) submitBtn.disabled = true;
+
+                try {
+                    if (this.authMode === 'register') {
+                        const user = await AuthManager.registerWithEmail(email, password);
+                        this.closeAuthModal();
+                        this.showToast(`🎉 Account created! Welcome, ${user.displayName || 'Learner'}!`, 'success');
+                    } else {
+                        const user = await AuthManager.signInWithEmail(email, password);
+                        this.closeAuthModal();
+                        this.showToast(`👋 Welcome back, ${user.displayName || 'Learner'}!`, 'success');
+                    }
+                } catch (err) {
+                    console.warn('Auth submission error:', err);
+                    let displayError = err.message || 'Authentication failed. Please check your credentials.';
+                    if (displayError.includes('Invalid login credentials')) {
+                        displayError = 'Invalid email or password. If you do not have an account yet, click "Create Account".';
+                    } else if (displayError.includes('User already registered')) {
+                        displayError = 'An account with this email already exists. Please switch to "Sign In".';
+                    }
+                    if (errorAlert && errorMsg) {
+                        errorMsg.textContent = displayError;
+                        errorAlert.classList.remove('hidden');
+                    }
+                    this.showToast(displayError, 'error');
+                } finally {
+                    if (submitLabel) submitLabel.textContent = origText;
+                    if (submitBtn) submitBtn.disabled = false;
                 }
             });
         }
@@ -3080,14 +3179,53 @@ class UIManager {
         }, 1200);
     }
 
+    setAuthMode(mode = 'signin') {
+        this.authMode = mode;
+        const tabSignIn = document.getElementById('tab-auth-signin');
+        const tabRegister = document.getElementById('tab-auth-register');
+        const titleElem = document.getElementById('auth-modal-title');
+        const subtitleElem = document.getElementById('auth-modal-subtitle');
+        const submitLabel = document.getElementById('btn-auth-submit-label');
+        const errorAlert = document.getElementById('auth-error-alert');
+
+        if (errorAlert) errorAlert.classList.add('hidden');
+
+        if (mode === 'signin') {
+            if (tabSignIn) {
+                tabSignIn.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition-all bg-sky-500 text-white shadow-md';
+            }
+            if (tabRegister) {
+                tabRegister.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200';
+            }
+            if (titleElem) titleElem.textContent = 'Welcome to Cantonese Learner';
+            if (subtitleElem) subtitleElem.textContent = 'Sign in to access and sync your Mastered words & Favorites.';
+            if (submitLabel) submitLabel.textContent = 'Sign In';
+        } else {
+            if (tabRegister) {
+                tabRegister.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition-all bg-sky-500 text-white shadow-md';
+            }
+            if (tabSignIn) {
+                tabSignIn.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200';
+            }
+            if (titleElem) titleElem.textContent = 'Create New Account';
+            if (subtitleElem) subtitleElem.textContent = 'Register with email & password to save decks and track progress in cloud.';
+            if (submitLabel) submitLabel.textContent = 'Create Account';
+        }
+    }
+
     openAuthModal() {
         if (this.modalAuth) {
+            this.setAuthMode('signin');
+            const errorAlert = document.getElementById('auth-error-alert');
+            if (errorAlert) errorAlert.classList.add('hidden');
             this.modalAuth.classList.remove('hidden');
         }
     }
 
     closeAuthModal() {
         if (this.modalAuth) {
+            const errorAlert = document.getElementById('auth-error-alert');
+            if (errorAlert) errorAlert.classList.add('hidden');
             this.modalAuth.classList.add('hidden');
         }
     }
