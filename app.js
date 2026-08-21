@@ -2113,6 +2113,45 @@ class UIManager {
 
         document.getElementById('modal-word').textContent = item.word;
         document.getElementById('modal-jyutping').textContent = item.jyutping;
+
+        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+        const isMastered = masteredSet.has(item.id);
+        const isFavorite = favSet.has(item.id);
+
+        const btnModalMastered = document.getElementById('modal-btn-toggle-mastered');
+        if (btnModalMastered) {
+            if (isMastered) {
+                btnModalMastered.className = 'px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm';
+                btnModalMastered.innerHTML = '✓ Mastered';
+            } else {
+                btnModalMastered.className = 'px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 hover:text-slate-200 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5';
+                btnModalMastered.innerHTML = 'Mark as Mastered';
+            }
+            btnModalMastered.onclick = (e) => {
+                e.stopPropagation();
+                this.toggleMastered(item.id);
+                this.openDetailModal(this.activeWordIndex);
+                if (this.currentView === 'profile-detail') this.renderProfileDetail();
+            };
+        }
+
+        const btnModalFav = document.getElementById('modal-btn-toggle-favorite');
+        if (btnModalFav) {
+            if (isFavorite) {
+                btnModalFav.className = 'px-3 py-1.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm';
+                btnModalFav.innerHTML = '⭐ Favorite';
+            } else {
+                btnModalFav.className = 'px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 hover:text-slate-200 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5';
+                btnModalFav.innerHTML = '☆ Add to Favorites';
+            }
+            btnModalFav.onclick = (e) => {
+                e.stopPropagation();
+                this.toggleFavorite(item.id);
+                this.openDetailModal(this.activeWordIndex);
+                if (this.currentView === 'profile-detail') this.renderProfileDetail();
+            };
+        }
         
         const meaningZhElem = document.getElementById('modal-meaning-zh');
         if (meaningZhElem) meaningZhElem.textContent = item.meaning_zh || item.word;
@@ -2378,14 +2417,29 @@ class UIManager {
             cardInner.onclick = () => this.toggleStudyCardFlip();
         }
 
-        document.getElementById('btn-study-mastered').onclick = (e) => {
-            e.stopPropagation();
-            const currentItem = this.activeProfile.items[this.studyIndex];
-            if (currentItem) {
-                this.toggleMastered(currentItem.id);
-                this.renderStudyCard();
-            }
-        };
+        const btnStudyFav = document.getElementById('btn-study-favorite');
+        if (btnStudyFav) {
+            btnStudyFav.onclick = (e) => {
+                e.stopPropagation();
+                const currentItem = this.activeProfile.items[this.studyIndex];
+                if (currentItem) {
+                    this.toggleFavorite(currentItem.id);
+                    this.renderStudyCard();
+                }
+            };
+        }
+
+        const btnStudyMastered = document.getElementById('btn-study-mastered');
+        if (btnStudyMastered) {
+            btnStudyMastered.onclick = (e) => {
+                e.stopPropagation();
+                const currentItem = this.activeProfile.items[this.studyIndex];
+                if (currentItem) {
+                    this.toggleMastered(currentItem.id);
+                    this.renderStudyCard();
+                }
+            };
+        }
     }
 
     renderStudyCard() {
@@ -2396,6 +2450,11 @@ class UIManager {
 
         this.studyCardFlipped = false;
         if (cardInner) cardInner.classList.remove('is-flipped');
+
+        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+        const isMastered = masteredSet.has(item.id);
+        const isFavorite = favSet.has(item.id);
 
         document.getElementById('study-front-word').textContent = item.word;
         document.getElementById('study-front-jyutping').textContent = item.jyutping;
@@ -2450,13 +2509,26 @@ class UIManager {
             srsDueElem.textContent = item.nextReviewDate ? `Next review: ${days} day(s)` : 'Next review: Today';
         }
 
+        const btnFavorite = document.getElementById('btn-study-favorite');
+        if (btnFavorite) {
+            if (isFavorite) {
+                btnFavorite.className = 'px-3.5 py-2 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm';
+                btnFavorite.innerHTML = '⭐ Favorite';
+            } else {
+                btnFavorite.className = 'px-3.5 py-2 bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all';
+                btnFavorite.innerHTML = '☆ Favorite';
+            }
+        }
+
         const btnMastered = document.getElementById('btn-study-mastered');
-        if (item.mastered) {
-            btnMastered.className = 'px-4 py-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm';
-            btnMastered.innerHTML = '✓ Mastered';
-        } else {
-            btnMastered.className = 'px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all';
-            btnMastered.innerHTML = 'Mark as Mastered';
+        if (btnMastered) {
+            if (isMastered) {
+                btnMastered.className = 'px-4 py-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm';
+                btnMastered.innerHTML = '✓ Mastered';
+            } else {
+                btnMastered.className = 'px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all';
+                btnMastered.innerHTML = 'Mark as Mastered';
+            }
         }
     }
 
