@@ -1,10 +1,15 @@
 # 🇭🇰 Cantonese Vocabulary Learner (廣東話學習)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI Pipeline](https://github.com/alexfraser-scotch/cantonese-learner/actions/workflows/ci.yml/badge.svg)](https://github.com/alexfraser-scotch/cantonese-learner/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-cantonese.swiftflowdigital.com-orange)](https://cantonese.swiftflowdigital.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-An interactive, open-source Cantonese Vocabulary Learning application featuring **3D flip flashcards**, **Jyutping (粵拼) 6-tone notation**, **Web Speech API audio pronunciation**, and **crowdsourced public deck sharing**.
+An interactive, open-source Cantonese Vocabulary Learning platform featuring **3D flip flashcards**, **Jyutping (粵拼) 6-tone notation**, **Web Speech API audio pronunciation**, **Leitner Spaced Repetition (SRS)**, and **crowdsourced public deck sharing**.
+
+🌐 **Live Application:** [https://cantonese.swiftflowdigital.com](https://cantonese.swiftflowdigital.com)  
+📦 **GitHub Repository:** [https://github.com/alexfraser-scotch/cantonese-learner](https://github.com/alexfraser-scotch/cantonese-learner)
 
 ---
 

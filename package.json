@@ -7,13 +7,23 @@
     "start": "node server.js",
     "test": "node --test test/*.test.js"
   },
+  "homepage": "https://cantonese.swiftflowdigital.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexfraser-scotch/cantonese-learner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexfraser-scotch/cantonese-learner/issues"
+  },
   "keywords": [
     "cantonese",
     "vocabulary",
     "jyutping",
     "flashcards",
-    "learning",
-    "audio"
+    "spaced-repetition",
+    "language-learning",
+    "open-source",
+    "web-speech-api"
   ],
   "author": "alexfraser-scotch",
   "license": "MIT"

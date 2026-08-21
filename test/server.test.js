@@ -96,12 +96,16 @@ test('Open-source governance templates verification', (t) => {
     const rootDir = path.join(__dirname, '..');
     const licenseFile = path.join(rootDir, 'LICENSE');
     const readmeFile = path.join(rootDir, 'README.md');
+    const securityFile = path.join(rootDir, 'SECURITY.md');
+    const conductFile = path.join(rootDir, 'CODE_OF_CONDUCT.md');
     const bugTemplate = path.join(rootDir, '.github', 'ISSUE_TEMPLATE', 'bug_report.md');
     const featureTemplate = path.join(rootDir, '.github', 'ISSUE_TEMPLATE', 'feature_request.md');
     const prTemplate = path.join(rootDir, '.github', 'PULL_REQUEST_TEMPLATE.md');
 
     assert.strictEqual(fs.existsSync(licenseFile), true, 'LICENSE file should exist');
     assert.strictEqual(fs.existsSync(readmeFile), true, 'README.md should exist');
+    assert.strictEqual(fs.existsSync(securityFile), true, 'SECURITY.md should exist');
+    assert.strictEqual(fs.existsSync(conductFile), true, 'CODE_OF_CONDUCT.md should exist');
     assert.strictEqual(fs.existsSync(bugTemplate), true, 'Bug report issue template should exist');
     assert.strictEqual(fs.existsSync(featureTemplate), true, 'Feature request issue template should exist');
     assert.strictEqual(fs.existsSync(prTemplate), true, 'PR template should exist');
