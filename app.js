@@ -130,11 +130,82 @@ class CantoneseDictionary {
     static getTopicImage(word, meaning = '') {
         const text = `${word} ${meaning}`.toLowerCase();
 
-        // 1. Family & People Topics
-        if (text.includes('爸爸') || text.includes('父親') || text.includes('father') || text.includes('dad') || text.includes('daddy')) {
+        // 1. Meals & Dining (Explicit Fixes for Breakfast, Lunch, Dinner, Rice, Noodles)
+        if (text.includes('早餐') || text.includes('朝食') || text.includes('breakfast')) {
+            return 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('午餐') || text.includes('晝食') || text.includes('午飯') || text.includes('lunch')) {
+            return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('晚餐') || text.includes('夜飯') || text.includes('晚飯') || text.includes('dinner') || text.includes('supper')) {
+            return 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('白飯') || text.includes('米飯') || text.includes('steamed rice') || (text.includes('飯') && text.includes('rice'))) {
+            return 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('麵條') || text.includes('麵') || text.includes('粉麵') || text.includes('noodle') || text.includes('ramen')) {
+            return 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('粥') || text.includes('congee') || text.includes('porridge')) {
+            return 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('麵包') || text.includes('面包') || text.includes('bread') || text.includes('toast')) {
+            return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('蛋') || text.includes('雞蛋') || text.includes('egg')) {
+            return 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('點心') || text.includes('dim sum')) {
+            return 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('燒賣') || text.includes('siu mai')) {
+            return 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('蝦餃') || text.includes('har gow') || text.includes('dumpling')) {
+            return 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('凍檸茶') || text.includes('檸茶') || text.includes('lemon tea')) {
+            return 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('奶茶') || text.includes('milk tea')) {
+            return 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('咖啡') || text.includes('coffee')) {
+            return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('茶') || text.includes('tea')) {
+            return 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('蘋果') || text.includes('apple')) {
+            return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('香蕉') || text.includes('banana')) {
+            return 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('西瓜') || text.includes('watermelon')) {
+            return 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('水果') || text.includes('fruit')) {
+            return 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('牛肉') || text.includes('beef')) {
+            return 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('雞肉') || text.includes('chicken')) {
+            return 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('魚') || text.includes('fish')) {
+            return 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('飯') || text.includes('食') || text.includes('food') || text.includes('eat') || text.includes('meal')) {
+            return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // 2. Family & People Topics
+        if (text.includes('爸爸') || text.includes('父親') || text.includes('father') || text.includes('dad')) {
             return 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('媽媽') || text.includes('母親') || text.includes('mother') || text.includes('mom') || text.includes('mommy')) {
+        if (text.includes('媽媽') || text.includes('母親') || text.includes('mother') || text.includes('mom')) {
             return 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80';
         }
         if (text.includes('哥哥') || text.includes('兄長') || text.includes('elder brother') || text.includes('brother')) {
@@ -149,10 +220,10 @@ class CantoneseDictionary {
         if (text.includes('妹妹') || text.includes('胞妹') || text.includes('younger sister')) {
             return 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('爺爺') || text.includes('祖父') || text.includes('公公') || text.includes('grandfather') || text.includes('grandpa')) {
+        if (text.includes('爺爺') || text.includes('祖父') || text.includes('公公') || text.includes('grandfather')) {
             return 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('嫲嫲') || text.includes('婆婆') || text.includes('祖母') || text.includes('grandmother') || text.includes('grandma')) {
+        if (text.includes('嫲嫲') || text.includes('婆婆') || text.includes('祖母') || text.includes('grandmother')) {
             return 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=600&q=80';
         }
         if (text.includes('家庭') || text.includes('家人') || text.includes('屋企人') || text.includes('family')) {
@@ -174,18 +245,15 @@ class CantoneseDictionary {
             return 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80';
         }
 
-        // 2. Household & Daily Life Topics
-        if (text.includes('廁所') || text.includes('洗手間') || text.includes('bathroom') || text.includes('toilet') || text.includes('restroom')) {
+        // 3. Household, Technology & Places
+        if (text.includes('廁所') || text.includes('洗手間') || text.includes('bathroom') || text.includes('toilet')) {
             return 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('椅子') || text.includes('chair') || text.includes('seat')) {
+        if (text.includes('椅子') || text.includes('chair')) {
             return 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=600&q=80';
         }
         if (text.includes('睡房') || text.includes('bedroom')) {
             return 'https://images.unsplash.com/photo-1540518614846-7ede433c5163?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('房間') || text.includes('room')) {
-            return 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80';
         }
         if (text.includes('客廳') || text.includes('living room')) {
             return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&q=80';
@@ -193,61 +261,65 @@ class CantoneseDictionary {
         if (text.includes('廚房') || text.includes('kitchen')) {
             return 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('門口') || text.includes('門') || text.includes('door')) {
-            return 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80';
+        if (text.includes('學校') || text.includes('school')) {
+            return 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('窗口') || text.includes('窗') || text.includes('window')) {
-            return 'https://images.unsplash.com/photo-1509644851169-2acc08aa25b5?auto=format&fit=crop&w=600&q=80';
+        if (text.includes('醫院') || text.includes('hospital')) {
+            return 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('衣服') || text.includes('衣物') || text.includes('clothes') || text.includes('clothing')) {
-            return 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=600&q=80';
+        if (text.includes('機場') || text.includes('airport')) {
+            return 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('褲子') || text.includes('長褲') || text.includes('trousers') || text.includes('pants')) {
-            return 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('鞋子') || text.includes('鞋') || text.includes('shoes')) {
-            return 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('帽子') || text.includes('cap') || text.includes('hat')) {
-            return 'https://images.unsplash.com/photo-1521369984125-658257002015?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('水') || text.includes('water') || text.includes('drink')) {
-            return 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('飯') || text.includes('食') || text.includes('food') || text.includes('eat') || text.includes('meal')) {
-            return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('茶') || text.includes('tea')) {
-            return 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('車') || text.includes('car')) {
-            return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80';
+        if (text.includes('公園') || text.includes('park')) {
+            return 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=600&q=80';
         }
         if (text.includes('巴士') || text.includes('bus')) {
             return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80';
         }
+        if (text.includes('的士') || text.includes('taxi') || text.includes('cab')) {
+            return 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('地鐵') || text.includes('mtr') || text.includes('subway')) {
+            return 'https://images.unsplash.com/photo-1515165562839-978bbcf18277?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('飛機') || text.includes('airplane') || text.includes('flight')) {
+            return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('車') || text.includes('car')) {
+            return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80';
+        }
         if (text.includes('書') || text.includes('book')) {
             return 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('電話') || text.includes('phone')) {
+        if (text.includes('手提電話') || text.includes('電話') || text.includes('phone') || text.includes('mobile')) {
             return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('電腦') || text.includes('computer')) {
+        if (text.includes('電腦') || text.includes('computer') || text.includes('laptop')) {
             return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=600&q=80';
         }
         if (text.includes('錢') || text.includes('money')) {
             return 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=600&q=80';
         }
+        if (text.includes('狗') || text.includes('dog')) {
+            return 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('貓') || text.includes('cat')) {
+            return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('太陽') || text.includes('晴天') || text.includes('sun') || text.includes('sunny')) {
+            return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+        }
+        if (text.includes('雨') || text.includes('rain')) {
+            return 'https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=600&q=80';
+        }
 
-        // 2. Curated Deterministic Unsplash High-Res Pool
+        // 4. Fallback Pool with Diverse High-Res Concept Images
         const fallbackPool = [
-            'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+            'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
             'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80',
             'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
+            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80'
         ];
         let hash = 0;
         for (let i = 0; i < word.length; i++) {
