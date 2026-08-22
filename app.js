@@ -675,7 +675,9 @@ class AuthManager {
                     uid: user.id || user.uid,
                     displayName: (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || (user.email ? user.email.split('@')[0] : 'Learner'),
                     email: user.email || '',
-                    photoURL: (user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'
+                    photoURL: (user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
+                    role: user.role || (user.email && user.email.toLowerCase() === 'canewjour@gmail.com' ? 'root' : 'user'),
+                    status: user.status || 'active'
                 };
                 const val = JSON.stringify(sessionUser);
                 localStorage.setItem(this.STORAGE_KEY, val);
@@ -685,6 +687,44 @@ class AuthManager {
         } catch (e) {
             console.warn('Failed to save user session:', e);
         }
+    }
+
+    static async syncUserBackend(user) {
+        if (!user || !user.email) return user;
+        try {
+            const resp = await fetch('/api/auth/sync-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    uid: user.id || user.uid,
+                    email: user.email,
+                    displayName: user.displayName || (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name))
+                })
+            });
+
+            if (resp.status === 403) {
+                const data = await resp.json();
+                await this.signOut();
+                alert(data.error || 'Your account has been disabled by an administrator.');
+                return null;
+            }
+
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.success && data.user) {
+                    if (this.currentUser) {
+                        this.currentUser.role = data.user.role || 'user';
+                        this.currentUser.status = data.user.status || 'active';
+                        this.currentUser.displayName = data.user.displayName || this.currentUser.displayName;
+                        this.saveSession(this.currentUser);
+                    }
+                    return data.user;
+                }
+            }
+        } catch (e) {
+            console.warn('Backend syncUser notice:', e.message);
+        }
+        return user;
     }
 
     static clearSession() {
@@ -701,6 +741,9 @@ class AuthManager {
             const savedUser = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
             if (savedUser) {
                 this.currentUser = JSON.parse(savedUser);
+                if (this.currentUser && this.currentUser.email && this.currentUser.email.toLowerCase() === 'canewjour@gmail.com') {
+                    this.currentUser.role = 'root';
+                }
                 return this.currentUser;
             }
         } catch (e) {
@@ -730,6 +773,7 @@ class AuthManager {
                 const { data: { session } } = await StorageManager.supabaseClient.auth.getSession();
                 if (session && session.user) {
                     this.saveSession(session.user);
+                    await this.syncUserBackend(session.user);
                     if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser);
                 }
 
@@ -737,6 +781,7 @@ class AuthManager {
                 StorageManager.supabaseClient.auth.onAuthStateChange(async (event, session) => {
                     if (session && session.user) {
                         this.saveSession(session.user);
+                        await this.syncUserBackend(session.user);
                         if (onAuthChangeCallback) onAuthChangeCallback(this.currentUser);
                     } else if (event === 'SIGNED_OUT') {
                         this.currentUser = null;
@@ -774,6 +819,7 @@ class AuthManager {
             if (data && data.user) {
                 if (data.session && data.session.user) {
                     this.saveSession(data.session.user);
+                    await this.syncUserBackend(data.session.user);
                     await StorageManager.fetchUserProgress();
                     if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
                         window.UIManager.handleAuthChange(this.currentUser);
@@ -802,11 +848,12 @@ class AuthManager {
 
             if (data && data.user) {
                 this.saveSession(data.user);
+                await this.syncUserBackend(data.user);
                 await StorageManager.fetchUserProgress();
                 if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
                     window.UIManager.handleAuthChange(this.currentUser);
                 }
-                return data.user;
+                return this.currentUser || data.user;
             }
         }
 
@@ -1656,6 +1703,7 @@ class UIManager {
         this.viewStudyMode = document.getElementById('view-study-mode');
         this.viewQuizMode = document.getElementById('view-quiz-mode');
         this.viewToneQuiz = document.getElementById('view-tone-quiz');
+        this.viewAdminPortal = document.getElementById('view-admin-portal');
 
         this.speechWarningBanner = document.getElementById('speech-warning-banner');
         this.modalCreateProfile = document.getElementById('modal-create-profile');
@@ -1675,7 +1723,7 @@ class UIManager {
         this.navNewProfileBtn = document.getElementById('nav-new-profile-btn');
         this.heroCreateProfileBtn = document.getElementById('hero-create-profile-btn');
         this.navSyncBtn = document.getElementById('nav-sync-btn');
-        this.navResetBtn = document.getElementById('nav-reset-btn');
+        this.btnNavAdminPortal = document.getElementById('btn-nav-admin-portal');
     }
 
     bindEvents() {
@@ -1695,14 +1743,18 @@ class UIManager {
                 this.showToast('Community decks synced!', 'success');
             });
         }
-        if (this.navResetBtn) {
-            this.navResetBtn.addEventListener('click', () => {
-                if (confirm('Reset all vocabulary lists back to default sample profiles? Custom lists will be overwritten.')) {
-                    StorageManager.resetToDefault();
-                    this.showToast('Reset profiles to defaults successfully.', 'info');
-                    this.switchView('dashboard');
-                }
-            });
+        // Admin Portal Search & Filter Bindings
+        const adminSearchUsers = document.getElementById('admin-search-users');
+        if (adminSearchUsers) {
+            adminSearchUsers.addEventListener('input', () => this.filterAndRenderAdminUsers());
+        }
+        const adminFilterRole = document.getElementById('admin-filter-role');
+        if (adminFilterRole) {
+            adminFilterRole.addEventListener('change', () => this.filterAndRenderAdminUsers());
+        }
+        const adminSearchDecks = document.getElementById('admin-search-decks');
+        if (adminSearchDecks) {
+            adminSearchDecks.addEventListener('input', () => this.filterAndRenderAdminDecks());
         }
 
         // Auth UI Bindings
@@ -1952,12 +2004,25 @@ class UIManager {
         this.viewStudyMode.classList.add('hidden');
         this.viewQuizMode.classList.add('hidden');
         if (this.viewToneQuiz) this.viewToneQuiz.classList.add('hidden');
+        if (this.viewAdminPortal) this.viewAdminPortal.classList.add('hidden');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         if (targetView === 'dashboard') {
             this.renderDashboard();
             this.viewDashboard.classList.remove('hidden');
+        } else if (targetView === 'admin-portal') {
+            const user = AuthManager.currentUser;
+            const role = user ? (user.role || (user.email && user.email.toLowerCase() === 'canewjour@gmail.com' ? 'root' : 'user')) : 'guest';
+            if (role !== 'admin' && role !== 'root') {
+                this.showToast('⛔ Access Denied: Admin privileges required.', 'error');
+                this.switchView('dashboard');
+                return;
+            }
+            if (this.viewAdminPortal) {
+                this.viewAdminPortal.classList.remove('hidden');
+                this.loadAdminData();
+            }
         } else if (targetView === 'profile-detail') {
             this.activeProfile = StorageManager.getProfileById(params.profileId);
             if (this.activeProfile) {
@@ -2101,6 +2166,7 @@ class UIManager {
                 <div>
                     <div class="flex items-start justify-between gap-3 mb-3">
                         <div class="flex items-center gap-1.5 flex-wrap">
+                            ${p.featured ? '<span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-[11px] font-bold flex items-center gap-1">⭐ Featured</span>' : ''}
                             <span class="px-2.5 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full text-[11px] font-semibold uppercase tracking-wider">${this.escapeHTML(p.category || 'General')}</span>
                             <span class="px-2 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded-full text-[11px] font-semibold">${this.escapeHTML(p.difficulty || 'Beginner')}</span>
                         </div>
@@ -3334,6 +3400,10 @@ class UIManager {
         const userAvatarImg = document.getElementById('user-avatar-img');
         const userDisplayName = document.getElementById('user-display-name');
         const userEmailText = document.getElementById('user-email-text');
+        const btnNavAdmin = document.getElementById('btn-nav-admin-portal');
+        const userRoleBadge = document.getElementById('user-role-badge');
+        const userDropdownRoleTag = document.getElementById('user-dropdown-role-tag');
+        const adminCurrentBadge = document.getElementById('admin-user-current-badge');
 
         if (user) {
             if (btnOpenAuth) btnOpenAuth.classList.add('hidden');
@@ -3341,14 +3411,467 @@ class UIManager {
             if (userAvatarImg) userAvatarImg.src = user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
             if (userDisplayName) userDisplayName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'Learner');
             if (userEmailText) userEmailText.textContent = user.email || '';
+
+            const role = user.role || (user.email && user.email.toLowerCase() === 'canewjour@gmail.com' ? 'root' : 'user');
+            const isStaff = role === 'admin' || role === 'root';
+
+            if (btnNavAdmin) {
+                if (isStaff) btnNavAdmin.classList.remove('hidden');
+                else btnNavAdmin.classList.add('hidden');
+            }
+
+            if (userRoleBadge) {
+                userRoleBadge.textContent = role === 'root' ? '👑 Root' : (role === 'admin' ? '🛡️ Admin' : 'Learner');
+                userRoleBadge.classList.remove('hidden');
+            }
+
+            if (userDropdownRoleTag) {
+                userDropdownRoleTag.textContent = `Role: ${role === 'root' ? '👑 Root Superadmin' : (role === 'admin' ? '🛡️ Admin' : '👤 Standard User')}`;
+            }
+
+            if (adminCurrentBadge) {
+                adminCurrentBadge.textContent = role === 'root' ? '👑 Root Superadmin' : '🛡️ Platform Admin';
+            }
         } else {
             if (btnOpenAuth) btnOpenAuth.classList.remove('hidden');
             if (userMenu) userMenu.classList.add('hidden');
+            if (btnNavAdmin) btnNavAdmin.classList.add('hidden');
+            if (userRoleBadge) userRoleBadge.classList.add('hidden');
         }
 
         await StorageManager.fetchUserProgress();
         this.renderDashboard();
         if (this.activeProfile) this.renderFilteredFlashcards();
+    }
+
+    // ==========================================
+    // Admin Portal & RBAC Management Methods
+    // ==========================================
+    switchAdminTab(tab) {
+        this.currentAdminTab = tab;
+        const tabUsers = document.getElementById('tab-admin-users');
+        const tabDecks = document.getElementById('tab-admin-decks');
+        const tabMaint = document.getElementById('tab-admin-maintenance');
+
+        const panelUsers = document.getElementById('admin-panel-users');
+        const panelDecks = document.getElementById('admin-panel-decks');
+        const panelMaint = document.getElementById('admin-panel-maintenance');
+
+        const activeClasses = 'px-4 py-2 text-xs font-bold rounded-xl transition-all bg-sky-500 text-white shadow-md flex items-center gap-2';
+        const inactiveClasses = 'px-4 py-2 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-900 flex items-center gap-2';
+
+        if (tabUsers) tabUsers.className = tab === 'users' ? activeClasses : inactiveClasses;
+        if (tabDecks) tabDecks.className = tab === 'decks' ? activeClasses : inactiveClasses;
+        if (tabMaint) tabMaint.className = tab === 'maintenance' ? activeClasses : inactiveClasses;
+
+        if (panelUsers) panelUsers.classList.toggle('hidden', tab !== 'users');
+        if (panelDecks) panelDecks.classList.toggle('hidden', tab !== 'decks');
+        if (panelMaint) panelMaint.classList.toggle('hidden', tab !== 'maintenance');
+    }
+
+    async loadAdminData() {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        try {
+            const resp = await fetch(`/api/admin/users?adminEmail=${encodeURIComponent(user.email)}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                this.adminUsersCache = data.users || [];
+                this.filterAndRenderAdminUsers();
+
+                const totalUsersElem = document.getElementById('admin-stat-total-users');
+                const totalAdminsElem = document.getElementById('admin-stat-total-admins');
+                if (totalUsersElem) totalUsersElem.textContent = this.adminUsersCache.length;
+                if (totalAdminsElem) {
+                    const adminCount = this.adminUsersCache.filter(u => u.role === 'admin' || u.role === 'root').length;
+                    totalAdminsElem.textContent = adminCount;
+                }
+            } else if (resp.status === 403) {
+                this.showToast('⛔ Admin authorization failed', 'error');
+                this.switchView('dashboard');
+                return;
+            }
+        } catch (e) {
+            console.warn('Failed to load admin users:', e);
+        }
+
+        this.filterAndRenderAdminDecks();
+    }
+
+    filterAndRenderAdminUsers() {
+        const tbody = document.getElementById('admin-users-table-body');
+        if (!tbody) return;
+
+        const searchInput = document.getElementById('admin-search-users');
+        const roleSelect = document.getElementById('admin-filter-role');
+
+        const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const roleFilter = roleSelect ? roleSelect.value : 'all';
+
+        let users = [...(this.adminUsersCache || [])];
+
+        if (q) {
+            users = users.filter(u => 
+                (u.email && u.email.toLowerCase().includes(q)) || 
+                (u.displayName && u.displayName.toLowerCase().includes(q))
+            );
+        }
+
+        if (roleFilter !== 'all') {
+            if (roleFilter === 'disabled') {
+                users = users.filter(u => u.status === 'disabled');
+            } else {
+                users = users.filter(u => u.role === roleFilter);
+            }
+        }
+
+        if (users.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">No users found matching filter.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = users.map(u => {
+            const isRoot = u.role === 'root' || u.isRoot || (u.email && u.email.toLowerCase() === 'canewjour@gmail.com');
+            const isAdmin = u.role === 'admin';
+            const isActive = u.status === 'active' || !u.status;
+
+            let roleBadge = '<span class="px-2 py-0.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-md text-[11px] font-mono">👤 User</span>';
+            if (isRoot) roleBadge = '<span class="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md text-[11px] font-mono font-bold">👑 Root Superadmin</span>';
+            else if (isAdmin) roleBadge = '<span class="px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/30 rounded-md text-[11px] font-mono font-bold">🛡️ Admin</span>';
+
+            const statusBadge = isActive
+                ? '<span class="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 rounded-md text-[10px] font-semibold flex items-center gap-1 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active</span>'
+                : '<span class="px-2 py-0.5 bg-rose-500/15 text-rose-300 border border-rose-500/30 rounded-md text-[10px] font-semibold flex items-center gap-1 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Disabled</span>';
+
+            const createdDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A';
+
+            return `
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-2.5">
+                            <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Avatar" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700">
+                            <div>
+                                <p class="font-bold text-slate-200">${this.escapeHTML(u.displayName || 'Learner')}</p>
+                                <p class="text-[11px] text-slate-400 font-mono">${this.escapeHTML(u.email || '')}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">${roleBadge}</td>
+                    <td class="py-3 px-4">${statusBadge}</td>
+                    <td class="py-3 px-4 text-slate-400 font-mono text-[11px]">${createdDate}</td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
+                            ${isRoot ? '<span class="text-[11px] text-amber-400/80 font-mono px-2 py-1 bg-amber-500/10 rounded-lg">Protected</span>' : `
+                                <select onchange="window.UIManager.handleAdminChangeRole('${u.id}', this.value)" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-200 rounded-lg px-2 py-1 focus:outline-none">
+                                    <option value="user" ${u.role === 'user' ? 'selected' : ''}>Role: User</option>
+                                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Role: Admin</option>
+                                </select>
+                                <button onclick="window.UIManager.handleAdminToggleStatus('${u.id}', '${u.status}')" title="${isActive ? 'Disable user access' : 'Enable user access'}" class="p-1.5 ${isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'} rounded-lg border border-slate-800 transition-all text-xs font-semibold">
+                                    ${isActive ? '⏸️ Lock' : '▶️ Unlock'}
+                                </button>
+                                <button onclick="window.UIManager.openAdminResetPasswordModal('${u.id}', '${this.escapeQuotes(u.email || '')}')" title="Reset password" class="p-1.5 text-sky-400 hover:bg-sky-500/10 rounded-lg border border-slate-800 transition-all text-xs">
+                                    🔑
+                                </button>
+                                <button onclick="window.UIManager.handleAdminDeleteUser('${u.id}', '${this.escapeQuotes(u.email || '')}')" title="Permanently delete user" class="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg border border-slate-800 transition-all text-xs">
+                                    🗑️
+                                </button>
+                            `}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    filterAndRenderAdminDecks() {
+        const tbody = document.getElementById('admin-decks-table-body');
+        if (!tbody) return;
+
+        const profiles = StorageManager.loadProfiles() || [];
+        const totalDecksElem = document.getElementById('admin-stat-total-decks');
+        const badgeElem = document.getElementById('admin-decks-count-badge');
+        if (totalDecksElem) totalDecksElem.textContent = profiles.length;
+        if (badgeElem) badgeElem.textContent = `${profiles.length} Decks`;
+
+        const searchInput = document.getElementById('admin-search-decks');
+        const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+        let filtered = [...profiles];
+        if (q) {
+            filtered = filtered.filter(p => 
+                p.name.toLowerCase().includes(q) || 
+                (p.author && p.author.toLowerCase().includes(q)) ||
+                (p.category && p.category.toLowerCase().includes(q))
+            );
+        }
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">No community decks found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(p => {
+            const isFeatured = !!p.featured;
+            return `
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                    <td class="py-3 px-4">
+                        <p class="font-bold text-slate-100">${this.escapeHTML(p.name)}</p>
+                        <span class="text-[10px] text-sky-400 font-mono">${this.escapeHTML(p.category || 'General')}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-300 text-xs">${this.escapeHTML(p.author || 'Community')}</td>
+                    <td class="py-3 px-4 font-mono text-slate-400">${p.items ? p.items.length : 0}</td>
+                    <td class="py-3 px-4 text-amber-400 font-mono font-bold">👍 ${p.likes || 0}</td>
+                    <td class="py-3 px-4">
+                        <button onclick="window.UIManager.handleAdminToggleFeatureDeck('${p.id}', ${!isFeatured})" class="px-2.5 py-1 ${isFeatured ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-slate-900 text-slate-400 border-slate-800'} border rounded-lg text-xs font-semibold transition-all flex items-center gap-1">
+                            ${isFeatured ? '⭐ Pinned (Featured)' : '☆ Standard'}
+                        </button>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="window.UIManager.handleAdminDeleteDeck('${p.id}', '${this.escapeQuotes(p.name)}')" class="px-2.5 py-1 text-rose-400 hover:bg-rose-500/10 border border-slate-800 rounded-lg text-xs transition-all flex items-center gap-1 ml-auto">
+                            🗑️ Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async handleAdminChangeRole(targetUserId, newRole) {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        try {
+            const resp = await fetch('/api/admin/users/role', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email,
+                    targetUserId: targetUserId,
+                    newRole: newRole
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast(`Role updated to ${newRole.toUpperCase()}!`, 'success');
+                this.loadAdminData();
+            } else {
+                this.showToast(data.error || 'Failed to update user role', 'error');
+                this.loadAdminData();
+            }
+        } catch (e) {
+            this.showToast('Error modifying user role', 'error');
+        }
+    }
+
+    async handleAdminToggleStatus(targetUserId, currentStatus) {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        const newStatus = currentStatus === 'disabled' ? 'active' : 'disabled';
+        if (!confirm(`Are you sure you want to ${newStatus === 'disabled' ? 'DISABLE' : 'ENABLE'} this user account?`)) return;
+
+        try {
+            const resp = await fetch('/api/admin/users/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email,
+                    targetUserId: targetUserId,
+                    newStatus: newStatus
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast(`User account is now ${newStatus.toUpperCase()}!`, 'success');
+                this.loadAdminData();
+            } else {
+                this.showToast(data.error || 'Failed to change user status', 'error');
+            }
+        } catch (e) {
+            this.showToast('Error modifying user status', 'error');
+        }
+    }
+
+    async handleAdminDeleteUser(targetUserId, email) {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        if (!confirm(`⚠️ PERMANENT ACTION:\nAre you sure you want to completely delete user ${email}? All user progress will be removed.`)) return;
+
+        try {
+            const resp = await fetch('/api/admin/users/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email,
+                    targetUserId: targetUserId
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast(`User ${email} deleted successfully.`, 'info');
+                this.loadAdminData();
+            } else {
+                this.showToast(data.error || 'Failed to delete user', 'error');
+            }
+        } catch (e) {
+            this.showToast('Error deleting user', 'error');
+        }
+    }
+
+    openAdminResetPasswordModal(targetUserId, email) {
+        this.adminTargetResetUserId = targetUserId;
+        this.adminTargetResetEmail = email;
+
+        const emailLabel = document.getElementById('admin-reset-target-email');
+        if (emailLabel) emailLabel.textContent = email;
+
+        const modal = document.getElementById('modal-admin-reset-password');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    async handleAdminSendPasswordResetLink() {
+        if (!this.adminTargetResetEmail) return;
+        try {
+            if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
+                const { error } = await StorageManager.supabaseClient.auth.resetPasswordForEmail(this.adminTargetResetEmail, {
+                    redirectTo: 'https://cantonese.swiftflowdigital.com/'
+                });
+                if (error) throw error;
+                this.showToast(`✉️ Password reset email sent to ${this.adminTargetResetEmail}!`, 'success');
+                const modal = document.getElementById('modal-admin-reset-password');
+                if (modal) modal.classList.add('hidden');
+            } else {
+                this.showToast('Supabase Auth client not initialized', 'warning');
+            }
+        } catch (e) {
+            this.showToast(e.message || 'Failed to dispatch reset email', 'error');
+        }
+    }
+
+    async handleAdminSetTempPassword(e) {
+        e.preventDefault();
+        const input = document.getElementById('input-admin-temp-password');
+        const tempPass = input ? input.value : '';
+        if (!tempPass || tempPass.length < 6) {
+            this.showToast('Temporary password must be at least 6 characters.', 'warning');
+            return;
+        }
+
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        try {
+            const resp = await fetch('/api/admin/users/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email,
+                    targetUserId: this.adminTargetResetUserId,
+                    newTempPassword: tempPass
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast(`🔑 Temporary password registered for ${this.adminTargetResetEmail}!`, 'success');
+                const modal = document.getElementById('modal-admin-reset-password');
+                if (modal) modal.classList.add('hidden');
+                if (input) input.value = '';
+            } else {
+                this.showToast(data.error || 'Failed to set temp password', 'error');
+            }
+        } catch (err) {
+            this.showToast('Error registering temp password', 'error');
+        }
+    }
+
+    async handleAdminToggleFeatureDeck(profileId, featured) {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        try {
+            const resp = await fetch('/api/admin/decks/feature', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email,
+                    profileId: profileId,
+                    featured: featured
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast(featured ? '⭐ Deck pinned as Featured!' : 'Deck unpinned from Featured', 'success');
+                await StorageManager.syncWithServer(() => {
+                    this.filterAndRenderAdminDecks();
+                    this.renderDashboard();
+                });
+            } else {
+                this.showToast(data.error || 'Failed to toggle featured status', 'error');
+            }
+        } catch (e) {
+            this.showToast('Error modifying deck status', 'error');
+        }
+    }
+
+    async handleAdminDeleteDeck(profileId, deckName) {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        if (!confirm(`Are you sure you want to delete community deck "${deckName}"?`)) return;
+
+        try {
+            const resp = await fetch('/api/admin/decks/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email,
+                    profileId: profileId
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast(`Deck "${deckName}" deleted.`, 'info');
+                await StorageManager.syncWithServer(() => {
+                    this.filterAndRenderAdminDecks();
+                    this.renderDashboard();
+                });
+            } else {
+                this.showToast(data.error || 'Failed to delete deck', 'error');
+            }
+        } catch (e) {
+            this.showToast('Error deleting deck', 'error');
+        }
+    }
+
+    async handleAdminResetProfilesPrompt() {
+        const user = AuthManager.currentUser;
+        if (!user || !user.email) return;
+
+        if (!confirm('⚠️ SYSTEM WARNING:\nThis will reset all starter profiles to default factory state. Proceed?')) return;
+
+        try {
+            const resp = await fetch('/api/admin/reset-profiles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: user.email
+                })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                this.showToast('✅ Default profiles have been restored to factory settings!', 'success');
+                await StorageManager.syncWithServer(() => {
+                    this.renderDashboard();
+                    this.filterAndRenderAdminDecks();
+                });
+            } else {
+                this.showToast(data.error || 'Failed to reset profiles', 'error');
+            }
+        } catch (e) {
+            this.showToast('Error executing system profiles reset', 'error');
+        }
     }
 
     checkEmailConfirmationRedirect() {

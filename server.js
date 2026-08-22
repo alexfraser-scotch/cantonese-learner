@@ -6,6 +6,117 @@ const PORT = process.env.PORT || 8080;
 
 const DATA_DIR = path.join(__dirname, 'data');
 const PROFILES_FILE = path.join(DATA_DIR, 'profiles.json');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+
+const ROOT_ADMIN_EMAILS = ['canewjour@gmail.com'];
+
+let inMemoryUsersStore = null;
+
+function ensureUsersFile() {
+    try {
+        if (!fs.existsSync(DATA_DIR)) {
+            fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+        if (!fs.existsSync(USERS_FILE)) {
+            const initialUsers = [
+                {
+                    id: 'usr-root-01',
+                    email: 'canewjour@gmail.com',
+                    displayName: 'canewjour (Root)',
+                    role: 'root',
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    lastLoginAt: new Date().toISOString()
+                }
+            ];
+            fs.writeFileSync(USERS_FILE, JSON.stringify(initialUsers, null, 2), 'utf-8');
+            inMemoryUsersStore = initialUsers;
+        }
+    } catch (e) {
+        console.warn('ensureUsersFile notice:', e.message);
+    }
+}
+
+function readUsers() {
+    ensureUsersFile();
+    if (inMemoryUsersStore && inMemoryUsersStore.length > 0) {
+        return inMemoryUsersStore;
+    }
+    try {
+        if (fs.existsSync(USERS_FILE)) {
+            const raw = fs.readFileSync(USERS_FILE, 'utf-8');
+            inMemoryUsersStore = JSON.parse(raw);
+        }
+    } catch (e) {
+        console.warn('readUsers notice:', e.message);
+    }
+
+    if (!Array.isArray(inMemoryUsersStore) || inMemoryUsersStore.length === 0) {
+        inMemoryUsersStore = [
+            {
+                id: 'usr-root-01',
+                email: 'canewjour@gmail.com',
+                displayName: 'canewjour (Root)',
+                role: 'root',
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                lastLoginAt: new Date().toISOString()
+            }
+        ];
+    }
+
+    // Guarantee Root Admin exists with immutable 'root' role and 'active' status
+    ROOT_ADMIN_EMAILS.forEach(rootEmail => {
+        const rootUser = inMemoryUsersStore.find(u => u.email && u.email.toLowerCase() === rootEmail.toLowerCase());
+        if (rootUser) {
+            rootUser.role = 'root';
+            rootUser.status = 'active';
+        } else {
+            inMemoryUsersStore.unshift({
+                id: `usr-root-${Date.now()}`,
+                email: rootEmail,
+                displayName: `${rootEmail.split('@')[0]} (Root)`,
+                role: 'root',
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                lastLoginAt: new Date().toISOString()
+            });
+        }
+    });
+
+    return inMemoryUsersStore;
+}
+
+function writeUsers(users) {
+    if (!Array.isArray(users)) return false;
+    // Enforce Root Admin immutability on write
+    users.forEach(u => {
+        if (u.email && ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === u.email.toLowerCase())) {
+            u.role = 'root';
+            u.status = 'active';
+        }
+    });
+    inMemoryUsersStore = users;
+    try {
+        if (!fs.existsSync(DATA_DIR)) {
+            fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
+        return true;
+    } catch (e) {
+        console.warn('writeUsers notice:', e.message);
+        return true;
+    }
+}
+
+function isAuthorizedAdmin(email) {
+    if (!email) return false;
+    const cleanEmail = email.toLowerCase().trim();
+    if (ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === cleanEmail)) return true;
+    const users = readUsers();
+    const user = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+    return !!(user && (user.role === 'admin' || user.role === 'root') && user.status === 'active');
+}
 
 const DEFAULT_PROFILES = [
     {
@@ -388,6 +499,354 @@ const server = http.createServer((req, res) => {
     }
 
     // ==========================================
+    // API ENDPOINT: AUTH SYNC USER (/api/auth/sync-user)
+    // ==========================================
+    if (pathName === '/api/auth/sync-user' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body || '{}');
+                const email = (data.email || '').toLowerCase().trim();
+                if (!email) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Email is required' }));
+                    return;
+                }
+
+                const users = readUsers();
+                let user = users.find(u => u.email && u.email.toLowerCase() === email);
+                const isRoot = ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === email);
+
+                if (!user) {
+                    user = {
+                        id: data.uid || `usr-${Date.now()}`,
+                        email: email,
+                        displayName: data.displayName || email.split('@')[0],
+                        role: isRoot ? 'root' : 'user',
+                        status: 'active',
+                        createdAt: new Date().toISOString(),
+                        lastLoginAt: new Date().toISOString()
+                    };
+                    users.push(user);
+                } else {
+                    user.lastLoginAt = new Date().toISOString();
+                    if (data.displayName && (!user.displayName || user.displayName === email.split('@')[0])) {
+                        user.displayName = data.displayName;
+                    }
+                    if (isRoot) {
+                        user.role = 'root';
+                        user.status = 'active';
+                    }
+                }
+
+                writeUsers(users);
+
+                if (user.status === 'disabled') {
+                    res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({
+                        success: false,
+                        disabled: true,
+                        error: 'Your account has been temporarily disabled by an administrator. Please contact support.'
+                    }));
+                    return;
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({
+                    success: true,
+                    user: user,
+                    role: user.role,
+                    status: user.status
+                }));
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+            }
+        });
+        return;
+    }
+
+    // ==========================================
+    // API ENDPOINTS: ADMIN PORTAL (/api/admin/*)
+    // ==========================================
+    if (pathName.startsWith('/api/admin/')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
+        // 1. GET /api/admin/users
+        if (pathName === '/api/admin/users' && req.method === 'GET') {
+            const queryParams = new URLSearchParams(urlParts[1] || '');
+            const adminEmail = queryParams.get('adminEmail');
+            if (!isAuthorizedAdmin(adminEmail)) {
+                res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                return;
+            }
+
+            const users = readUsers();
+            const profiles = readProfiles();
+            const enrichedUsers = users.map(u => ({
+                ...u,
+                isRoot: u.role === 'root' || ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === (u.email || '').toLowerCase()),
+                decksCount: profiles.filter(p => p.author && p.author.toLowerCase() === (u.displayName || '').toLowerCase()).length
+            }));
+
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({ success: true, users: enrichedUsers, rootEmails: ROOT_ADMIN_EMAILS }));
+            return;
+        }
+
+        // 2. POST /api/admin/users/role
+        if (pathName === '/api/admin/users/role' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    const users = readUsers();
+                    const target = users.find(u => u.id === data.targetUserId || u.email === data.targetUserEmail);
+
+                    if (!target) {
+                        res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Target user not found' }));
+                        return;
+                    }
+
+                    if (target.role === 'root' || ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === (target.email || '').toLowerCase())) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Permission denied: Root Admin role cannot be modified.' }));
+                        return;
+                    }
+
+                    target.role = data.newRole === 'admin' ? 'admin' : 'user';
+                    writeUsers(users);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, user: target }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+
+        // 3. POST /api/admin/users/status (Enable / Disable)
+        if (pathName === '/api/admin/users/status' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    const users = readUsers();
+                    const target = users.find(u => u.id === data.targetUserId || u.email === data.targetUserEmail);
+
+                    if (!target) {
+                        res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Target user not found' }));
+                        return;
+                    }
+
+                    if (target.role === 'root' || ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === (target.email || '').toLowerCase())) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Permission denied: Root Admin cannot be disabled.' }));
+                        return;
+                    }
+
+                    target.status = data.newStatus === 'disabled' ? 'disabled' : 'active';
+                    writeUsers(users);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, user: target }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+
+        // 4. POST /api/admin/users/delete
+        if (pathName === '/api/admin/users/delete' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    let users = readUsers();
+                    const target = users.find(u => u.id === data.targetUserId || u.email === data.targetUserEmail);
+
+                    if (!target) {
+                        res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Target user not found' }));
+                        return;
+                    }
+
+                    if (target.role === 'root' || ROOT_ADMIN_EMAILS.some(r => r.toLowerCase() === (target.email || '').toLowerCase())) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Permission denied: Root Admin cannot be deleted.' }));
+                        return;
+                    }
+
+                    users = users.filter(u => u.id !== target.id);
+                    writeUsers(users);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, deletedUserId: target.id }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+
+        // 5. POST /api/admin/users/reset-password
+        if (pathName === '/api/admin/users/reset-password' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    const users = readUsers();
+                    const target = users.find(u => u.id === data.targetUserId || u.email === data.targetUserEmail);
+
+                    if (!target) {
+                        res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Target user not found' }));
+                        return;
+                    }
+
+                    target.tempPasswordSetAt = new Date().toISOString();
+                    target.passwordResetRequested = true;
+                    writeUsers(users);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({
+                        success: true,
+                        message: `Password reset request registered for ${target.email}. Temporary password instructions sent.`,
+                        user: target
+                    }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+
+        // 6. POST /api/admin/decks/feature (Toggle Featured Deck)
+        if (pathName === '/api/admin/decks/feature' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    const profiles = readProfiles();
+                    const profile = profiles.find(p => p.id === data.profileId);
+
+                    if (!profile) {
+                        res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Profile not found' }));
+                        return;
+                    }
+
+                    profile.featured = data.featured !== undefined ? !!data.featured : !profile.featured;
+                    writeProfiles(profiles);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, profileId: profile.id, featured: profile.featured }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+
+        // 7. POST /api/admin/decks/delete
+        if (pathName === '/api/admin/decks/delete' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    let profiles = readProfiles();
+                    profiles = profiles.filter(p => p.id !== data.profileId);
+                    writeProfiles(profiles);
+
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, profileId: data.profileId }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+
+        // 8. POST /api/admin/reset-profiles
+        if (pathName === '/api/admin/reset-profiles' && req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body || '{}');
+                    if (!isAuthorizedAdmin(data.adminEmail)) {
+                        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Unauthorized: Admin access required' }));
+                        return;
+                    }
+
+                    writeProfiles(DEFAULT_PROFILES);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, profiles: DEFAULT_PROFILES }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+    }
+
+    // ==========================================
     // API ENDPOINT: USER PROGRESS (/api/user/progress)
     // ==========================================
     if (pathName === '/api/user/progress') {
@@ -575,6 +1034,11 @@ module.exports = {
     ensureDataFile,
     readProfiles,
     writeProfiles,
-    DEFAULT_PROFILES
+    DEFAULT_PROFILES,
+    ensureUsersFile,
+    readUsers,
+    writeUsers,
+    ROOT_ADMIN_EMAILS,
+    isAuthorizedAdmin
 };
 

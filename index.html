@@ -89,14 +89,22 @@
                         <button id="btn-user-avatar" class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all">
                             <img id="user-avatar-img" src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="User Avatar" class="w-6 h-6 rounded-full object-cover border border-slate-700">
                             <span id="user-display-name" class="text-xs font-bold text-slate-200 max-w-[100px] truncate">Learner</span>
+                            <span id="user-role-badge" class="hidden text-[10px] px-1.5 py-0.5 bg-sky-500/20 text-sky-300 rounded-md font-mono border border-sky-500/30">User</span>
                             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
 
-                        <div class="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 hidden group-hover:block z-50">
+                        <div class="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 hidden group-hover:block z-50">
                             <div class="px-3 py-2 border-b border-slate-800">
                                 <p class="text-[11px] text-slate-400">Signed in as</p>
                                 <p id="user-email-text" class="text-xs font-bold text-slate-200 truncate">user@example.com</p>
+                                <span id="user-dropdown-role-tag" class="inline-block mt-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">Role: User</span>
                             </div>
+                            
+                            <!-- Admin Portal Link (Visible to Admin/Root only) -->
+                            <button id="btn-nav-admin-portal" onclick="window.UIManager.switchView('admin-portal')" class="hidden w-full text-left px-3 py-2 text-xs font-bold text-sky-400 hover:bg-sky-500/10 rounded-xl transition-all flex items-center gap-2 mt-1">
+                                <span>🛡️</span> Admin Control Portal
+                            </button>
+
                             <button id="btn-user-signout" class="w-full text-left px-3 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all flex items-center gap-2 mt-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                 Sign Out
@@ -108,10 +116,6 @@
                 <button id="nav-sync-btn" title="Sync latest community profiles" class="px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     Sync Decks
-                </button>
-
-                <button id="nav-reset-btn" title="Reset default profiles" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl border border-slate-800 transition-all hidden md:flex">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                 </button>
             </div>
         </div>
@@ -509,6 +513,164 @@
                 <div class="flex items-center justify-center gap-3">
                     <button onclick="window.UIManager.initToneQuizMode()" class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all">Play Again</button>
                     <button onclick="window.UIManager.switchView('dashboard')" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition-all">Back to Dashboard</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: ADMIN CONTROL PORTAL (#view-admin-portal) -->
+        <!-- ========================================== -->
+        <section id="view-admin-portal" class="space-y-8 hidden">
+            <!-- Admin Portal Hero Banner -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-sky-500/20 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 bg-sky-500/20 text-sky-300 border border-sky-500/30 rounded-lg text-[10px] font-mono uppercase tracking-wider font-bold">
+                                🛡️ Role-Based Access Control
+                            </span>
+                            <span id="admin-user-current-badge" class="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-[10px] font-mono uppercase tracking-wider font-bold">
+                                👑 Root Superadmin
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">Admin Control Portal</h2>
+                        <p class="text-slate-400 text-xs sm:text-sm">Manage user accounts, roles, community flashcard decks, and system profile settings.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.UIManager.loadAdminData()" class="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition-all flex items-center gap-1.5 shadow-sm">
+                            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Refresh Data
+                        </button>
+                        <button onclick="window.UIManager.switchView('dashboard')" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
+                            ← Back to Dashboard
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Metrics Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/80">
+                    <div class="p-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl">
+                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Total Users</span>
+                        <div id="admin-stat-total-users" class="text-2xl font-black text-slate-100 font-mono">1</div>
+                    </div>
+                    <div class="p-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl">
+                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Active Admins</span>
+                        <div id="admin-stat-total-admins" class="text-2xl font-black text-sky-400 font-mono">1</div>
+                    </div>
+                    <div class="p-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl">
+                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Community Decks</span>
+                        <div id="admin-stat-total-decks" class="text-2xl font-black text-amber-400 font-mono">3</div>
+                    </div>
+                    <div class="p-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl">
+                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">System Health</span>
+                        <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Online (Hostinger Cloud)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Sub-Navigation Tabs -->
+            <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <button type="button" id="tab-admin-users" onclick="window.UIManager.switchAdminTab('users')" class="px-4 py-2 text-xs font-bold rounded-xl transition-all bg-sky-500 text-white shadow-md flex items-center gap-2">
+                    <span>👥</span> User Management & Roles
+                </button>
+                <button type="button" id="tab-admin-decks" onclick="window.UIManager.switchAdminTab('decks')" class="px-4 py-2 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-900 flex items-center gap-2">
+                    <span>📚</span> Community Deck Moderation
+                </button>
+                <button type="button" id="tab-admin-maintenance" onclick="window.UIManager.switchAdminTab('maintenance')" class="px-4 py-2 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-900 flex items-center gap-2">
+                    <span>⚙️</span> System Maintenance
+                </button>
+            </div>
+
+            <!-- TAB 1: USER MANAGEMENT PANEL -->
+            <div id="admin-panel-users" class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                    <div class="relative flex-1 max-w-md">
+                        <input id="admin-search-users" type="text" placeholder="Search by name or email..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all">
+                        <svg class="w-4 h-4 text-slate-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="admin-filter-role" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
+                            <option value="all">All Roles</option>
+                            <option value="root">Root Admin Only</option>
+                            <option value="admin">Admins Only</option>
+                            <option value="user">Users Only</option>
+                            <option value="disabled">Disabled Accounts</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-x-auto shadow-xl">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">User</th>
+                                <th class="py-3 px-4">Role</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Created / Last Login</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-table-body" class="divide-y divide-slate-800/60">
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-slate-500">Loading user accounts...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: COMMUNITY DECK MODERATION PANEL -->
+            <div id="admin-panel-decks" class="space-y-4 hidden">
+                <div class="flex items-center justify-between bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                    <input id="admin-search-decks" type="text" placeholder="Search community decks by title or author..." class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all">
+                    <span id="admin-decks-count-badge" class="text-xs text-slate-400 font-mono">0 Decks</span>
+                </div>
+
+                <div class="glass-card rounded-2xl border border-slate-800 overflow-x-auto shadow-xl">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900/90 text-slate-400 font-semibold border-b border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">Deck Title</th>
+                                <th class="py-3 px-4">Author</th>
+                                <th class="py-3 px-4">Items</th>
+                                <th class="py-3 px-4">Likes</th>
+                                <th class="py-3 px-4">Featured Status</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-decks-table-body" class="divide-y divide-slate-800/60">
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-slate-500">Loading community decks...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: SYSTEM MAINTENANCE PANEL -->
+            <div id="admin-panel-maintenance" class="space-y-6 hidden">
+                <div class="p-6 bg-rose-500/10 border border-rose-500/30 rounded-3xl space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-rose-500/20 text-rose-400 rounded-2xl text-2xl">⚠️</div>
+                        <div class="space-y-1 flex-1">
+                            <h4 class="text-base font-extrabold text-rose-200">Danger Zone: Reset Default Profiles</h4>
+                            <p class="text-xs text-rose-300/80 leading-relaxed">
+                                Restores the official Cantonese starter decks ("Essential Greetings & Basics", "Cha Chaan Teng & Dining", "Tech & Modern Terms") to original state.
+                                This will erase custom additions made to default decks.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="window.UIManager.handleAdminResetProfilesPrompt()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-600/30 transition-all flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Reset System Profiles to Defaults
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1047,6 +1209,46 @@
                 <button type="button" id="btn-close-email-confirmed" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all">
                     Start Learning Cantonese 🚀
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 8: ADMIN RESET USER PASSWORD -->
+    <!-- ========================================== -->
+    <div id="modal-admin-reset-password" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-modal w-full max-w-md rounded-3xl border border-slate-800 shadow-2xl p-6 sm:p-8 space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🔑</span>
+                    <h3 class="text-lg font-bold text-slate-100">Reset User Password</h3>
+                </div>
+                <button onclick="document.getElementById('modal-admin-reset-password').classList.add('hidden')" class="p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800">✕</button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-3 bg-slate-900/80 border border-slate-800 rounded-xl text-xs space-y-1">
+                    <span class="text-slate-400">Target User Account:</span>
+                    <p id="admin-reset-target-email" class="font-bold text-slate-100 font-mono">user@example.com</p>
+                </div>
+
+                <div class="space-y-3">
+                    <button type="button" onclick="window.UIManager.handleAdminSendPasswordResetLink()" class="w-full py-2.5 bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                        <span>✉️</span> Send Supabase Password Reset Email
+                    </button>
+
+                    <div class="relative flex items-center justify-center my-2">
+                        <div class="border-t border-slate-800 w-full"></div>
+                        <span class="bg-slate-950 px-2 text-[10px] text-slate-500 uppercase tracking-wider absolute">Or set temp password</span>
+                    </div>
+
+                    <form onsubmit="window.UIManager.handleAdminSetTempPassword(event)" class="space-y-3">
+                        <input id="input-admin-temp-password" type="text" minlength="6" placeholder="Enter new temporary password..." required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-500 transition-all">
+                        <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all">
+                            Set Temporary Password
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

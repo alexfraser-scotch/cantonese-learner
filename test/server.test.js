@@ -192,6 +192,90 @@ test('SRS Box Retention Statistics Aggregator', (t) => {
     assert.strictEqual(stats.due, 1, 'Due count should be 1');
 });
 
+test('Role-Based Access Control (RBAC) and Root Admin initialization', (t) => {
+    const { readUsers, ROOT_ADMIN_EMAILS, isAuthorizedAdmin } = require('../server.js');
+    const users = readUsers();
+    assert.ok(Array.isArray(users), 'Users should be an array');
+    
+    // 1. Root Admin exists and is protected
+    const rootUser = users.find(u => u.email && u.email.toLowerCase() === 'canewjour@gmail.com');
+    assert.ok(rootUser, 'canewjour@gmail.com must exist as seeded Root Admin');
+    assert.strictEqual(rootUser.role, 'root', 'Root admin role must be root');
+    assert.strictEqual(rootUser.status, 'active', 'Root admin status must be active');
+
+    // 2. Auth checks
+    assert.strictEqual(isAuthorizedAdmin('canewjour@gmail.com'), true, 'canewjour@gmail.com should be authorized admin');
+    assert.strictEqual(isAuthorizedAdmin('randomuser@example.com'), false, 'Non-admin should not be authorized');
+});
+
+test('Root Admin Immutability and Security Guards', (t) => {
+    const { readUsers, writeUsers } = require('../server.js');
+    const users = readUsers();
+    
+    // Attempting to modify Root Admin role or disable Root Admin via writeUsers
+    const modifiedUsers = users.map(u => {
+        if (u.email === 'canewjour@gmail.com') {
+            return { ...u, role: 'user', status: 'disabled' };
+        }
+        return u;
+    });
+
+    writeUsers(modifiedUsers);
+    const reloadedUsers = readUsers();
+    const rootUser = reloadedUsers.find(u => u.email === 'canewjour@gmail.com');
+    
+    // Root Admin must remain immutable
+    assert.strictEqual(rootUser.role, 'root', 'Root Admin role cannot be overridden');
+    assert.strictEqual(rootUser.status, 'active', 'Root Admin status cannot be disabled');
+});
+
+test('User Role Promotion and Status Toggle Lifecycle', (t) => {
+    const { readUsers, writeUsers, isAuthorizedAdmin } = require('../server.js');
+    let users = readUsers();
+    
+    // Create test user
+    const testUser = {
+        id: 'usr-test-lifecycle',
+        email: 'learner-test@example.com',
+        displayName: 'Test Learner',
+        role: 'user',
+        status: 'active',
+        createdAt: new Date().toISOString()
+    };
+    users.push(testUser);
+    writeUsers(users);
+
+    // Promote to Admin
+    testUser.role = 'admin';
+    writeUsers(users);
+    assert.strictEqual(isAuthorizedAdmin('learner-test@example.com'), true, 'Promoted user should be authorized admin');
+
+    // Disable Account
+    testUser.status = 'disabled';
+    writeUsers(users);
+    assert.strictEqual(isAuthorizedAdmin('learner-test@example.com'), false, 'Disabled admin should not be authorized');
+
+    // Clean up
+    users = users.filter(u => u.id !== 'usr-test-lifecycle');
+    writeUsers(users);
+});
+
+test('Community Deck Moderation & Featured Pinning', (t) => {
+    const profiles = readProfiles();
+    const deck = profiles[0];
+    const originalFeatured = deck.featured;
+
+    deck.featured = true;
+    writeProfiles(profiles);
+
+    const reloaded = readProfiles();
+    assert.strictEqual(reloaded[0].featured, true, 'Deck should be marked as featured');
+
+    // Revert
+    reloaded[0].featured = originalFeatured;
+    writeProfiles(reloaded);
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();
