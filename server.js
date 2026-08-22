@@ -1013,7 +1013,12 @@ const server = http.createServer((req, res) => {
                 res.end(`Server Error: ${err.code}`);
             }
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
+            const headers = { 'Content-Type': contentType };
+            if (ext === '.js' || ext === '.html' || ext === '.css') {
+                headers['Cache-Control'] = 'no-cache, must-revalidate, max-age=0';
+                headers['Pragma'] = 'no-cache';
+            }
+            res.writeHead(200, headers);
             res.end(content);
         }
     });

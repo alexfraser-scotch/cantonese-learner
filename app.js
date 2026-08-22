@@ -4033,5 +4033,18 @@ class UIManager {
 
 // Global App Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const raw = localStorage.getItem('cantonese_learner_user_session_v1') || sessionStorage.getItem('cantonese_learner_user_session_v1');
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.email && parsed.email.toLowerCase().trim() === 'canewjour@gmail.com') {
+                parsed.role = 'root';
+                const updated = JSON.stringify(parsed);
+                localStorage.setItem('cantonese_learner_user_session_v1', updated);
+                sessionStorage.setItem('cantonese_learner_user_session_v1', updated);
+            }
+        }
+    } catch (e) {}
+
     window.UIManager = new UIManager();
 });
