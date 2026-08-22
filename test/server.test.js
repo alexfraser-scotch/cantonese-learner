@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
 const fs = require('node:fs');
-const { ensureDataFile, readProfiles, writeProfiles, DEFAULT_PROFILES } = require('../server.js');
+const { server, ensureDataFile, readProfiles, writeProfiles, DEFAULT_PROFILES } = require('../server.js');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const PROFILES_FILE = path.join(DATA_DIR, 'profiles.json');
@@ -190,4 +190,10 @@ test('SRS Box Retention Statistics Aggregator', (t) => {
     assert.strictEqual(stats.box2, 1, 'Box 2 count should be 1');
     assert.strictEqual(stats.box5, 1, 'Box 5 count should be 1');
     assert.strictEqual(stats.due, 1, 'Due count should be 1');
+});
+
+test('Teardown test runner server handle', (t) => {
+    if (server && typeof server.close === 'function') {
+        server.close();
+    }
 });
