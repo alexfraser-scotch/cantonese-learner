@@ -1757,6 +1757,21 @@ class UIManager {
             adminSearchDecks.addEventListener('input', () => this.filterAndRenderAdminDecks());
         }
 
+        // User Avatar Dropdown Toggle
+        const btnUserAvatar = document.getElementById('btn-user-avatar');
+        const userDropdownMenuBox = document.getElementById('user-dropdown-menu-box');
+        if (btnUserAvatar && userDropdownMenuBox) {
+            btnUserAvatar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdownMenuBox.classList.toggle('hidden');
+            });
+            document.addEventListener('click', (e) => {
+                if (!btnUserAvatar.contains(e.target) && !userDropdownMenuBox.contains(e.target)) {
+                    userDropdownMenuBox.classList.add('hidden');
+                }
+            });
+        }
+
         // Auth UI Bindings
         if (this.btnOpenAuth) {
             this.btnOpenAuth.addEventListener('click', () => this.openAuthModal());
@@ -3401,6 +3416,7 @@ class UIManager {
         const userDisplayName = document.getElementById('user-display-name');
         const userEmailText = document.getElementById('user-email-text');
         const btnNavAdmin = document.getElementById('btn-nav-admin-portal');
+        const btnNavAdminHeader = document.getElementById('nav-admin-portal-header-btn');
         const userRoleBadge = document.getElementById('user-role-badge');
         const userDropdownRoleTag = document.getElementById('user-dropdown-role-tag');
         const adminCurrentBadge = document.getElementById('admin-user-current-badge');
@@ -3420,6 +3436,11 @@ class UIManager {
                 else btnNavAdmin.classList.add('hidden');
             }
 
+            if (btnNavAdminHeader) {
+                if (isStaff) btnNavAdminHeader.classList.remove('hidden');
+                else btnNavAdminHeader.classList.add('hidden');
+            }
+
             if (userRoleBadge) {
                 userRoleBadge.textContent = role === 'root' ? '👑 Root' : (role === 'admin' ? '🛡️ Admin' : 'Learner');
                 userRoleBadge.classList.remove('hidden');
@@ -3436,6 +3457,7 @@ class UIManager {
             if (btnOpenAuth) btnOpenAuth.classList.remove('hidden');
             if (userMenu) userMenu.classList.add('hidden');
             if (btnNavAdmin) btnNavAdmin.classList.add('hidden');
+            if (btnNavAdminHeader) btnNavAdminHeader.classList.add('hidden');
             if (userRoleBadge) userRoleBadge.classList.add('hidden');
         }
 
