@@ -772,12 +772,14 @@ class AuthManager {
             }
 
             if (data && data.user) {
-                this.saveSession(data.user);
-                await StorageManager.fetchUserProgress();
-                if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
-                    window.UIManager.handleAuthChange(this.currentUser);
+                if (data.session && data.session.user) {
+                    this.saveSession(data.session.user);
+                    await StorageManager.fetchUserProgress();
+                    if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
+                        window.UIManager.handleAuthChange(this.currentUser);
+                    }
                 }
-                return data.user;
+                return { user: data.user, hasSession: !!data.session };
             }
         }
 
@@ -1644,6 +1646,8 @@ class UIManager {
         } catch (e) {
             console.warn('Initial dashboard render/sync error:', e);
         }
+
+        this.checkEmailConfirmationRedirect();
     }
 
     initDOM() {
@@ -1783,9 +1787,17 @@ class UIManager {
 
                 try {
                     if (this.authMode === 'register') {
-                        const user = await AuthManager.registerWithEmail(email, password);
-                        this.closeAuthModal();
-                        this.showToast(`🎉 Account created! Welcome, ${user.displayName || 'Learner'}!`, 'success');
+                        const res = await AuthManager.registerWithEmail(email, password);
+                        if (res && res.hasSession) {
+                            this.closeAuthModal();
+                            this.showToast(`🎉 Account created! Welcome, ${(res.user && res.user.email) ? res.user.email.split('@')[0] : 'Learner'}!`, 'success');
+                        } else {
+                            if (errorAlert && errorMsg) {
+                                errorAlert.className = "p-3 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 flex items-start gap-2 block";
+                                errorMsg.innerHTML = `<strong>✉️ Confirmation Email Sent!</strong><br>We've sent a confirmation link to <span class="font-bold text-slate-100">${email}</span>. Please check your inbox (or spam folder) and click the link to confirm your email address.`;
+                            }
+                            this.showToast(`✉️ Confirmation email sent to ${email}! Please check your inbox.`, 'info');
+                        }
                     } else {
                         const user = await AuthManager.signInWithEmail(email, password);
                         this.closeAuthModal();
@@ -1808,6 +1820,14 @@ class UIManager {
                     if (submitLabel) submitLabel.textContent = origText;
                     if (submitBtn) submitBtn.disabled = false;
                 }
+            });
+        }
+
+        const btnCloseConfirmed = document.getElementById('btn-close-email-confirmed');
+        if (btnCloseConfirmed) {
+            btnCloseConfirmed.addEventListener('click', () => {
+                const modal = document.getElementById('modal-email-confirmed');
+                if (modal) modal.classList.add('hidden');
             });
         }
 
@@ -3329,6 +3349,42 @@ class UIManager {
         await StorageManager.fetchUserProgress();
         this.renderDashboard();
         if (this.activeProfile) this.renderFilteredFlashcards();
+    }
+
+    checkEmailConfirmationRedirect() {
+        const hash = window.location.hash || '';
+        const search = window.location.search || '';
+
+        const isConfirmed = hash.includes('type=signup') || 
+                            hash.includes('type=email_confirmation') || 
+                            hash.includes('type=recovery') || 
+                            hash.includes('access_token') || 
+                            search.includes('type=signup') || 
+                            search.includes('type=email_confirmation') ||
+                            search.includes('code=');
+
+        if (isConfirmed) {
+            // Clean URL hash so token isn't left visible in browser address bar
+            try {
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState(null, document.title, window.location.pathname);
+                }
+            } catch (e) {}
+
+            setTimeout(() => {
+                const userEmail = (AuthManager.currentUser && AuthManager.currentUser.email) 
+                    ? AuthManager.currentUser.email 
+                    : (localStorage.getItem('cantonese_learner_user_session_v1') ? JSON.parse(localStorage.getItem('cantonese_learner_user_session_v1')).email : 'Verified Learner');
+
+                const emailElem = document.getElementById('confirmed-user-email');
+                if (emailElem && userEmail) emailElem.textContent = userEmail;
+
+                const modal = document.getElementById('modal-email-confirmed');
+                if (modal) modal.classList.remove('hidden');
+
+                this.showToast('🎉 Email confirmed! Welcome to Cantonese Learner!', 'success');
+            }, 400);
+        }
     }
 
     // ==========================================
