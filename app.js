@@ -668,6 +668,14 @@ class AuthManager {
     static initialized = false;
     static STORAGE_KEY = 'cantonese_learner_user_session_v1';
 
+    static resolveUserRole(user) {
+        if (!user || !user.email) return 'guest';
+        const cleanEmail = user.email.toLowerCase().trim();
+        if (cleanEmail === 'canewjour@gmail.com') return 'root';
+        if (user.role === 'root' || user.role === 'admin') return user.role;
+        return 'user';
+    }
+
     static saveSession(user) {
         try {
             if (user) {
@@ -676,7 +684,7 @@ class AuthManager {
                     displayName: (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || (user.email ? user.email.split('@')[0] : 'Learner'),
                     email: user.email || '',
                     photoURL: (user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || user.photoURL || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
-                    role: user.role || (user.email && user.email.toLowerCase() === 'canewjour@gmail.com' ? 'root' : 'user'),
+                    role: this.resolveUserRole(user),
                     status: user.status || 'active'
                 };
                 const val = JSON.stringify(sessionUser);
@@ -741,8 +749,8 @@ class AuthManager {
             const savedUser = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
             if (savedUser) {
                 this.currentUser = JSON.parse(savedUser);
-                if (this.currentUser && this.currentUser.email && this.currentUser.email.toLowerCase() === 'canewjour@gmail.com') {
-                    this.currentUser.role = 'root';
+                if (this.currentUser) {
+                    this.currentUser.role = this.resolveUserRole(this.currentUser);
                 }
                 return this.currentUser;
             }
@@ -2028,7 +2036,7 @@ class UIManager {
             this.viewDashboard.classList.remove('hidden');
         } else if (targetView === 'admin-portal') {
             const user = AuthManager.currentUser;
-            const role = user ? (user.role || (user.email && user.email.toLowerCase() === 'canewjour@gmail.com' ? 'root' : 'user')) : 'guest';
+            const role = AuthManager.resolveUserRole(user);
             if (role !== 'admin' && role !== 'root') {
                 this.showToast('⛔ Access Denied: Admin privileges required.', 'error');
                 this.switchView('dashboard');
@@ -3428,7 +3436,7 @@ class UIManager {
             if (userDisplayName) userDisplayName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'Learner');
             if (userEmailText) userEmailText.textContent = user.email || '';
 
-            const role = user.role || (user.email && user.email.toLowerCase() === 'canewjour@gmail.com' ? 'root' : 'user');
+            const role = AuthManager.resolveUserRole(user);
             const isStaff = role === 'admin' || role === 'root';
 
             if (btnNavAdmin) {
