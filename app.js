@@ -756,9 +756,15 @@ class AuthManager {
         if (password.length < 6) throw new Error('Password must be at least 6 characters.');
 
         if (StorageManager.supabaseClient && StorageManager.supabaseClient.auth) {
+            const redirectUrl = window.location.origin && !window.location.origin.includes('localhost') 
+                ? window.location.origin 
+                : 'https://cantonese.swiftflowdigital.com/';
             const { data, error } = await StorageManager.supabaseClient.auth.signUp({
                 email: email.trim(),
-                password: password
+                password: password,
+                options: {
+                    emailRedirectTo: redirectUrl
+                }
             });
 
             if (error) {
