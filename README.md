@@ -21,6 +21,8 @@ An interactive, open-source Cantonese Vocabulary Learning platform featuring **3
 - 🎵 **Cantonese 6-Tone Pronunciation Chart:** Interactive audio pitch guide covering all 6 Jyutping tones (詩 `si1`, 史 `si2`, 試 `si3`, 時 `si4`, 市 `si5`, 事 `si6`).
 - 🎙️ **Voice Recording & Audio Comparison:** Live microphone recording using HTML5 `MediaRecorder` API allowing learners to record their own Cantonese pronunciation and compare it against native TTS audio.
 - 📊 **SRS Retention Analytics Bar:** Dashboard stats bar visualizing card distribution across Leitner Box 1–5 retention tiers and tracking cards due for review today.
+- 🖨️ **Printable Flashcard Sheet Generator:** Generate beautifully formatted 3x3 print-ready physical flashcard sheets with cut-lines and `@media print` CSS rules for offline study or classroom handouts.
+- 📥 **Anki Deck Export (.csv / .txt):** Export any custom vocabulary profile into Anki-compatible TSV/CSV format with custom tags (`Cantonese::Category`) and formatted card notes for seamless import into Anki and CrowdAnki.
 - 🌐 **Crowdsourced Deck & Profile Sharing:** Public community REST API allowing users to create, upvote (👍), upload, and share custom Cantonese vocabulary decks.
 - 🎯 **Mastery & Favoriting System:** Track your learning progress with card completion toggles and favorite quick-lists.
 - ⚡ **Lightweight & Dependency-Free:** Built with vanilla modern JavaScript, HTML5/CSS3, and native Node.js HTTP API server.
@@ -89,26 +91,76 @@ The backend provides RESTful endpoints to read, create, update, and manage publi
 
 ---
 
-## 🧪 Testing
+## 🏗️ Architecture & Technical Highlights
 
-Run the automated backend API test suite:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       Client (SPA)                          │
+├───────────────────┬─────────────────────┬───────────────────┤
+│  3D Flashcards    │ Leitner 5-Box SRS   │ Tone Pitch Chart  │
+│  CSS3 Transforms  │ Interval Engine     │ 6-Tone Drills     │
+├───────────────────┼─────────────────────┼───────────────────┤
+│ Web Speech TTS    │ MediaRecorder API   │ Anki & Print Gen  │
+│ (zh-HK synthesis) │ (Voice Comparison)  │ (TSV / @media)    │
+└───────────────────┴──────────┬──────────┴───────────────────┘
+                               │ HTTP / REST
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 Node.js Native HTTP Server                  │
+│              (Zero External Runtime Dependencies)           │
+├─────────────────────────────────────────────────────────────┤
+│  REST API Routing (/api/profiles) & Static File Server      │
+│  Atomic Data Persistence (data/profiles.json)               │
+│  Payload Validation, Sanitization & CORS Handling           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+* **Zero External Dependencies:** Built entirely with vanilla modern JavaScript, HTML5/CSS3, and native Node.js standard libraries (`http`, `fs`, `path`). No heavy framework bloat, fast load times, and minimal maintenance overhead.
+* **Dual Audio Architecture:** Combines native browser `window.speechSynthesis` configured with the Cantonese `zh-HK` voice engine alongside the HTML5 `MediaRecorder` API for real-time learner voice playback.
+* **Leitner SRS Engine:** Mathematically scheduled review intervals (1, 3, 7, 14, 30 days) with retention analytics and daily due-card queues.
+* **Data Portability:** Full two-way support for digital export (Anki `.txt`/TSV with tags) and physical study (3x3 grid printable flashcards).
+
+---
+
+## 🧪 Testing & CI/CD
+
+The repository maintains an automated native test suite verified across Node.js versions:
 
 ```bash
 npm test
 ```
 
+### Continuous Integration
+All pull requests and commits trigger automated GitHub Actions workflows running across **Node.js 18.x, 20.x, and 22.x** to verify:
+* REST API payload handling and data persistence.
+* Spaced Repetition (SRS) interval calculations.
+* Tone extraction algorithms.
+* Open-source governance files (`LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/`).
+
 ---
 
 ## 🤝 Contributing & Community Roadmap
 
-We welcome contributions from language learners, linguists, and developers! 
+We welcome contributions from language learners, linguists, and software engineers! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for contribution guidelines.
 
-- 🌟 **Feature Roadmap:**
-  - [x] 3D Flashcards & Jyutping Support
-  - [x] Community REST API for Shared Decks
-  - [ ] User Profile Registration & Public Creator Cards
-  - [ ] Spaced Repetition Algorithm (Leitner / Anki SRS Integration)
-  - [ ] Anki Deck `.apkg` Import & Export
+### 🌟 Project Roadmap
+- [x] 3D Flip Flashcards & Jyutping 6-tone notation
+- [x] Community REST API for Shared Decks (`/api/profiles`)
+- [x] Spaced Repetition Algorithm (Leitner 5-Box SRS Engine)
+- [x] Cantonese 6-Tone Ear Training Quiz & Tone Pitch Chart
+- [x] Voice Recording & Audio Pronunciation Comparison (`MediaRecorder`)
+- [x] Printable Flashcard Handout Generator (`@media print` 3x3 layout)
+- [x] Anki Deck TSV/CSV Export with `Cantonese::Category` tagging
+- [x] Automated GitHub Actions CI Matrix (`18.x`, `20.x`, `22.x`)
+- [x] Security Policy (`SECURITY.md`) and Code of Conduct (`CODE_OF_CONDUCT.md`)
+- [ ] Progressive Web App (PWA) offline service worker caching
+- [ ] AI-assisted example sentence & tone generation (OpenAI Codex API)
+
+---
+
+## 🛡️ Security
+
+For vulnerability disclosures and reporting procedures, please refer to [SECURITY.md](SECURITY.md).
 
 ---
 
