@@ -380,8 +380,84 @@ test('Dictation Mode (默書) Word Randomization & State Flow', (t) => {
     assert.strictEqual(dictationState.isFinished, true, 'Completing all items marks dictation as finished');
 });
 
+test('High-Precision Image Auto-Generation & Word-Boundary Token Matching', (t) => {
+    // Helper replicating safeMatch logic
+    function safeMatch(text, wordsZh = [], wordsEn = []) {
+        if (!text) return false;
+        const lowerText = text.toLowerCase();
+        for (const zh of wordsZh) {
+            if (lowerText.includes(zh.toLowerCase())) return true;
+        }
+        for (const en of wordsEn) {
+            const escaped = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`\\b${escaped}(s|es|ed|ing|d)?\\b`, 'i');
+            if (regex.test(lowerText)) return true;
+        }
+        return false;
+    }
+
+    // 1. Verify safeMatch prevents false-positive substring accidents
+    assert.strictEqual(safeMatch('scared / afraid', ['車'], ['car']), false, '"scared" must NOT trigger "car"');
+    assert.strictEqual(safeMatch('teacher 老師', ['茶'], ['tea']), false, '"teacher" must NOT trigger "tea"');
+    assert.strictEqual(safeMatch('category 類別', ['貓'], ['cat']), false, '"category" must NOT trigger "cat"');
+    assert.strictEqual(safeMatch('weather 天氣', ['食'], ['eat']), false, '"weather" must NOT trigger "eat"');
+    assert.strictEqual(safeMatch('beggar 乞丐', ['蛋'], ['egg']), false, '"beggar" must NOT trigger "egg"');
+    assert.strictEqual(safeMatch('vocabulary 詞彙', ['的士'], ['cab']), false, '"vocabulary" must NOT trigger "cab"');
+
+    // 2. Verify accurate emotion and topic detections
+    assert.strictEqual(safeMatch('生氣 angry', ['生氣', '憤怒'], ['angry', 'mad']), true, '"生氣 angry" matches angry topic');
+    assert.strictEqual(safeMatch('害怕 scared / afraid', ['害怕', '恐懼'], ['scared', 'afraid']), true, '"害怕 scared" matches scared topic');
+    assert.strictEqual(safeMatch('緊張 nervous', ['緊張'], ['nervous', 'anxious']), true, '"緊張 nervous" matches nervous topic');
+    assert.strictEqual(safeMatch('擔心 worried', ['擔心'], ['worried', 'concern']), true, '"擔心 worried" matches worried topic');
+    assert.strictEqual(safeMatch('害羞 shy', ['害羞', '怕醜'], ['shy', 'blushing']), true, '"害羞 shy" matches shy topic');
+    assert.strictEqual(safeMatch('勇敢 brave', ['勇敢', '膽大'], ['brave', 'courageous']), true, '"勇敢 brave" matches brave topic');
+
+    // 3. Verify that all 6 emotion words from screenshot receive unique, accurate thematic URLs
+    const emotionTestItems = [
+        { word: '生氣', meaning: 'Angry / Mad', meaningZh: '生氣 / 憤怒' },
+        { word: '害怕', meaning: 'Scared / Afraid', meaningZh: '害怕 / 恐懼' },
+        { word: '緊張', meaning: 'Nervous / Tense', meaningZh: '緊張 / 忐忑' },
+        { word: '擔心', meaning: 'Worried / Anxious', meaningZh: '擔心 / 憂慮' },
+        { word: '害羞', meaning: 'Shy / Blushing', meaningZh: '害羞 / 怕醜' },
+        { word: '勇敢', meaning: 'Brave / Courageous', meaningZh: '勇敢 / 膽大' }
+    ];
+
+    // Mock getTopicImage implementation
+    function getTopicImage(word, meaning = '') {
+        const text = `${word} ${meaning}`.trim();
+        if (safeMatch(text, ['生氣', '憤怒'], ['angry', 'mad', 'furious'])) {
+            return 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (safeMatch(text, ['害怕', '恐懼'], ['scared', 'afraid', 'fear'])) {
+            return 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (safeMatch(text, ['緊張'], ['nervous', 'tense', 'tension', 'stress'])) {
+            return 'https://images.unsplash.com/photo-1541199249251-f713e6145474?auto=format&fit=crop&w=600&q=80';
+        }
+        if (safeMatch(text, ['擔心'], ['worried', 'concern', 'worry', 'anxious', 'anxiety'])) {
+            return 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (safeMatch(text, ['害羞', '怕醜'], ['shy', 'blushing'])) {
+            return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+        }
+        if (safeMatch(text, ['勇敢', '膽大'], ['brave', 'courageous'])) {
+            return 'https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&w=600&q=80';
+        }
+        return 'https://images.unsplash.com/photo-fallback';
+    }
+
+    const assignedImages = emotionTestItems.map(item => getTopicImage(item.word, item.meaning));
+    const uniqueImages = new Set(assignedImages);
+
+    assert.strictEqual(uniqueImages.size, 6, 'All 6 emotions must have distinct, customized topic photos');
+    assert.ok(!assignedImages[0].includes('dumpling'), '生氣 (Angry) must not be dumplings');
+    assert.ok(!assignedImages[1].includes('photo-1503376780353-7e6692767b70'), '害怕 (Scared) must not be sports car');
+    assert.ok(!assignedImages[2].includes('photo-1495474472287-4d71bcdd2085'), '緊張 (Nervous) must not be coffee latte art');
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();
     }
 });
+

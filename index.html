@@ -243,6 +243,9 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Take Quiz
                     </button>
+                    <button id="btn-profile-fix-images" onclick="window.UIManager.fixDeckImages()" title="Upgrade & Fix Inaccurate Deck Images" class="px-3.5 py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-semibold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                        <span>🪄</span> Fix / Upgrade Images
+                    </button>
                     <button id="btn-profile-export" title="Export as JSON" class="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl border border-slate-800 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     </button>
@@ -1085,7 +1088,10 @@
                         <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                             <span>🖼️</span> Picture / Illustration URL
                         </label>
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <button id="btn-modal-search-image-picker" type="button" onclick="window.UIManager.openImagePickerModal('edit-modal')" class="px-2.5 py-1 bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
+                                🔍 Search / Pick Gallery
+                            </button>
                             <button id="btn-modal-auto-pick-image" type="button" class="px-2.5 py-1 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
                                 🪄 Auto-Pick Image
                             </button>
@@ -1487,6 +1493,67 @@
             <div class="pt-2 flex justify-end">
                 <button onclick="window.UIManager.closeDictationSetupModal()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs rounded-xl border border-slate-800 transition-all">
                     Cancel 取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 8: INTERACTIVE IMAGE SEARCH & GALLERY PICKER -->
+    <!-- ========================================== -->
+    <div id="modal-image-picker" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-modal w-full max-w-2xl rounded-3xl border border-slate-800 shadow-2xl p-6 sm:p-8 space-y-5 max-h-[90vh] flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-xl">🖼️</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            Select or Search Word Picture
+                            <span class="px-2 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full text-[10px] font-semibold">Curated HD</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Click any high-resolution thumbnail below to instantly apply it to this Cantonese term.</p>
+                    </div>
+                </div>
+                <button id="btn-close-image-picker" onclick="window.UIManager.closeImagePickerModal()" class="p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800 transition-colors">✕</button>
+            </div>
+
+            <!-- Search & Filter Controls -->
+            <div class="space-y-3 shrink-0">
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" id="input-image-picker-search" placeholder="Search keywords (e.g. angry, scared, happy, dim sum, hong kong, tea, dog)..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+
+                <!-- Thematic Category Chips -->
+                <div id="image-picker-category-bar" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                    <button data-category="all" class="category-chip px-3 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shrink-0 transition-all">All</button>
+                    <button data-category="emotions" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">🎭 Emotions</button>
+                    <button data-category="food" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">🥟 Food & Drinks</button>
+                    <button data-category="hk" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">🇭🇰 Hong Kong</button>
+                    <button data-category="actions" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">🏃 Actions</button>
+                    <button data-category="objects" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">📱 Objects</button>
+                    <button data-category="animals" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">🐾 Animals & Nature</button>
+                    <button data-category="people" class="category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all">👥 People</button>
+                </div>
+            </div>
+
+            <!-- Visual Grid Gallery Container (Scrollable) -->
+            <div id="image-picker-gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-y-auto pr-1 grow min-h-[260px] max-h-[360px]">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Custom URL Quick Input & Apply Footer -->
+            <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                <div class="flex items-center gap-2 w-full sm:w-auto grow">
+                    <input type="text" id="input-image-picker-custom-url" placeholder="Or paste direct image URL (https://...)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-purple-500">
+                    <button id="btn-image-picker-apply-custom" onclick="window.UIManager.applyCustomImageUrlFromPicker()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 whitespace-nowrap transition-all">
+                        Apply URL
+                    </button>
+                </div>
+                <button onclick="window.UIManager.closeImagePickerModal()" class="w-full sm:w-auto px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-all">
+                    Done
                 </button>
             </div>
         </div>

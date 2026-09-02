@@ -72,7 +72,27 @@ class CantoneseDictionary {
         '手提電話': { jyutping: 'sau2 tai4 din6 waa2', meaning_zh: '手提電話 / 智能手機', meaning: 'Mobile Phone / Smartphone', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80', example: '我部手提電話快要冇電喇。', example_meaning: 'My mobile phone is almost out of battery.' },
         '香港': { jyutping: 'hoeng1 gong2', meaning_zh: '香港 / 港島九龍', meaning: 'Hong Kong', image: 'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80', example: '香港係一座美麗嘅城市。', example_meaning: 'Hong Kong is a beautiful city.' },
         '廁所': { jyutping: 'ci2 so2', meaning_zh: '廁所 / 洗手間', meaning: 'Bathroom / Restroom / Toilet', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80', example: '請問廁所在哪裏？', example_meaning: 'Excuse me, where is the bathroom?' },
-        '洗手間': { jyutping: 'sai2 sau2 gaan1', meaning_zh: '洗手間 / 廁所', meaning: 'Restroom / Washroom', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80', example: '我想去一去洗手間。', example_meaning: 'I would like to go to the restroom.' }
+        '洗手間': { jyutping: 'sai2 sau2 gaan1', meaning_zh: '洗手間 / 廁所', meaning: 'Restroom / Washroom', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80', example: '我想去一去洗手間。', example_meaning: 'I would like to go to the restroom.' },
+
+        // Emotions & Moods (High-Precision Curated Master Entries)
+        '生氣': { jyutping: 'sang1 hei3', meaning_zh: '生氣 / 憤怒 / 發火', meaning: 'Angry / Mad / Furious', image: 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80', example: '佢整爛咗我嘅玩具，我好生氣。', example_meaning: 'He broke my toy, I am very angry.' },
+        '憤怒': { jyutping: 'fan5 nou6', meaning_zh: '憤怒 / 極度生氣', meaning: 'Furious / Outraged / Angry', image: 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80', example: '見到不公義嘅事，大家感到好憤怒。', example_meaning: 'Seeing injustice makes everyone feel outraged.' },
+        '害怕': { jyutping: 'hoi6 paa3', meaning_zh: '害怕 / 恐懼 / 驚慌', meaning: 'Scared / Afraid / Fear', image: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80', example: '妹妹好害怕黑麻麻嘅地方。', example_meaning: 'Little sister is very scared of dark places.' },
+        '恐懼': { jyutping: 'hung2 geoi6', meaning_zh: '恐懼 / 驚慌', meaning: 'Fear / Dread / Terror', image: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80', example: '我們要勇敢面對心中的恐懼。', example_meaning: 'We must bravely face the fears in our hearts.' },
+        '緊張': { jyutping: 'gan2 zoeng1', meaning_zh: '緊張 / 忐忑不安', meaning: 'Nervous / Tense / Anxious', image: 'https://images.unsplash.com/photo-1541199249251-f713e6145474?auto=format&fit=crop&w=600&q=80', example: '聽日要面試，我覺得好緊張。', example_meaning: 'I have an interview tomorrow, I feel very nervous.' },
+        '擔心': { jyutping: 'daan1 sam1', meaning_zh: '擔心 / 憂慮 / 牽掛', meaning: 'Worried / Anxious / Concerned', image: 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?auto=format&fit=crop&w=600&q=80', example: '媽媽好擔心我嘅身體健康。', example_meaning: 'Mom is very worried about my health.' },
+        '害羞': { jyutping: 'hoi6 sau1', meaning_zh: '害羞 / 怕醜 / 靦腆', meaning: 'Shy / Bashful / Blushing', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80', example: '佢見到陌生人會好害羞。', example_meaning: 'She gets very shy when meeting strangers.' },
+        '勇敢': { jyutping: 'jung5 gam2', meaning_zh: '勇敢 / 膽大 / 英勇', meaning: 'Brave / Courageous / Bold', image: 'https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&w=600&q=80', example: '消防員非常勇敢，衝入火場救人。', example_meaning: 'Firefighters are very brave, rushing into fires to save people.' },
+        '開心': { jyutping: 'hoi1 sam1', meaning_zh: '開心 / 快樂 / 歡喜', meaning: 'Happy / Joyful / Glad', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80', example: '今日同朋友一齊玩得好開心。', example_meaning: 'Had a very happy time playing with friends today.' },
+        '傷心': { jyutping: 'soeng1 sam1', meaning_zh: '傷心 / 難過 / 悲傷', meaning: 'Sad / Heartbroken / Grieved', image: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80', example: '隻小狗唔見咗，佢好傷心。', example_meaning: 'The puppy went missing, he is very sad.' },
+        '難過': { jyutping: 'naan4 gwo3', meaning_zh: '難過 / 傷心痛心', meaning: 'Sad / Feeling bad / Grieved', image: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80', example: '聽到呢個消息我心裡好難過。', example_meaning: 'Hearing this news makes my heart feel very sad.' },
+        '興奮': { jyutping: 'hing1 fan5', meaning_zh: '興奮 / 雀躍狂歡', meaning: 'Excited / Thrilled / Hyped', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80', example: '聽日去旅行，大家都好興奮。', example_meaning: 'Going on a trip tomorrow, everyone is very excited.' },
+        '攰': { jyutping: 'gui6', meaning_zh: '攰 / 疲倦 / 累', meaning: 'Tired / Exhausted / Fatigued', image: 'https://images.unsplash.com/photo-1520206183501-b80df61e43c2?auto=format&fit=crop&w=600&q=80', example: '做咗一日嘢，真係好攰。', example_meaning: 'After working all day, I am really tired.' },
+        '累': { jyutping: 'leoi6', meaning_zh: '累 / 疲累 / 勞累', meaning: 'Tired / Fatigued / Weary', image: 'https://images.unsplash.com/photo-1520206183501-b80df61e43c2?auto=format&fit=crop&w=600&q=80', example: '行咗咁耐路，我對腳好累。', example_meaning: 'Walked for so long, my legs are very tired.' },
+        '冷靜': { jyutping: 'laang5 zing6', meaning_zh: '冷靜 / 平靜安詳', meaning: 'Calm / Composed / Relaxed', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80', example: '遇到突發事件最緊要保持冷靜。', example_meaning: 'The most important thing when encountering emergencies is staying calm.' },
+        '放鬆': { jyutping: 'fong3 sung1', meaning_zh: '放鬆 / 悠閒自得', meaning: 'Relax / Relaxed / Unwind', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80', example: '聽下輕音樂可以令人放鬆心情。', example_meaning: 'Listening to soft music can help you relax your mind.' },
+        '自信': { jyutping: 'zi6 seon3', meaning_zh: '自信 / 自信滿滿', meaning: 'Confident / Self-assured', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80', example: '上台演講要有自信。', example_meaning: 'You need to be confident when speaking on stage.' },
+        '驚訝': { jyutping: 'ging1 ngaa6', meaning_zh: '驚訝 / 吃驚震驚', meaning: 'Surprised / Astonished / Shocked', image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80', example: '見到份驚喜禮物，佢好驚訝。', example_meaning: 'Seeing the surprise gift, she was very surprised.' }
     };
 
     // Master Character Jyutping Map covering Hundreds of Common Chinese Characters
@@ -90,10 +110,23 @@ class CantoneseDictionary {
         '光': 'gwong1', '星': 'sing1', '雲': 'wan4', '氣': 'hei3', '花': 'faa1',
         '草': 'cou2', '樹': 'syu6', '葉': 'jip6', '竹': 'zuk1', '林': 'lam4',
 
+        // Emotions, Feelings & Mind
+        '生': 'sang1', '死': 'sei2', '害': 'hoi6', '怕': 'paa3', '緊': 'gan2',
+        '張': 'zoeng1', '擔': 'daan1', '心': 'sam1', '羞': 'sau1', '勇': 'jung5',
+        '敢': 'gam2', '開': 'hoi1', '傷': 'soeng1', '難': 'naan4', '過': 'gwo3',
+        '興': 'hing1', '奮': 'fan5', '攰': 'gui6', '累': 'leoi6', '冷': 'laang5',
+        '靜': 'zing6', '放': 'fong3', '鬆': 'sung1', '自': 'zi6', '信': 'seon3',
+        '驚': 'ging1', '訝': 'ngaa6', '憤': 'fan5', '怒': 'nou6', '恐': 'hung2',
+        '懼': 'geoi6', '憂': 'jau1', '慮': 'leoi6', '愁': 'sau4', '愛': 'oi3',
+        '情': 'cing4', '感': 'gam2', '意': 'ji3', '思': 'si1', '想': 'soeng2',
+        '念': 'nim6', '樂': 'lok6', '喜': 'hei2', '悲': 'bei1', '痛': 'tung3',
+        '哭': 'huk1', '笑': 'siu3', '喊': 'haam3', '愁': 'sau4', '怒': 'nou6',
+
         // Body Parts & People
         '人': 'jan4', '口': 'hau2', '目': 'muk6', '耳': 'ji5', '手': 'sau2',
-        '足': 'zuk1', '腳': 'goek3', '心': 'sam1', '頭': 'tau4', '眼': 'ngaan5',
-        '骨': 'gwat1', '肉': 'juk6', '身': 'san1', '體': 'tai2',
+        '足': 'zuk1', '腳': 'goek3', '頭': 'tau4', '眼': 'ngaan5', '鼻': 'bei6',
+        '齒': 'ci2', '面': 'min6', '臉': 'lim5', '骨': 'gwat1', '肉': 'juk6',
+        '身': 'san1', '體': 'tai2',
 
         // Directions
         '東': 'dung1', '南': 'naam4', '西': 'sai1', '北': 'bak1', '中': 'zung1',
@@ -104,15 +137,16 @@ class CantoneseDictionary {
         '我': 'ngo5', '你': 'nei5', '佢': 'heoi5', '哋': 'dei6', '係': 'hai6',
         '唔': 'm4', '有': 'jau5', '冇': 'mou5', '去': 'heoi3', '食': 'sik6',
         '飲': 'jam2', '睇': 'tai2', '聽': 'ting1', '講': 'gong2', '諗': 'nam2',
-        '想': 'soeng2', '要': 'jiu3', '做': 'zou6', '玩': 'waan2', '行': 'haang4',
-        '走': 'zau2', '嚟': 'lai4', '返': 'faan1', '出': 'ceot1', '入': 'jap6',
-        '落': 'lok6', '過': 'gwo3', '畀': 'bei2', '拎': 'ling1', '買': 'maai5',
-        '賣': 'maai6', '用': 'jung6', '見': 'gin3', '學': 'hok6', '寫': 'se2',
-        '讀': 'duk6', '開': 'hoi1', '關': 'gwaan1', '坐': 'co5', '企': 'kei5',
-        '瞓': 'fan3', '醒': 'sing2', '愛': 'oi3', '家': 'gaa1', '年': 'nin4',
+        '要': 'jiu3', '做': 'zou6', '玩': 'waan2', '行': 'haang4', '走': 'zau2',
+        '跑': 'paau2', '跳': 'tiu3', '游': 'jau4', '水': 'seoi2', '唱': 'coeng3',
+        '歌': 'go1', '舞': 'mou5', '讀': 'duk6', '寫': 'se2', '學': 'hok6',
+        '煮': 'zyu2', '買': 'maai5', '賣': 'maai6', '搭': 'daap3', '揸': 'zaa1',
+        '瞓': 'fan3', '訓': 'fan3', '醒': 'sing2', '出': 'ceot1', '入': 'jap6',
+        '落': 'lok6', '畀': 'bei2', '拎': 'ling1', '用': 'jung6', '見': 'gin3',
+        '關': 'gwaan1', '坐': 'co5', '企': 'kei5', '家': 'gaa1', '年': 'nin4',
         '時': 'si4', '分': 'fan1', '大': 'daai6', '小': 'siu2', '多': 'do1',
         '少': 'siu2', '長': 'coeng4', '高': 'gou1', '新': 'san1', '舊': 'gau6',
-        '快': 'faai3', '慢': 'maan6', '熱': 'jit6', '冷': 'laang5', '凍': 'dung3',
+        '快': 'faai3', '慢': 'maan6', '熱': 'jit6', '凍': 'dung3', '溫': 'wan1',
         '紅': 'hung4', '藍': 'laam4', '黃': 'wong4', '綠': 'luk6', '白': 'baak6',
         '黑': 'hak1', '紫': 'zi2', '橙': 'caang2'
     };
@@ -127,203 +161,459 @@ class CantoneseDictionary {
         '兩': 'Two (Pair)'
     };
 
+    /**
+     * Safe word-boundary and multi-token matcher for accurate Cantonese and English topic detection.
+     * Prevents false positive substring matches (e.g. "scared" matching "car", "teacher" matching "tea").
+     */
+    static safeMatch(text, wordsZh = [], wordsEn = []) {
+        if (!text) return false;
+        const lowerText = text.toLowerCase();
+        for (const zh of wordsZh) {
+            if (lowerText.includes(zh.toLowerCase())) return true;
+        }
+        for (const en of wordsEn) {
+            const escaped = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`\\b${escaped}(s|es|ed|ing|d)?\\b`, 'i');
+            if (regex.test(lowerText)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Comprehensive Curated Gallery for Image Search & Gallery Picker Modal
+     */
+    static IMAGE_GALLERY = [
+        // 🎭 Emotions & Moods
+        { title: '生氣 / 憤怒 (Angry / Mad)', category: 'emotions', tags: ['angry', 'mad', 'furious', '生氣', '憤怒', '發火'], url: 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80' },
+        { title: '害怕 / 恐懼 (Scared / Afraid)', category: 'emotions', tags: ['scared', 'afraid', 'fear', '害怕', '恐懼', '驚'], url: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80' },
+        { title: '緊張 / 慌張 (Nervous / Anxious)', category: 'emotions', tags: ['nervous', 'anxious', 'stress', 'tense', '緊張', '慌張'], url: 'https://images.unsplash.com/photo-1541199249251-f713e6145474?auto=format&fit=crop&w=600&q=80' },
+        { title: '擔心 / 憂慮 (Worried / Concerned)', category: 'emotions', tags: ['worried', 'concern', 'worry', '擔心', '憂慮'], url: 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?auto=format&fit=crop&w=600&q=80' },
+        { title: '害羞 / 怕醜 (Shy / Blushing)', category: 'emotions', tags: ['shy', 'blushing', 'bashful', '害羞', '怕醜'], url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80' },
+        { title: '勇敢 / 膽大 (Brave / Courageous)', category: 'emotions', tags: ['brave', 'courageous', 'heroic', 'bold', '勇敢', '膽大'], url: 'https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&w=600&q=80' },
+        { title: '開心 / 快樂 (Happy / Joyful)', category: 'emotions', tags: ['happy', 'joyful', 'cheerful', 'glad', '開心', '快樂'], url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80' },
+        { title: '傷心 / 難過 (Sad / Grieved)', category: 'emotions', tags: ['sad', 'grieved', 'heartbroken', 'crying', '傷心', '難過'], url: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80' },
+        { title: '興奮 / 雀躍 (Excited / Thrilled)', category: 'emotions', tags: ['excited', 'thrilled', 'hyped', '興奮', '雀躍'], url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80' },
+        { title: '攰 / 疲倦 (Tired / Exhausted)', category: 'emotions', tags: ['tired', 'exhausted', 'fatigue', '攰', '累'], url: 'https://images.unsplash.com/photo-1520206183501-b80df61e43c2?auto=format&fit=crop&w=600&q=80' },
+        { title: '冷靜 / 放鬆 (Calm / Relaxed)', category: 'emotions', tags: ['calm', 'relaxed', 'peaceful', 'zen', '冷靜', '放鬆'], url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80' },
+        { title: '自信 / 得意 (Confident / Proud)', category: 'emotions', tags: ['confident', 'proud', 'confidence', '自信'], url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80' },
+        { title: '驚訝 / 震驚 (Surprised / Shocked)', category: 'emotions', tags: ['surprised', 'shocked', 'astonished', '驚訝'], url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80' },
+        { title: '愛 / 喜歡 (Love / Affection)', category: 'emotions', tags: ['love', 'romance', 'heart', '愛', '喜歡', '鍾意'], url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80' },
+
+        // 🥟 Food, Drinks & Cha Chaan Teng
+        { title: '蛋撻 (Egg Tart)', category: 'food', tags: ['egg tart', 'tart', 'pastry', '蛋撻'], url: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80' },
+        { title: '凍檸茶 (Iced Lemon Tea)', category: 'food', tags: ['iced lemon tea', 'lemon tea', 'tea', '凍檸茶', '檸茶'], url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80' },
+        { title: '菠蘿包 (Pineapple Bun)', category: 'food', tags: ['pineapple bun', 'bun', 'bread', '菠蘿包', '菠蘿油'], url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80' },
+        { title: '叉燒包 / 燒賣 (Dim Sum / Bao)', category: 'food', tags: ['bbq pork bun', 'siu mai', 'bun', 'dim sum', '叉燒包', '燒賣'], url: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80' },
+        { title: '蝦餃 / 點心 (Har Gow / Dumpling)', category: 'food', tags: ['dumpling', 'har gow', 'dim sum', '蝦餃', '點心', '餃子'], url: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80' },
+        { title: '港式奶茶 (Milk Tea)', category: 'food', tags: ['milk tea', 'tea', 'drink', '奶茶', '熱奶茶'], url: 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80' },
+        { title: '咖啡 (Coffee)', category: 'food', tags: ['coffee', 'cafe', 'latte', 'espresso', '咖啡'], url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },
+        { title: '白飯 / 炒飯 (Rice / Fried Rice)', category: 'food', tags: ['rice', 'steamed rice', 'fried rice', '白飯', '米飯', '炒飯'], url: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80' },
+        { title: '麵條 / 湯麵 (Noodles / Ramen)', category: 'food', tags: ['noodle', 'noodles', 'ramen', 'soup', '麵', '麵條', '雲吞麵'], url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80' },
+        { title: '廣東粥 (Congee / Porridge)', category: 'food', tags: ['congee', 'porridge', '粥', '皮蛋瘦肉粥'], url: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80' },
+        { title: '火鍋 / 打邊爐 (Hot Pot)', category: 'food', tags: ['hot pot', 'hotpot', '火鍋', '打邊爐', '晚餐'], url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80' },
+        { title: '牛肉 / 牛排 (Beef / Steak)', category: 'food', tags: ['beef', 'steak', 'meat', '牛肉', '牛排'], url: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80' },
+        { title: '雞肉 (Chicken)', category: 'food', tags: ['chicken', 'poultry', '雞肉', '炸雞'], url: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=600&q=80' },
+        { title: '海鮮 / 魚 (Seafood / Fish)', category: 'food', tags: ['fish', 'seafood', 'shrimp', '魚', '海鮮'], url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80' },
+        { title: '水果 (Fresh Fruits)', category: 'food', tags: ['fruit', 'fruits', 'apple', 'banana', '水果', '蘋果', '香蕉'], url: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80' },
+        { title: '埋單 / 結賬 (Check / Bill)', category: 'food', tags: ['bill', 'check', 'receipt', 'payment', '埋單', '結賬'], url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80' },
+
+        // 🇭🇰 Hong Kong Landmarks & Culture
+        { title: '香港維港 (Victoria Harbour)', category: 'hk', tags: ['hong kong', 'harbour', 'skyline', 'victoria', '香港', '維港'], url: 'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80' },
+        { title: '香港電車 (Hong Kong Tram / Ding Ding)', category: 'hk', tags: ['tram', 'ding ding', 'streetcar', '電車', '叮叮車'], url: 'https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?auto=format&fit=crop&w=600&q=80' },
+        { title: '天星小輪 (Star Ferry)', category: 'hk', tags: ['ferry', 'boat', 'star ferry', '天星小輪', '渡輪'], url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80' },
+        { title: '霓虹街景 (Hong Kong Neon Lights)', category: 'hk', tags: ['neon', 'night', 'street', 'mong kok', '霓虹燈', '夜市'], url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80' },
+        { title: '港鐵地鐵 (MTR Subway)', category: 'hk', tags: ['mtr', 'subway', 'metro', 'train', '地鐵', '港鐵'], url: 'https://images.unsplash.com/photo-1515165562839-978bbcf18277?auto=format&fit=crop&w=600&q=80' },
+
+        // 🏃 Actions & Verbs
+        { title: '跑步 / 運動 (Run / Running)', category: 'actions', tags: ['run', 'running', 'jogging', 'exercise', '跑步', '做運動'], url: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80' },
+        { title: '行路 / 散步 (Walk / Walking)', category: 'actions', tags: ['walk', 'walking', 'stroll', '行路', '散步'], url: 'https://images.unsplash.com/photo-1508873535684-277a3cbcc4e8?auto=format&fit=crop&w=600&q=80' },
+        { title: '瞓覺 / 休息 (Sleep / Resting)', category: 'actions', tags: ['sleep', 'sleeping', 'bed', 'rest', '瞓覺', '訓覺'], url: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=600&q=80' },
+        { title: '睇書 / 閱讀 (Read / Reading)', category: 'actions', tags: ['read', 'reading', 'book', 'study', '睇書', '閱讀', '書'], url: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80' },
+        { title: '寫字 / 寫作 (Write / Writing)', category: 'actions', tags: ['write', 'writing', 'pen', 'paper', '寫字', '寫作'], url: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600&q=80' },
+        { title: '煮飯 / 烹飪 (Cook / Cooking)', category: 'actions', tags: ['cook', 'cooking', 'kitchen', 'chef', '煮飯', '烹飪'], url: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80' },
+        { title: '揸車 / 駕駛 (Drive / Driving)', category: 'actions', tags: ['drive', 'driving', 'steering', '揸車', '駕駛'], url: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80' },
+        { title: '去旅行 (Travel / Vacation)', category: 'actions', tags: ['travel', 'trip', 'vacation', 'flight', '旅行', '旅遊'], url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80' },
+        { title: '返工 / 工作 (Work / Working)', category: 'actions', tags: ['work', 'working', 'office', 'job', '返工', '工作'], url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80' },
+        { title: '買嘢 / 購物 (Shopping / Buy)', category: 'actions', tags: ['shopping', 'shop', 'buy', 'store', '買嘢', '購物'], url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80' },
+
+        // 📱 Tech & Household Objects
+        { title: '手提電話 (Smartphone / Phone)', category: 'objects', tags: ['phone', 'mobile', 'smartphone', '手提電話', '手機'], url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80' },
+        { title: '電腦 (Computer / Laptop)', category: 'objects', tags: ['computer', 'laptop', 'pc', '電腦'], url: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=600&q=80' },
+        { title: '互聯網 / 網絡 (Internet / Network)', category: 'objects', tags: ['internet', 'network', 'wifi', '網絡', '互聯網'], url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80' },
+        { title: '充電器 (Charger / Power Bank)', category: 'objects', tags: ['charger', 'battery', 'power bank', '充電器'], url: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80' },
+        { title: '金錢 / 鈔票 (Money / Cash)', category: 'objects', tags: ['money', 'cash', 'dollar', 'currency', '錢', '金錢'], url: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=600&q=80' },
+        { title: '洗手間 / 廁所 (Bathroom / Restroom)', category: 'objects', tags: ['bathroom', 'toilet', 'restroom', '廁所', '洗手間'], url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80' },
+
+        // 🐾 Animals & Nature
+        { title: '小狗 (Dog / Puppy)', category: 'animals', tags: ['dog', 'puppy', 'canine', '狗', '小狗'], url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80' },
+        { title: '小貓 (Cat / Kitten)', category: 'animals', tags: ['cat', 'kitten', 'feline', '貓', '小貓'], url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80' },
+        { title: '太陽 / 晴天 (Sun / Sunny)', category: 'animals', tags: ['sun', 'sunny', 'daylight', '太陽', '晴天'], url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' },
+        { title: '下雨 / 雨天 (Rain / Rainy)', category: 'animals', tags: ['rain', 'rainy', 'shower', '雨', '落雨'], url: 'https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=600&q=80' },
+        { title: '高山 (Mountain / Hill)', category: 'animals', tags: ['mountain', 'mountains', 'hill', '山', '高山'], url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
+        { title: '大海 / 海灘 (Ocean / Beach)', category: 'animals', tags: ['sea', 'ocean', 'beach', 'coast', '海', '大海', '沙灘'], url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80' },
+
+        // 👥 People & Family
+        { title: '家庭 / 家人 (Family)', category: 'people', tags: ['family', 'parents', 'home', '家庭', '屋企人', '家人'], url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80' },
+        { title: '好朋友 (Friends)', category: 'people', tags: ['friend', 'friends', 'friendship', '朋友', '好朋友'], url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80' },
+        { title: '老師 / 先生 (Teacher / Tutor)', category: 'people', tags: ['teacher', 'professor', 'tutor', '老師', '先生'], url: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=600&q=80' },
+        { title: '學生 (Student)', category: 'people', tags: ['student', 'pupil', 'learner', '學生'], url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80' },
+        { title: '醫生 (Doctor)', category: 'people', tags: ['doctor', 'physician', 'medical', '醫生'], url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80' }
+    ];
+
+    /**
+     * Search image gallery by query and category
+     */
+    static searchGallery(query = '', category = 'all') {
+        const q = (query || '').trim().toLowerCase();
+        return this.IMAGE_GALLERY.filter(item => {
+            const matchesCategory = (category === 'all' || item.category === category);
+            if (!matchesCategory) return false;
+            if (!q) return true;
+            return item.title.toLowerCase().includes(q) || item.tags.some(t => t.toLowerCase().includes(q));
+        });
+    }
+
+    /**
+     * High-Precision Topic Image Resolver with Safe Word-Boundary Matching
+     * Maps Cantonese terms and English meanings to contextually accurate, high-res Unsplash visuals.
+     */
     static getTopicImage(word, meaning = '') {
-        const text = `${word} ${meaning}`.toLowerCase();
+        const text = `${word} ${meaning}`.trim();
+        if (!text) return 'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80';
 
-        // 1. Meals & Dining (Explicit Fixes for Breakfast, Lunch, Dinner, Rice, Noodles)
-        if (text.includes('早餐') || text.includes('朝食') || text.includes('breakfast')) {
-            return 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80';
+        // ==========================================
+        // 1. 🎭 Emotions & Moods (High Priority Fixes)
+        // ==========================================
+        if (this.safeMatch(text, ['生氣', '憤怒', '發火', '火滾', '惱怒'], ['angry', 'mad', 'furious', 'rage', 'wrath', 'pissed'])) {
+            return 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('午餐') || text.includes('晝食') || text.includes('午飯') || text.includes('lunch')) {
-            return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+        if (this.safeMatch(text, ['害怕', '恐懼', '驚', '驚慌', '怕鬼', '畏懼'], ['scared', 'afraid', 'fear', 'terrified', 'frightened', 'horror', 'spooky', 'dread'])) {
+            return 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('晚餐') || text.includes('夜飯') || text.includes('晚飯') || text.includes('dinner') || text.includes('supper')) {
-            return 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
+        if (this.safeMatch(text, ['緊張', '慌張', '忐忑'], ['nervous', 'tense', 'tension', 'stress', 'stressed'])) {
+            return 'https://images.unsplash.com/photo-1541199249251-f713e6145474?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('白飯') || text.includes('米飯') || text.includes('steamed rice') || (text.includes('飯') && text.includes('rice'))) {
-            return 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80';
+        if (this.safeMatch(text, ['擔心', '憂慮', '憂心', '牽掛', '操心', '焦慮'], ['worried', 'worry', 'concern', 'concerned', 'anxious', 'anxiety', 'apprehensive'])) {
+            return 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('麵條') || text.includes('麵') || text.includes('粉麵') || text.includes('noodle') || text.includes('ramen')) {
-            return 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80';
+        if (this.safeMatch(text, ['害羞', '怕醜', '靦腆', '不好意思'], ['shy', 'blushing', 'bashful', 'timid', 'coy'])) {
+            return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('粥') || text.includes('congee') || text.includes('porridge')) {
-            return 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80';
+        if (this.safeMatch(text, ['勇敢', '膽大', '英勇', '大膽', '豪勇'], ['brave', 'courageous', 'bold', 'heroic', 'valiant', 'courage'])) {
+            return 'https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('麵包') || text.includes('面包') || text.includes('bread') || text.includes('toast')) {
-            return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('蛋') || text.includes('雞蛋') || text.includes('egg')) {
-            return 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('點心') || text.includes('dim sum')) {
-            return 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('燒賣') || text.includes('siu mai')) {
-            return 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('蝦餃') || text.includes('har gow') || text.includes('dumpling')) {
-            return 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('凍檸茶') || text.includes('檸茶') || text.includes('lemon tea')) {
-            return 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('奶茶') || text.includes('milk tea')) {
-            return 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('咖啡') || text.includes('coffee')) {
-            return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('茶') || text.includes('tea')) {
-            return 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('蘋果') || text.includes('apple')) {
-            return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('香蕉') || text.includes('banana')) {
-            return 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('西瓜') || text.includes('watermelon')) {
-            return 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('水果') || text.includes('fruit')) {
-            return 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('牛肉') || text.includes('beef')) {
-            return 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('雞肉') || text.includes('chicken')) {
-            return 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('魚') || text.includes('fish')) {
-            return 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('飯') || text.includes('食') || text.includes('food') || text.includes('eat') || text.includes('meal')) {
-            return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80';
-        }
-
-        // 2. Family & People Topics
-        if (text.includes('爸爸') || text.includes('父親') || text.includes('father') || text.includes('dad')) {
-            return 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('媽媽') || text.includes('母親') || text.includes('mother') || text.includes('mom')) {
-            return 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('哥哥') || text.includes('兄長') || text.includes('elder brother') || text.includes('brother')) {
-            return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('姐姐') || text.includes('姊姊') || text.includes('elder sister') || text.includes('sister')) {
-            return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('弟弟') || text.includes('胞弟') || text.includes('younger brother')) {
-            return 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('妹妹') || text.includes('胞妹') || text.includes('younger sister')) {
+        if (this.safeMatch(text, ['開心', '快樂', '高興', '歡喜', '愉悅', '笑逐顏開'], ['happy', 'joyful', 'glad', 'cheerful', 'delighted', 'pleased', 'joy'])) {
             return 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('爺爺') || text.includes('祖父') || text.includes('公公') || text.includes('grandfather')) {
+        if (this.safeMatch(text, ['傷心', '難過', '悲傷', '痛心', '心碎', '淒涼'], ['sad', 'heartbroken', 'grieved', 'sorrow', 'unhappy', 'crying', 'grief'])) {
+            return 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['興奮', '雀躍', '激動', '狂歡'], ['excited', 'thrilled', 'hyped', 'ecstatic', 'excitement'])) {
+            return 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['攰', '累', '疲倦', '疲累', '困倦', '筋疲力盡'], ['tired', 'exhausted', 'sleepy', 'fatigue', 'weary'])) {
+            return 'https://images.unsplash.com/photo-1520206183501-b80df61e43c2?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['冷靜', '放鬆', '平靜', '安詳', '定水'], ['calm', 'relaxed', 'relax', 'peaceful', 'serene', 'tranquil', 'chill'])) {
+            return 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['自信', '得意', '自豪', '驕傲'], ['confident', 'confidence', 'proud', 'pride', 'self-assured'])) {
+            return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['驚訝', '震驚', '吃驚', '詫異'], ['surprised', 'shocked', 'astonished', 'amazed', 'surprise', 'wonder'])) {
+            return 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['愛', '心動', '喜歡', '鍾意', '熱愛', '愛情'], ['love', 'romance', 'romantic', 'affection', 'crush', 'fond'])) {
+            return 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['孤獨', '寂寞', '孤單', '冷清'], ['lonely', 'alone', 'solitary', 'loneliness', 'isolated'])) {
+            return 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // ==========================================
+        // 2. 🥟 Food, Drinks & Cha Chaan Teng
+        // ==========================================
+        if (this.safeMatch(text, ['蛋撻', '蛋塔'], ['egg tart', 'tart'])) {
+            return 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['凍檸茶', '檸檬茶', '檸茶'], ['iced lemon tea', 'lemon tea'])) {
+            return 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['菠蘿包', '菠蘿油'], ['pineapple bun', 'pineapple bread'])) {
+            return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['叉燒包', '叉燒'], ['bbq pork bun', 'char siu', 'bbq pork'])) {
+            return 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['點心', '飲茶'], ['dim sum', 'yum cha'])) {
+            return 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['蝦餃', '餃子', '水餃'], ['dumpling', 'dumplings', 'har gow', 'potsticker'])) {
+            return 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['燒賣'], ['siu mai', 'shumai'])) {
+            return 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['奶茶', '港式奶茶'], ['milk tea', 'boba', 'milktea'])) {
+            return 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['咖啡'], ['coffee', 'espresso', 'cappuccino', 'latte', 'cafe'])) {
+            return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['綠茶', '紅茶', '烏龍茶', '普洱茶', '茶葉'], ['tea', 'green tea', 'black tea', 'oolong'])) {
+            return 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['早餐', '早點'], ['breakfast', 'brunch'])) {
+            return 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['午餐', '午飯', '晏晝飯'], ['lunch'])) {
+            return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['晚餐', '晚飯', '夜飯', '宵夜'], ['dinner', 'supper', 'feast'])) {
+            return 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['白飯', '米飯', '炒飯'], ['steamed rice', 'rice', 'fried rice'])) {
+            return 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['麵條', '粉麵', '拉麵', '烏冬', '雲吞麵'], ['noodle', 'noodles', 'ramen', 'udon', 'pasta', 'spaghetti'])) {
+            return 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['粥', '廣東粥'], ['congee', 'porridge', 'gruel'])) {
+            return 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['麵包', '多士'], ['bread', 'toast', 'bakery', 'croissant', 'bagel'])) {
+            return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['雞蛋', '煎蛋', '荷包蛋'], ['egg', 'eggs', 'omelet'])) {
+            return 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['牛肉', '牛扒', '牛柳'], ['beef', 'steak', 'sirloin'])) {
+            return 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['雞肉', '炸雞', '燒雞'], ['chicken', 'poultry', 'fried chicken'])) {
+            return 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['魚', '海鮮', '蝦', '蟹', '龍蝦'], ['fish', 'seafood', 'shrimp', 'crab', 'lobster', 'salmon'])) {
+            return 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['蘋果'], ['apple'])) {
+            return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['香蕉'], ['banana'])) {
+            return 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['西瓜'], ['watermelon'])) {
+            return 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['水果', '鮮果'], ['fruit', 'fruits', 'berry'])) {
+            return 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['埋單', '結賬', '買單', '收據'], ['bill', 'check', 'receipt', 'payment'])) {
+            return 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // ==========================================
+        // 3. 🇭🇰 Hong Kong Landmarks & Culture
+        // ==========================================
+        if (this.safeMatch(text, ['香港', '維港', '維多利亞港', '九龍'], ['hong kong', 'victoria harbour', 'kowloon', 'skyline'])) {
+            return 'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['電車', '叮叮車', '叮叮'], ['tram', 'ding ding', 'streetcar'])) {
+            return 'https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['天星小輪', '渡輪', '船'], ['ferry', 'star ferry', 'boat', 'vessel'])) {
+            return 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['地鐵', '港鐵'], ['mtr', 'subway', 'metro', 'underground'])) {
+            return 'https://images.unsplash.com/photo-1515165562839-978bbcf18277?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['霓虹燈', '夜市', '女人街', '廟街'], ['neon', 'night market', 'street market'])) {
+            return 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // ==========================================
+        // 4. 🏃 Actions & Verbs
+        // ==========================================
+        if (this.safeMatch(text, ['跑步', '慢跑', '賽跑'], ['run', 'running', 'jog', 'jogging', 'sprint'])) {
+            return 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['行路', '散步', '行街', '步行'], ['walk', 'walking', 'stroll', 'hike', 'hiking'])) {
+            return 'https://images.unsplash.com/photo-1508873535684-277a3cbcc4e8?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['瞓覺', '訓覺', '瞓', '睡眠', '小休'], ['sleep', 'sleeping', 'nap', 'bedtime', 'slumber'])) {
+            return 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['睇書', '閱讀', '讀書'], ['read', 'reading', 'book', 'novel', 'literature'])) {
+            return 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['寫字', '寫作', '寫信'], ['write', 'writing', 'handwriting', 'letter', 'author'])) {
+            return 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['唱歌', '唱K'], ['sing', 'singing', 'karaoke', 'vocal'])) {
+            return 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['跳舞', '街舞'], ['dance', 'dancing', 'dancer', 'ballet'])) {
+            return 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['游水', '游泳'], ['swim', 'swimming', 'swimmer', 'pool'])) {
+            return 'https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['煮飯', '烹飪', '下廚', '煮嘢食'], ['cook', 'cooking', 'chef', 'culinary', 'recipe'])) {
+            return 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['揸車', '駕駛'], ['drive', 'driving', 'steering', 'motorist'])) {
+            return 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['去旅行', '旅遊', '出遊'], ['travel', 'trip', 'vacation', 'holiday', 'tourism', 'tourist'])) {
+            return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['返工', '工作', '上班', '公幹'], ['work', 'working', 'office', 'job', 'career', 'corporate'])) {
+            return 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['溫習', '學習', '自修'], ['study', 'studying', 'learn', 'learning', 'homework', 'exam'])) {
+            return 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['買嘢', '購物', '逛街'], ['shopping', 'retail', 'market', 'store', 'mall', 'purchase'])) {
+            return 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['做運動', '健身', '操肌'], ['exercise', 'fitness', 'gym', 'workout', 'training'])) {
+            return 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['清潔', '打掃', '洗衫'], ['clean', 'cleaning', 'housework', 'tidy', 'sweep', 'mop'])) {
+            return 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['聽歌', '聽音樂', '音樂'], ['listen', 'music', 'song', 'audio', 'earphones', 'tunes'])) {
+            return 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // ==========================================
+        // 5. 👥 People & Family
+        // ==========================================
+        if (this.safeMatch(text, ['爸爸', '父親', '老竇'], ['father', 'dad', 'daddy', 'papa'])) {
+            return 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['媽媽', '母親', '媽咪'], ['mother', 'mom', 'mommy', 'mama'])) {
+            return 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['哥哥', '兄長', '大哥'], ['brother', 'elder brother', 'older brother'])) {
+            return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['姐姐', '姊姊', '大姐'], ['sister', 'elder sister', 'older sister'])) {
+            return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['弟弟', '細佬'], ['younger brother', 'little brother'])) {
+            return 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['妹妹', '細妹'], ['younger sister', 'little sister'])) {
+            return 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['爺爺', '祖父', '公公'], ['grandfather', 'grandpa', 'granddad'])) {
             return 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('嫲嫲') || text.includes('婆婆') || text.includes('祖母') || text.includes('grandmother')) {
+        if (this.safeMatch(text, ['嫲嫲', '婆婆', '祖母'], ['grandmother', 'grandma', 'granny'])) {
             return 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('家庭') || text.includes('家人') || text.includes('屋企人') || text.includes('family')) {
+        if (this.safeMatch(text, ['家庭', '家人', '屋企人'], ['family', 'relatives', 'household'])) {
             return 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('朋友') || text.includes('friend')) {
+        if (this.safeMatch(text, ['朋友', '好朋友', '老友'], ['friend', 'friends', 'friendship', 'pal', 'buddy'])) {
             return 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('老師') || text.includes('先生') || text.includes('teacher')) {
+        if (this.safeMatch(text, ['老師', '先生', '導師'], ['teacher', 'tutor', 'instructor', 'professor', 'educator'])) {
             return 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('學生') || text.includes('student')) {
+        if (this.safeMatch(text, ['學生', '同學'], ['student', 'pupil', 'classmate'])) {
             return 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('醫生') || text.includes('doctor')) {
+        if (this.safeMatch(text, ['醫生', '大夫'], ['doctor', 'physician', 'surgeon', 'medic'])) {
             return 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('護士') || text.includes('nurse')) {
+        if (this.safeMatch(text, ['護士', '姑娘'], ['nurse', 'nursing'])) {
             return 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80';
         }
 
-        // 3. Household, Technology & Places
-        if (text.includes('廁所') || text.includes('洗手間') || text.includes('bathroom') || text.includes('toilet')) {
+        // ==========================================
+        // 6. 🚗 Transport, Places, Animals & Objects
+        // ==========================================
+        if (this.safeMatch(text, ['廁所', '洗手間'], ['bathroom', 'toilet', 'restroom', 'washroom', 'lavatory'])) {
             return 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('椅子') || text.includes('chair')) {
-            return 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('睡房') || text.includes('bedroom')) {
-            return 'https://images.unsplash.com/photo-1540518614846-7ede433c5163?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('客廳') || text.includes('living room')) {
-            return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('廚房') || text.includes('kitchen')) {
-            return 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('學校') || text.includes('school')) {
-            return 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('醫院') || text.includes('hospital')) {
-            return 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('機場') || text.includes('airport')) {
-            return 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('公園') || text.includes('park')) {
-            return 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('巴士') || text.includes('bus')) {
-            return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('的士') || text.includes('taxi') || text.includes('cab')) {
-            return 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('地鐵') || text.includes('mtr') || text.includes('subway')) {
-            return 'https://images.unsplash.com/photo-1515165562839-978bbcf18277?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('飛機') || text.includes('airplane') || text.includes('flight')) {
-            return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('車') || text.includes('car')) {
-            return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('書') || text.includes('book')) {
-            return 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80';
-        }
-        if (text.includes('手提電話') || text.includes('電話') || text.includes('phone') || text.includes('mobile')) {
+        if (this.safeMatch(text, ['手提電話', '智能手機', '手機'], ['phone', 'mobile', 'smartphone', 'cellphone'])) {
             return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('電腦') || text.includes('computer') || text.includes('laptop')) {
+        if (this.safeMatch(text, ['電腦', '手提電腦'], ['computer', 'laptop', 'desktop', 'macbook'])) {
             return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('錢') || text.includes('money')) {
-            return 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=600&q=80';
+        if (this.safeMatch(text, ['網絡', '互聯網'], ['internet', 'network', 'wifi', 'web'])) {
+            return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('狗') || text.includes('dog')) {
+        if (this.safeMatch(text, ['充電器', '行動電源'], ['charger', 'power bank', 'battery pack'])) {
+            return 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['私家車', '汽車', '車輛'], ['car', 'automobile', 'vehicle', 'sedan'])) {
+            return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['的士', '計程車'], ['taxi', 'cab', 'taxicab'])) {
+            return 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['巴士', '公車'], ['bus', 'coach'])) {
+            return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['飛機', '航班'], ['airplane', 'plane', 'flight', 'aircraft', 'aviation'])) {
+            return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['機場', '客運大樓'], ['airport', 'terminal'])) {
+            return 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['學校'], ['school', 'campus', 'classroom'])) {
+            return 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['醫院', '診所'], ['hospital', 'clinic', 'infirmary'])) {
+            return 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['公園', '花園'], ['park', 'garden'])) {
+            return 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['狗', '小狗', '狗狗'], ['dog', 'puppy', 'hound', 'canine'])) {
             return 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('貓') || text.includes('cat')) {
+        if (this.safeMatch(text, ['貓', '小貓', '貓咪'], ['cat', 'kitten', 'feline', 'kitty'])) {
             return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('太陽') || text.includes('晴天') || text.includes('sun') || text.includes('sunny')) {
+        if (this.safeMatch(text, ['太陽', '晴天'], ['sun', 'sunny', 'sunshine', 'daylight'])) {
             return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
         }
-        if (text.includes('雨') || text.includes('rain')) {
+        if (this.safeMatch(text, ['雨', '落雨', '下雨'], ['rain', 'rainy', 'raining', 'shower', 'downpour'])) {
             return 'https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=600&q=80';
         }
+        if (this.safeMatch(text, ['山', '高山'], ['mountain', 'mountains', 'summit', 'peak', 'hill'])) {
+            return 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80';
+        }
+        if (this.safeMatch(text, ['海', '大海', '海洋', '沙灘'], ['sea', 'ocean', 'beach', 'coast', 'waves'])) {
+            return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80';
+        }
 
-        // 4. Fallback Pool with Diverse High-Res Concept Images
+        // ==========================================
+        // 7. 🎨 Rich Thematic High-Variety Fallback Palette
+        // ==========================================
         const fallbackPool = [
-            'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80',
-            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80'
+            'https://images.unsplash.com/photo-1506970845246-18f21d533b20?auto=format&fit=crop&w=600&q=80', // HK Victoria Harbour
+            'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80', // HK Neon Night Market
+            'https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?auto=format&fit=crop&w=600&q=80', // HK Ding Ding Tram
+            'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80', // Star Ferry Harbour
+            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80', // Green Mountains
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80', // Ocean Beach
+            'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80', // Happy Portrait
+            'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80', // Friends Friendship
+            'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80', // Study & Library
+            'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80', // World Travel Journey
+            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80', // Workspace Design
+            'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'  // Golden Sunlight Nature
         ];
+
         let hash = 0;
-        for (let i = 0; i < word.length; i++) {
-            hash = (hash << 5) - hash + word.charCodeAt(i);
+        for (let i = 0; i < text.length; i++) {
+            hash = (hash << 5) - hash + text.charCodeAt(i);
             hash |= 0;
         }
         return fallbackPool[Math.abs(hash) % fallbackPool.length];
@@ -653,6 +943,95 @@ const DEFAULT_PROFILES = [
                 meaning: 'Charger / Power Bank',
                 example: '你有冇帶手提電話充電器？',
                 example_meaning: 'Do you have a phone charger with you?',
+                mastered: false,
+                favorite: false
+            }
+        ]
+    },
+    {
+        id: 'prof-emotions-04',
+        name: 'Feelings & Emotions (廣東話心情與感受)',
+        category: 'Emotions',
+        description: 'Express feelings, psychological states, and moods in natural spoken Cantonese.',
+        createdAt: new Date().toISOString(),
+        items: [
+            {
+                id: 'w-19',
+                word: '生氣',
+                jyutping: 'saang1 hei3',
+                meaning: 'Angry / Mad',
+                example: '你唔好咁生氣啦，坐低飲杯水先。',
+                example_meaning: "Don't be so angry, sit down and have a glass of water first.",
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-20',
+                word: '害怕',
+                jyutping: 'hoi2 paa3',
+                meaning: 'Scared / Afraid',
+                example: '佢好害怕睇恐怖片。',
+                example_meaning: 'He is very scared of watching horror movies.',
+                mastered: false,
+                favorite: false
+            },
+            {
+                id: 'w-21',
+                word: '緊張',
+                jyutping: 'gan2 zoeng1',
+                meaning: 'Nervous / Tense',
+                example: '聽日要演講，我好緊張。',
+                example_meaning: 'I have a speech tomorrow, I feel very nervous.',
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-22',
+                word: '擔心',
+                jyutping: 'daam1 sam1',
+                meaning: 'Worried / Anxious',
+                example: '唔使擔心，事情一定會順利的。',
+                example_meaning: "Don't worry, things will definitely go smoothly.",
+                mastered: true,
+                favorite: false
+            },
+            {
+                id: 'w-23',
+                word: '害羞',
+                jyutping: 'hoi6 sau1',
+                meaning: 'Shy / Blushing',
+                example: '個小朋友見到陌生人就有啲害羞。',
+                example_meaning: 'The child gets a little shy when meeting strangers.',
+                mastered: false,
+                favorite: false
+            },
+            {
+                id: 'w-24',
+                word: '勇敢',
+                jyutping: 'jung5 gam2',
+                meaning: 'Brave / Courageous',
+                example: '消防員非常勇敢，救咗好多人。',
+                example_meaning: 'Firefighters are very brave and have saved many people.',
+                mastered: true,
+                favorite: true
+            },
+            {
+                id: 'w-25',
+                word: '開心',
+                jyutping: 'hoi1 sam1',
+                meaning: 'Happy / Joyful',
+                example: '今日同朋友聚會好開心！',
+                example_meaning: 'Today hanging out with friends was so happy!',
+                mastered: true,
+                favorite: true
+            },
+            {
+                id: 'w-26',
+                word: '傷心',
+                jyutping: 'soeng1 sam1',
+                meaning: 'Sad / Heartbroken',
+                example: '聽到呢個壞消息，大家都很傷心。',
+                example_meaning: 'Hearing this bad news, everyone was very sad.',
                 mastered: false,
                 favorite: false
             }
@@ -1738,6 +2117,7 @@ class UIManager {
         this.modalDictationSetup = document.getElementById('modal-dictation-setup');
         this.modalDetail = document.getElementById('modal-detail');
         this.modalVoiceHelp = document.getElementById('modal-voice-help');
+        this.modalImagePicker = document.getElementById('modal-image-picker');
         this.toastContainer = document.getElementById('toast-container');
 
         this.modalAuth = document.getElementById('modal-auth');
@@ -2008,6 +2388,27 @@ class UIManager {
         if (inputModalEditImage) {
             inputModalEditImage.addEventListener('input', () => this.updateModalEditImagePreview());
         }
+
+        // Image Picker Modal Search & Category Filter Listeners
+        const inputImageSearch = document.getElementById('input-image-picker-search');
+        if (inputImageSearch) {
+            inputImageSearch.addEventListener('input', (e) => {
+                this.renderImagePickerGallery(e.target.value, this.imagePickerActiveCategory || 'all');
+            });
+        }
+
+        const categoryChips = document.querySelectorAll('#image-picker-category-bar .category-chip');
+        categoryChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                categoryChips.forEach(c => {
+                    c.className = 'category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all';
+                });
+                chip.className = 'category-chip px-3 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shrink-0 transition-all';
+                this.imagePickerActiveCategory = chip.dataset.category || 'all';
+                const currentQuery = (document.getElementById('input-image-picker-search') || {}).value || '';
+                this.renderImagePickerGallery(currentQuery, this.imagePickerActiveCategory);
+            });
+        });
 
         const btnModalPrevWord = document.getElementById('btn-modal-prev-word');
         if (btnModalPrevWord) {
@@ -2685,6 +3086,152 @@ class UIManager {
 
         if (this.currentView === 'profile-detail') {
             this.renderProfileDetail();
+        }
+    }
+
+    openImagePickerModal(context = 'edit-modal', initialQuery = '') {
+        this.imagePickerContext = context;
+        let defaultQuery = initialQuery;
+
+        if (!defaultQuery) {
+            if (context === 'edit-modal') {
+                const word = (document.getElementById('input-modal-edit-word') || {}).value || '';
+                const meaningEn = (document.getElementById('input-modal-edit-meaning-en') || {}).value || '';
+                defaultQuery = word || meaningEn;
+            } else if (typeof context === 'string' && context.startsWith('draft-item-')) {
+                const idx = parseInt(context.replace('draft-item-', ''), 10);
+                if (this.draftParsedItems[idx]) {
+                    defaultQuery = this.draftParsedItems[idx].word || this.draftParsedItems[idx].meaning;
+                }
+            }
+        }
+
+        const inputSearch = document.getElementById('input-image-picker-search');
+        if (inputSearch) {
+            inputSearch.value = defaultQuery || '';
+        }
+
+        this.imagePickerActiveCategory = 'all';
+        const categoryChips = document.querySelectorAll('#image-picker-category-bar .category-chip');
+        categoryChips.forEach(chip => {
+            if (chip.dataset.category === 'all') {
+                chip.className = 'category-chip px-3 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shrink-0 transition-all';
+            } else {
+                chip.className = 'category-chip px-3 py-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 font-semibold shrink-0 transition-all';
+            }
+        });
+
+        this.renderImagePickerGallery(defaultQuery, 'all');
+
+        if (this.modalImagePicker) {
+            this.modalImagePicker.classList.remove('hidden');
+        }
+    }
+
+    closeImagePickerModal() {
+        if (this.modalImagePicker) {
+            this.modalImagePicker.classList.add('hidden');
+        }
+    }
+
+    renderImagePickerGallery(query = '', category = 'all') {
+        const grid = document.getElementById('image-picker-gallery-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        const results = CantoneseDictionary.searchGallery(query, category);
+
+        if (results.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full py-12 text-center text-slate-500 text-xs space-y-2">
+                    <p class="text-lg">🔍 No matching pictures found for "${this.escapeHTML(query)}"</p>
+                    <p class="text-[11px] text-slate-400">Try searching a different keyword or paste a direct image URL below.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let currentUrl = '';
+        if (this.imagePickerContext === 'edit-modal') {
+            currentUrl = (document.getElementById('input-modal-edit-image') || {}).value || '';
+        }
+
+        results.forEach(img => {
+            const isSelected = currentUrl && currentUrl === img.url;
+            const card = document.createElement('div');
+            card.className = `group relative rounded-2xl overflow-hidden border cursor-pointer transition-all hover:scale-[1.03] bg-slate-900 ${
+                isSelected ? 'border-purple-500 ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/20' : 'border-slate-800 hover:border-purple-500/60'
+            }`;
+
+            card.innerHTML = `
+                <div class="aspect-video w-full bg-slate-950 overflow-hidden relative">
+                    <img src="${this.escapeHTML(img.url)}" alt="${this.escapeHTML(img.title)}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" loading="lazy">
+                    ${isSelected ? '<span class="absolute top-2 right-2 bg-purple-500 text-white p-1 rounded-full text-[10px] font-bold shadow">✓</span>' : ''}
+                </div>
+                <div class="p-2 space-y-0.5 bg-slate-900/95">
+                    <p class="text-[11px] font-bold text-slate-200 truncate">${this.escapeHTML(img.title)}</p>
+                    <span class="inline-block px-1.5 py-0.5 bg-slate-800 text-[9px] font-medium text-slate-400 rounded">${this.escapeHTML(img.category)}</span>
+                </div>
+            `;
+
+            card.onclick = () => this.selectImageFromPicker(img.url);
+            grid.appendChild(card);
+        });
+    }
+
+    selectImageFromPicker(url) {
+        if (!url) return;
+
+        if (this.imagePickerContext === 'edit-modal') {
+            const inputImg = document.getElementById('input-modal-edit-image');
+            if (inputImg) {
+                inputImg.value = url;
+                this.updateModalEditImagePreview();
+            }
+        } else if (typeof this.imagePickerContext === 'string' && this.imagePickerContext.startsWith('draft-item-')) {
+            const idx = parseInt(this.imagePickerContext.replace('draft-item-', ''), 10);
+            if (this.draftParsedItems[idx]) {
+                this.draftParsedItems[idx].image = url;
+                this.renderLiveParserTable();
+            }
+        }
+
+        this.closeImagePickerModal();
+        this.showToast('✨ Picture selected & applied successfully!', 'success');
+    }
+
+    applyCustomImageUrlFromPicker() {
+        const inputCustom = document.getElementById('input-image-picker-custom-url');
+        const url = inputCustom ? inputCustom.value.trim() : '';
+        if (!url) {
+            this.showToast('Please enter a valid image URL.', 'warning');
+            return;
+        }
+        this.selectImageFromPicker(url);
+    }
+
+    fixDeckImages() {
+        if (!this.activeProfile || !Array.isArray(this.activeProfile.items) || this.activeProfile.items.length === 0) {
+            this.showToast('No active deck or items found to upgrade.', 'warning');
+            return;
+        }
+
+        let upgradedCount = 0;
+        this.activeProfile.items.forEach(item => {
+            const accurateImg = CantoneseDictionary.getTopicImage(item.word, item.meaning || item.meaning_zh);
+            if (accurateImg && accurateImg !== item.image) {
+                item.image = accurateImg;
+                upgradedCount++;
+            }
+        });
+
+        StorageManager.updateProfile(this.activeProfile);
+        this.renderProfileDetail();
+
+        if (upgradedCount > 0) {
+            this.showToast(`✨ Successfully upgraded ${upgradedCount} cards with high-precision photos!`, 'success');
+        } else {
+            this.showToast('All card pictures in this deck already have high-precision matches! 👍', 'info');
         }
     }
 

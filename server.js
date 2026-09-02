@@ -325,6 +325,95 @@ const DEFAULT_PROFILES = [
                 favorite: false
             }
         ]
+    },
+    {
+        id: 'prof-emotions-04',
+        name: 'Feelings & Emotions (廣東話心情與感受)',
+        category: 'Emotions',
+        description: 'Express feelings, psychological states, and moods in natural spoken Cantonese.',
+        createdAt: new Date().toISOString(),
+        items: [
+            {
+                id: 'w-19',
+                word: '生氣',
+                jyutping: 'saang1 hei3',
+                meaning: 'Angry / Mad',
+                example: '你唔好咁生氣啦，坐低飲杯水先。',
+                example_meaning: "Don't be so angry, sit down and have a glass of water first.",
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-20',
+                word: '害怕',
+                jyutping: 'hoi2 paa3',
+                meaning: 'Scared / Afraid',
+                example: '佢好害怕睇恐怖片。',
+                example_meaning: 'He is very scared of watching horror movies.',
+                mastered: false,
+                favorite: false
+            },
+            {
+                id: 'w-21',
+                word: '緊張',
+                jyutping: 'gan2 zoeng1',
+                meaning: 'Nervous / Tense',
+                example: '聽日要演講，我好緊張。',
+                example_meaning: 'I have a speech tomorrow, I feel very nervous.',
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-22',
+                word: '擔心',
+                jyutping: 'daam1 sam1',
+                meaning: 'Worried / Anxious',
+                example: '唔使擔心，事情一定會順利的。',
+                example_meaning: "Don't worry, things will definitely go smoothly.",
+                mastered: true,
+                favorite: false
+            },
+            {
+                id: 'w-23',
+                word: '害羞',
+                jyutping: 'hoi6 sau1',
+                meaning: 'Shy / Blushing',
+                example: '個小朋友見到陌生人就有啲害羞。',
+                example_meaning: 'The child gets a little shy when meeting strangers.',
+                mastered: false,
+                favorite: false
+            },
+            {
+                id: 'w-24',
+                word: '勇敢',
+                jyutping: 'jung5 gam2',
+                meaning: 'Brave / Courageous',
+                example: '消防員非常勇敢，救咗好多人。',
+                example_meaning: 'Firefighters are very brave and have saved many people.',
+                mastered: true,
+                favorite: true
+            },
+            {
+                id: 'w-25',
+                word: '開心',
+                jyutping: 'hoi1 sam1',
+                meaning: 'Happy / Joyful',
+                example: '今日同朋友聚會好開心！',
+                example_meaning: 'Today hanging out with friends was so happy!',
+                mastered: true,
+                favorite: true
+            },
+            {
+                id: 'w-26',
+                word: '傷心',
+                jyutping: 'soeng1 sam1',
+                meaning: 'Sad / Heartbroken',
+                example: '聽到呢個壞消息，大家都很傷心。',
+                example_meaning: 'Hearing this bad news, everyone was very sad.',
+                mastered: false,
+                favorite: false
+            }
+        ]
     }
 ];
 
@@ -355,7 +444,17 @@ const IMAGE_MAP = {
     '手提電話': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80',
     '網絡': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
     '應用程式': 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80',
-    '充電器': 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80'
+    '充電器': 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80',
+    '生氣': 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80',
+    '憤怒': 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80',
+    '害怕': 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80',
+    '恐懼': 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80',
+    '緊張': 'https://images.unsplash.com/photo-1541199249251-f713e6145474?auto=format&fit=crop&w=600&q=80',
+    '擔心': 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?auto=format&fit=crop&w=600&q=80',
+    '害羞': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    '勇敢': 'https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&w=600&q=80',
+    '開心': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
+    '傷心': 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80'
 };
 
 const MEANING_ZH_MAP = {
@@ -368,6 +467,14 @@ const MEANING_ZH_MAP = {
     '冇問題': '冇問題 / 沒關係',
     '呢個幾多錢？': '多少錢 / 詢問價格',
     '凍檸茶': '凍檸茶 / 冰檸檬茶',
+    '生氣': '生氣 / 憤怒 / 發火',
+    '害怕': '害怕 / 恐懼 / 驚慌',
+    '緊張': '緊張 / 忐忑不安',
+    '擔心': '擔心 / 憂慮 / 牽掛',
+    '害羞': '害羞 / 怕醜 / 靦腆',
+    '勇敢': '勇敢 / 膽大 / 英勇',
+    '開心': '開心 / 快樂 / 歡喜',
+    '傷心': '傷心 / 難過 / 悲傷',
     '蛋撻': '蛋撻 / 酥皮雞蛋塔',
     '點心': '點心 / 飲茶點心',
     '埋單': '埋單 / 結賬買單',

@@ -138,3 +138,23 @@ body {
 .pulse-glow {
     animation: soft-pulse 3s infinite ease-in-out;
 }
+
+/* Image Gallery Picker & Search Grid */
+#image-picker-gallery-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+#image-picker-gallery-grid::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.3);
+    border-radius: 9999px;
+}
+
+.category-chip {
+    cursor: pointer;
+    user-select: none;
+}
+
+.category-chip:active {
+    transform: scale(0.96);
+}
+
