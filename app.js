@@ -1700,7 +1700,8 @@ class UIManager {
             remainingSeconds: 10,
             startTime: null,
             elapsedSeconds: 0,
-            stopwatchTimer: null
+            stopwatchTimer: null,
+            filterScope: 'all'
         };
 
         try {
@@ -1734,6 +1735,7 @@ class UIManager {
 
         this.speechWarningBanner = document.getElementById('speech-warning-banner');
         this.modalCreateProfile = document.getElementById('modal-create-profile');
+        this.modalDictationSetup = document.getElementById('modal-dictation-setup');
         this.modalDetail = document.getElementById('modal-detail');
         this.modalVoiceHelp = document.getElementById('modal-voice-help');
         this.toastContainer = document.getElementById('toast-container');
@@ -2112,7 +2114,7 @@ class UIManager {
         } else if (targetView === 'dictation-mode') {
             this.activeProfile = StorageManager.getProfileById(params.profileId) || this.activeProfile;
             if (this.activeProfile && this.activeProfile.items.length > 0) {
-                this.initDictationMode();
+                this.initDictationMode(params.scope || this.dictationState.filterScope || 'all');
                 if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
             } else {
                 this.showToast('Profile has no vocabulary items for dictation.', 'warning');
@@ -3023,24 +3025,117 @@ class UIManager {
     // ==========================================
     // Dictation Mode (默書模式) Handlers
     // ==========================================
-    startDictationMode() {
-        this.switchView('dictation-mode', { profileId: this.activeProfile ? this.activeProfile.id : null });
+    openDictationSetupModal() {
+        if (!this.activeProfile || !this.activeProfile.items || this.activeProfile.items.length === 0) {
+            this.showToast('Profile has no vocabulary items for dictation.', 'warning');
+            return;
+        }
+
+        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+
+        const allCount = this.activeProfile.items.length;
+        const learningCount = this.activeProfile.items.filter(i => !masteredSet.has(i.id)).length;
+        const masteredCount = this.activeProfile.items.filter(i => masteredSet.has(i.id)).length;
+        const favCount = this.activeProfile.items.filter(i => favSet.has(i.id)).length;
+
+        // Update counts in modal
+        const countAll = document.getElementById('dictation-count-all');
+        const countLearning = document.getElementById('dictation-count-learning');
+        const countMastered = document.getElementById('dictation-count-mastered');
+        const countFav = document.getElementById('dictation-count-favorites');
+
+        if (countAll) countAll.textContent = `${allCount} words`;
+        if (countLearning) countLearning.textContent = `${learningCount} words`;
+        if (countMastered) countMastered.textContent = `${masteredCount} words`;
+        if (countFav) countFav.textContent = `${favCount} words`;
+
+        // Configure button states based on item availability
+        this.setDictationScopeBtnState('btn-dictation-scope-all', allCount);
+        this.setDictationScopeBtnState('btn-dictation-scope-learning', learningCount);
+        this.setDictationScopeBtnState('btn-dictation-scope-mastered', masteredCount);
+        this.setDictationScopeBtnState('btn-dictation-scope-favorites', favCount);
+
+        const modal = document.getElementById('modal-dictation-setup');
+        if (modal) modal.classList.remove('hidden');
     }
 
-    initDictationMode() {
+    setDictationScopeBtnState(btnId, count) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (count === 0) {
+            btn.disabled = true;
+            btn.classList.add('opacity-40', 'cursor-not-allowed');
+            btn.classList.remove('hover:bg-slate-800/90', 'hover:border-purple-500/50');
+        } else {
+            btn.disabled = false;
+            btn.classList.remove('opacity-40', 'cursor-not-allowed');
+            btn.classList.add('hover:bg-slate-800/90', 'hover:border-purple-500/50');
+        }
+    }
+
+    closeDictationSetupModal() {
+        const modal = document.getElementById('modal-dictation-setup');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    confirmStartDictation(scope = 'all') {
+        this.closeDictationSetupModal();
+        this.startDictationMode(scope);
+    }
+
+    startDictationMode(scope) {
+        if (!scope) {
+            this.openDictationSetupModal();
+            return;
+        }
+        this.dictationState.filterScope = scope;
+        this.switchView('dictation-mode', { profileId: this.activeProfile ? this.activeProfile.id : null, scope });
+    }
+
+    initDictationMode(scope = this.dictationState.filterScope || 'all') {
         if (!this.activeProfile || !this.activeProfile.items || this.activeProfile.items.length === 0) return;
         this.stopDictationAutoPlay();
         this.stopDictationStopwatch();
 
-        // 1. Randomize all words at once for dictation
-        const itemsCopy = [...this.activeProfile.items];
-        const randomized = itemsCopy.sort(() => 0.5 - Math.random());
+        this.dictationState.filterScope = scope;
+
+        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+
+        let filteredItems = [...this.activeProfile.items];
+        let scopeLabel = 'All Words';
+
+        if (scope === 'learning') {
+            filteredItems = filteredItems.filter(i => !masteredSet.has(i.id));
+            scopeLabel = 'Learning 學習中';
+        } else if (scope === 'mastered') {
+            filteredItems = filteredItems.filter(i => masteredSet.has(i.id));
+            scopeLabel = 'Mastered 已掌握';
+        } else if (scope === 'favorites') {
+            filteredItems = filteredItems.filter(i => favSet.has(i.id));
+            scopeLabel = 'Favorites 我的最愛';
+        }
+
+        if (filteredItems.length === 0) {
+            this.showToast(`No words found in "${scopeLabel}". Using all words instead.`, 'info');
+            filteredItems = [...this.activeProfile.items];
+            scopeLabel = 'All Words';
+            this.dictationState.filterScope = 'all';
+        }
+
+        // 1. Randomize chosen word list at once for dictation
+        const randomized = filteredItems.sort(() => 0.5 - Math.random());
 
         this.dictationState.items = randomized;
         this.dictationState.currentIndex = 0;
         this.dictationState.isRevealed = false;
         this.dictationState.isFinished = false;
         this.dictationState.remainingSeconds = this.dictationState.autoPlaySeconds;
+
+        // Update scope label in header
+        const scopeNameElem = document.getElementById('dictation-scope-name');
+        if (scopeNameElem) scopeNameElem.textContent = `${scopeLabel} (${randomized.length})`;
 
         // Start Stopwatch
         this.startDictationStopwatch();

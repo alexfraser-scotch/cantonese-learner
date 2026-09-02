@@ -344,6 +344,35 @@ test('Dictation Mode (默書) Word Randomization & State Flow', (t) => {
     assert.strictEqual(formatStopwatchTime(125), '02:05', '125s formats to 02:05');
     assert.strictEqual(formatStopwatchTime(3600), '60:00', '3600s formats to 60:00');
 
+    // 3. Word list scope filtering verification (All, Learning, Mastered, Favorites)
+    const mockUserProgress = {
+        masteredItemIds: ['w1', 'w3'], // '你好' and '多謝' are mastered
+        favoriteItemIds: ['w2', 'w3']  // '早晨' and '多謝' are favorites
+    };
+
+    const masteredSet = new Set(mockUserProgress.masteredItemIds);
+    const favSet = new Set(mockUserProgress.favoriteItemIds);
+
+    function filterItemsByScope(items, scope) {
+        if (scope === 'learning') return items.filter(i => !masteredSet.has(i.id));
+        if (scope === 'mastered') return items.filter(i => masteredSet.has(i.id));
+        if (scope === 'favorites') return items.filter(i => favSet.has(i.id));
+        return [...items];
+    }
+
+    const allScope = filterItemsByScope(mockProfile.items, 'all');
+    const learningScope = filterItemsByScope(mockProfile.items, 'learning');
+    const masteredScope = filterItemsByScope(mockProfile.items, 'mastered');
+    const favoritesScope = filterItemsByScope(mockProfile.items, 'favorites');
+
+    assert.strictEqual(allScope.length, 4, 'All words scope includes all 4 items');
+    assert.strictEqual(learningScope.length, 2, 'Learning scope includes 2 unmastered items (w2, w4)');
+    assert.deepStrictEqual(learningScope.map(i => i.id).sort(), ['w2', 'w4'].sort());
+    assert.strictEqual(masteredScope.length, 2, 'Mastered scope includes 2 mastered items (w1, w3)');
+    assert.deepStrictEqual(masteredScope.map(i => i.id).sort(), ['w1', 'w3'].sort());
+    assert.strictEqual(favoritesScope.length, 2, 'Favorites scope includes 2 favorited items (w2, w3)');
+    assert.deepStrictEqual(favoritesScope.map(i => i.id).sort(), ['w2', 'w3'].sort());
+
     // Completion at end of list
     dictationState.currentIndex = dictationState.items.length - 1;
     // Advancing past last item marks dictation as finished

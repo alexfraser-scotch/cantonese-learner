@@ -459,7 +459,12 @@
                     Exit Dictation / 退出默書
                 </button>
                 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Scope Badge / Selector -->
+                    <button onclick="window.UIManager.openDictationSetupModal()" id="dictation-scope-badge" class="px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all" title="Change Word List Scope">
+                        <span>📋</span> <span id="dictation-scope-name">All Words</span>
+                        <svg class="w-3.5 h-3.5 text-purple-400 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
                     <!-- Live Stopwatch Badge -->
                     <span id="dictation-stopwatch-badge" class="px-3 py-1.5 bg-slate-900 border border-slate-800 text-amber-300 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 shadow-inner" title="Dictation Session Timer">
                         <span>⏱️</span> <span id="dictation-stopwatch-timer">00:00</span>
@@ -585,7 +590,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-slate-800">
-                    <button onclick="window.UIManager.startDictationMode()" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5">
+                    <button onclick="window.UIManager.openDictationSetupModal()" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5">
                         🔄 重新默書 Start Another Dictation
                     </button>
                     <button onclick="window.UIManager.exitDictationMode()" class="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
@@ -1402,6 +1407,87 @@
                         </button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 9: DICTATION SCOPE SELECTION MODAL -->
+    <!-- ========================================== -->
+    <div id="modal-dictation-setup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-card rounded-3xl border border-purple-500/30 max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl relative my-8">
+            <!-- Close Button -->
+            <button onclick="window.UIManager.closeDictationSetupModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-100 p-2 rounded-xl bg-slate-900/60 hover:bg-slate-800 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Header -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-tr from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-purple-500/20">
+                    ✍️
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold text-slate-100 font-cantonese">默書範圍 Dictation Word List</h3>
+                    <p class="text-xs text-slate-400">Choose which word list to practice for this dictation session:</p>
+                </div>
+            </div>
+
+            <!-- 4 Word List Options Grid -->
+            <div class="space-y-3">
+                <!-- Option 1: All Words -->
+                <button onclick="window.UIManager.confirmStartDictation('all')" id="btn-dictation-scope-all" class="w-full p-4 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-left transition-all group flex items-center justify-between">
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">📚</span>
+                        <div>
+                            <span class="text-sm font-bold text-slate-100 group-hover:text-purple-300 transition-colors block">All Words 全部詞語</span>
+                            <span class="text-[11px] text-slate-400">Randomize and dictate all vocabulary in this deck</span>
+                        </div>
+                    </div>
+                    <span id="dictation-count-all" class="px-3 py-1 bg-sky-500/20 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-mono font-bold">0 words</span>
+                </button>
+
+                <!-- Option 2: Learning -->
+                <button onclick="window.UIManager.confirmStartDictation('learning')" id="btn-dictation-scope-learning" class="w-full p-4 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-left transition-all group flex items-center justify-between">
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">📖</span>
+                        <div>
+                            <span class="text-sm font-bold text-slate-100 group-hover:text-purple-300 transition-colors block">Learning 學習中詞語</span>
+                            <span class="text-[11px] text-slate-400">Words currently marked as still in progress</span>
+                        </div>
+                    </div>
+                    <span id="dictation-count-learning" class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-mono font-bold">0 words</span>
+                </button>
+
+                <!-- Option 3: Mastered -->
+                <button onclick="window.UIManager.confirmStartDictation('mastered')" id="btn-dictation-scope-mastered" class="w-full p-4 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-left transition-all group flex items-center justify-between">
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">✅</span>
+                        <div>
+                            <span class="text-sm font-bold text-slate-100 group-hover:text-purple-300 transition-colors block">Mastered 已掌握詞語</span>
+                            <span class="text-[11px] text-slate-400">Test your retention on completed mastery words</span>
+                        </div>
+                    </div>
+                    <span id="dictation-count-mastered" class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-mono font-bold">0 words</span>
+                </button>
+
+                <!-- Option 4: Favorites -->
+                <button onclick="window.UIManager.confirmStartDictation('favorites')" id="btn-dictation-scope-favorites" class="w-full p-4 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-left transition-all group flex items-center justify-between">
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">⭐</span>
+                        <div>
+                            <span class="text-sm font-bold text-slate-100 group-hover:text-purple-300 transition-colors block">Favorites 我的最愛詞語</span>
+                            <span class="text-[11px] text-slate-400">Practice only your starred favorite words</span>
+                        </div>
+                    </div>
+                    <span id="dictation-count-favorites" class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-mono font-bold">0 words</span>
+                </button>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="pt-2 flex justify-end">
+                <button onclick="window.UIManager.closeDictationSetupModal()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs rounded-xl border border-slate-800 transition-all">
+                    Cancel 取消
+                </button>
             </div>
         </div>
     </div>
