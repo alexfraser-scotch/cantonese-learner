@@ -1686,6 +1686,20 @@ class UIManager {
             isFinished: false
         };
 
+        this.dictationState = {
+            items: [],
+            currentIndex: 0,
+            isRevealed: false,
+            isFinished: false,
+            isAutoPlaying: false,
+            autoPlaySeconds: 10,
+            autoPlayIntervalSeconds: 3,
+            autoPlayTimer: null,
+            autoPlaySubTimer: null,
+            countdownTimer: null,
+            remainingSeconds: 10
+        };
+
         try {
             AuthManager.init((user) => this.handleAuthChange(user));
         } catch (e) {
@@ -1710,8 +1724,10 @@ class UIManager {
         this.viewProfileDetail = document.getElementById('view-profile-detail');
         this.viewStudyMode = document.getElementById('view-study-mode');
         this.viewQuizMode = document.getElementById('view-quiz-mode');
+        this.viewDictationMode = document.getElementById('view-dictation-mode');
         this.viewToneQuiz = document.getElementById('view-tone-quiz');
         this.viewAdminPortal = document.getElementById('view-admin-portal');
+        this.viewPrintSheet = document.getElementById('view-print-sheet');
 
         this.speechWarningBanner = document.getElementById('speech-warning-banner');
         this.modalCreateProfile = document.getElementById('modal-create-profile');
@@ -2015,6 +2031,17 @@ class UIManager {
                 }
                 if (e.key === 'ArrowLeft') this.navigateStudyCard(-1);
                 if (e.key === 'ArrowRight') this.navigateStudyCard(1);
+            } else if (this.currentView === 'dictation-mode') {
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    this.playDictationCurrentWord();
+                }
+                if (e.key === 'f' || e.key === 'F') {
+                    this.toggleDictationFlip();
+                }
+                if (e.key === 'ArrowLeft') this.navigateDictation(-1);
+                if (e.key === 'ArrowRight') this.navigateDictation(1);
+                if (e.key === 'Escape') this.exitDictationMode();
             }
         });
     }
@@ -2026,8 +2053,15 @@ class UIManager {
         this.viewProfileDetail.classList.add('hidden');
         this.viewStudyMode.classList.add('hidden');
         this.viewQuizMode.classList.add('hidden');
+        if (this.viewDictationMode) this.viewDictationMode.classList.add('hidden');
         if (this.viewToneQuiz) this.viewToneQuiz.classList.add('hidden');
         if (this.viewAdminPortal) this.viewAdminPortal.classList.add('hidden');
+        if (this.viewPrintSheet) this.viewPrintSheet.classList.add('hidden');
+
+        // Stop dictation auto-play if leaving dictation view
+        if (targetView !== 'dictation-mode' && this.dictationState && this.dictationState.isAutoPlaying) {
+            this.stopDictationAutoPlay();
+        }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -2070,6 +2104,15 @@ class UIManager {
                 this.viewQuizMode.classList.remove('hidden');
             } else {
                 this.showToast('Need at least 2 vocabulary items to generate a quiz.', 'warning');
+                this.switchView('profile-detail', { profileId: params.profileId });
+            }
+        } else if (targetView === 'dictation-mode') {
+            this.activeProfile = StorageManager.getProfileById(params.profileId) || this.activeProfile;
+            if (this.activeProfile && this.activeProfile.items.length > 0) {
+                this.initDictationMode();
+                if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
+            } else {
+                this.showToast('Profile has no vocabulary items for dictation.', 'warning');
                 this.switchView('profile-detail', { profileId: params.profileId });
             }
         } else if (targetView === 'tone-quiz') {
@@ -2972,6 +3015,291 @@ class UIManager {
             }
             this.renderQuizQuestion();
         }, 1000);
+    }
+
+    // ==========================================
+    // Dictation Mode (默書模式) Handlers
+    // ==========================================
+    startDictationMode() {
+        this.switchView('dictation-mode', { profileId: this.activeProfile ? this.activeProfile.id : null });
+    }
+
+    initDictationMode() {
+        if (!this.activeProfile || !this.activeProfile.items || this.activeProfile.items.length === 0) return;
+        this.stopDictationAutoPlay();
+
+        // 1. Randomize all words at once for dictation
+        const itemsCopy = [...this.activeProfile.items];
+        const randomized = itemsCopy.sort(() => 0.5 - Math.random());
+
+        this.dictationState.items = randomized;
+        this.dictationState.currentIndex = 0;
+        this.dictationState.isRevealed = false;
+        this.dictationState.isFinished = false;
+        this.dictationState.remainingSeconds = this.dictationState.autoPlaySeconds;
+
+        this.renderDictationCard();
+        // Play word audio on initial entry
+        setTimeout(() => this.playDictationCurrentWord(), 300);
+    }
+
+    renderDictationCard() {
+        const cardContainer = document.getElementById('dictation-card-container');
+        const summaryContainer = document.getElementById('dictation-summary-container');
+        if (!cardContainer || !summaryContainer) return;
+
+        if (this.dictationState.isFinished) {
+            this.stopDictationAutoPlay();
+            cardContainer.classList.add('hidden');
+            summaryContainer.classList.remove('hidden');
+
+            const badge = document.getElementById('dictation-mode-badge');
+            if (badge) {
+                badge.className = 'px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold flex items-center gap-1.5';
+                badge.innerHTML = '<span>✅</span> 默書完成 Finished';
+            }
+
+            const progressText = document.getElementById('dictation-progress-text');
+            if (progressText) progressText.textContent = `Completed ${this.dictationState.items.length} words`;
+
+            // Render complete word list in one page
+            const summaryList = document.getElementById('dictation-summary-list');
+            if (summaryList) {
+                summaryList.innerHTML = '';
+                this.dictationState.items.forEach((item, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'p-4 bg-slate-900/80 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-purple-500/30 transition-all';
+                    row.innerHTML = `
+                        <div class="flex items-start sm:items-center gap-3">
+                            <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center text-xs font-bold font-mono shrink-0">${idx + 1}</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl font-bold text-slate-100 font-cantonese">${this.escapeHTML(item.word)}</span>
+                                    <span class="jyutping-badge px-2.5 py-0.5 rounded-lg text-xs font-mono font-semibold">${this.escapeHTML(item.jyutping)}</span>
+                                </div>
+                                <div class="text-xs text-slate-300 font-medium mt-0.5">
+                                    <span>${this.escapeHTML(item.meaning_zh || '')}</span>
+                                    <span class="text-slate-400 text-[11px] ml-1.5">(${this.escapeHTML(item.meaning || '')})</span>
+                                </div>
+                                ${item.example ? `<p class="text-[11px] text-purple-300 font-cantonese mt-1">${this.escapeHTML(item.example)} <span class="text-slate-500 text-[10px]">(${this.escapeHTML(item.example_meaning || '')})</span></p>` : ''}
+                            </div>
+                        </div>
+                        <button onclick="window.UIManager.playAudioText('${this.escapeQuotes(item.word)}')" class="p-2.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-xl border border-sky-500/30 transition-all text-xs flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                            Listen
+                        </button>
+                    `;
+                    summaryList.appendChild(row);
+                });
+            }
+            return;
+        }
+
+        cardContainer.classList.remove('hidden');
+        summaryContainer.classList.add('hidden');
+
+        const badge = document.getElementById('dictation-mode-badge');
+        if (badge) {
+            badge.className = 'px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full text-xs font-bold flex items-center gap-1.5';
+            badge.innerHTML = '<span>✍️</span> 默書中 In Progress';
+        }
+
+        const currentItem = this.dictationState.items[this.dictationState.currentIndex];
+        if (!currentItem) return;
+
+        // Progress Text
+        const progressText = document.getElementById('dictation-progress-text');
+        if (progressText) {
+            progressText.textContent = `Word ${this.dictationState.currentIndex + 1} of ${this.dictationState.items.length}`;
+        }
+
+        // Next Button Text
+        const nextBtnText = document.getElementById('btn-dictation-next-text');
+        if (nextBtnText) {
+            if (this.dictationState.currentIndex === this.dictationState.items.length - 1) {
+                nextBtnText.textContent = 'Button 3: 完成默書 Finish Dictation 🏁';
+            } else {
+                nextBtnText.textContent = 'Button 3: 下一個 Next Word →';
+            }
+        }
+
+        // Card Views: Hidden vs Revealed
+        const hiddenView = document.getElementById('dictation-hidden-view');
+        const revealedView = document.getElementById('dictation-revealed-view');
+        const flipText = document.getElementById('dictation-flip-text');
+        const flipIcon = document.getElementById('dictation-flip-icon');
+
+        if (this.dictationState.isRevealed) {
+            if (hiddenView) hiddenView.classList.add('hidden');
+            if (revealedView) revealedView.classList.remove('hidden');
+            if (flipText) flipText.textContent = 'Button 2: 隱藏答案 Hide Details';
+            if (flipIcon) flipIcon.textContent = '🙈';
+
+            document.getElementById('dictation-word-text').textContent = currentItem.word;
+            document.getElementById('dictation-word-jyutping').textContent = currentItem.jyutping;
+            document.getElementById('dictation-word-meaning-zh').textContent = currentItem.meaning_zh || currentItem.word;
+            document.getElementById('dictation-word-meaning-en').textContent = currentItem.meaning || 'Definition';
+
+            const exampleBox = document.getElementById('dictation-example-box');
+            if (currentItem.example && exampleBox) {
+                exampleBox.classList.remove('hidden');
+                document.getElementById('dictation-word-example').textContent = currentItem.example;
+                document.getElementById('dictation-word-example-meaning').textContent = currentItem.example_meaning || '';
+            } else if (exampleBox) {
+                exampleBox.classList.add('hidden');
+            }
+        } else {
+            if (hiddenView) hiddenView.classList.remove('hidden');
+            if (revealedView) revealedView.classList.add('hidden');
+            if (flipText) flipText.textContent = 'Button 2: 翻牌對答案 Flip Details';
+            if (flipIcon) flipIcon.textContent = '👀';
+        }
+    }
+
+    playDictationCurrentWord() {
+        const item = this.dictationState.items[this.dictationState.currentIndex];
+        if (item && item.word) {
+            this.playAudioText(item.word, 'btn-dictation-listen');
+        }
+    }
+
+    toggleDictationFlip() {
+        this.dictationState.isRevealed = !this.dictationState.isRevealed;
+        this.renderDictationCard();
+    }
+
+    navigateDictation(direction) {
+        if (this.dictationState.isAutoPlaying) {
+            this.stopDictationAutoPlay();
+        }
+
+        if (direction === 1) {
+            if (this.dictationState.currentIndex >= this.dictationState.items.length - 1) {
+                this.dictationState.isFinished = true;
+                this.renderDictationCard();
+                this.showToast('Dictation session completed! 🎉', 'success');
+                return;
+            }
+            this.dictationState.currentIndex++;
+        } else if (direction === -1) {
+            if (this.dictationState.currentIndex > 0) {
+                this.dictationState.currentIndex--;
+            }
+        }
+
+        this.dictationState.isRevealed = false; // Details hidden by default for next/prev word
+        this.renderDictationCard();
+        setTimeout(() => this.playDictationCurrentWord(), 200);
+    }
+
+    setDictationAutoPlayDuration(seconds) {
+        this.dictationState.autoPlaySeconds = Math.max(3, parseInt(seconds, 10) || 10);
+        if (this.dictationState.isAutoPlaying) {
+            this.startDictationAutoPlay(); // Restart cycle with new configured duration
+        }
+    }
+
+    toggleDictationAutoPlay() {
+        if (this.dictationState.isAutoPlaying) {
+            this.stopDictationAutoPlay();
+            this.showToast('Auto play paused ⏸️', 'info');
+        } else {
+            this.startDictationAutoPlay();
+            this.showToast(`Auto play started ▶️ (${this.dictationState.autoPlaySeconds}s per word)`, 'info');
+        }
+    }
+
+    startDictationAutoPlay() {
+        this.stopDictationAutoPlay();
+        this.dictationState.isAutoPlaying = true;
+
+        const btnIcon = document.getElementById('dictation-autoplay-btn-icon');
+        const btnText = document.getElementById('dictation-autoplay-btn-text');
+        const btn = document.getElementById('btn-dictation-toggle-autoplay');
+
+        if (btnIcon) btnIcon.textContent = '⏸️';
+        if (btnText) btnText.textContent = 'Pause Auto Play';
+        if (btn) btn.className = 'px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 animate-pulse';
+
+        this.runDictationAutoPlayCycle();
+    }
+
+    runDictationAutoPlayCycle() {
+        if (!this.dictationState.isAutoPlaying || this.dictationState.isFinished) return;
+
+        this.dictationState.isRevealed = false;
+        this.renderDictationCard();
+
+        let elapsed = 0;
+        const totalSec = this.dictationState.autoPlaySeconds;
+        let playCount = 0;
+
+        const playAudio = () => {
+            if (!this.dictationState.isAutoPlaying) return;
+            playCount++;
+            this.playDictationCurrentWord();
+        };
+
+        // Play audio immediately at t=0
+        playAudio();
+
+        // Repeated audio playback every 3 seconds
+        this.dictationState.autoPlaySubTimer = setInterval(() => {
+            if (!this.dictationState.isAutoPlaying) return;
+            playAudio();
+        }, 3000);
+
+        // Update countdown status every 1 second
+        const statusElem = document.getElementById('dictation-autoplay-status');
+        if (statusElem) {
+            statusElem.textContent = `⏳ Next word in ${totalSec}s... (Audio repeat every 3s)`;
+        }
+
+        this.dictationState.countdownTimer = setInterval(() => {
+            if (!this.dictationState.isAutoPlaying) return;
+            elapsed++;
+            const remaining = Math.max(0, totalSec - elapsed);
+            if (statusElem) {
+                statusElem.textContent = `⏳ Next word in ${remaining}s... (Played ${playCount} times)`;
+            }
+
+            if (elapsed >= totalSec) {
+                clearInterval(this.dictationState.countdownTimer);
+                clearInterval(this.dictationState.autoPlaySubTimer);
+
+                if (this.dictationState.currentIndex < this.dictationState.items.length - 1) {
+                    this.dictationState.currentIndex++;
+                    this.runDictationAutoPlayCycle();
+                } else {
+                    this.stopDictationAutoPlay();
+                    this.dictationState.isFinished = true;
+                    this.renderDictationCard();
+                    this.showToast('Dictation completed! 🎉', 'success');
+                }
+            }
+        }, 1000);
+    }
+
+    stopDictationAutoPlay() {
+        this.dictationState.isAutoPlaying = false;
+        if (this.dictationState.countdownTimer) clearInterval(this.dictationState.countdownTimer);
+        if (this.dictationState.autoPlaySubTimer) clearInterval(this.dictationState.autoPlaySubTimer);
+        if (this.dictationState.autoPlayTimer) clearTimeout(this.dictationState.autoPlayTimer);
+
+        const btnIcon = document.getElementById('dictation-autoplay-btn-icon');
+        const btnText = document.getElementById('dictation-autoplay-btn-text');
+        const btn = document.getElementById('btn-dictation-toggle-autoplay');
+        const statusElem = document.getElementById('dictation-autoplay-status');
+
+        if (btnIcon) btnIcon.textContent = '▶️';
+        if (btnText) btnText.textContent = 'Start Auto Play';
+        if (btn) btn.className = 'px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5';
+        if (statusElem) statusElem.textContent = 'Play audio every 3s within duration';
+    }
+
+    exitDictationMode() {
+        this.stopDictationAutoPlay();
+        this.switchView('profile-detail', { profileId: this.activeProfile ? this.activeProfile.id : null });
     }
 
     // ==========================================

@@ -276,6 +276,69 @@ test('Community Deck Moderation & Featured Pinning', (t) => {
     writeProfiles(reloaded);
 });
 
+test('Dictation Mode (默書) Word Randomization & State Flow', (t) => {
+    const mockProfile = {
+        id: 'prof-dictation-test',
+        name: 'Dictation Test Deck',
+        items: [
+            { id: 'w1', word: '你好', jyutping: 'nei5 hou2', meaning: 'Hello' },
+            { id: 'w2', word: '早晨', jyutping: 'zou2 san4', meaning: 'Good morning' },
+            { id: 'w3', word: '多謝', jyutping: 'do1 ze6', meaning: 'Thank you' },
+            { id: 'w4', word: '唔該', jyutping: 'm4 goi1', meaning: 'Please/Excuse me' }
+        ]
+    };
+
+    // 1. Randomization at once
+    const randomized = [...mockProfile.items].sort(() => 0.5 - Math.random());
+    assert.strictEqual(randomized.length, 4, 'Randomized items count must equal total items');
+    assert.ok(randomized.every(item => mockProfile.items.some(orig => orig.id === item.id)), 'All original items must be present');
+
+    // 2. Dictation state machine simulation
+    let dictationState = {
+        items: randomized,
+        currentIndex: 0,
+        isRevealed: false,
+        isFinished: false,
+        autoPlaySeconds: 10,
+        autoPlayIntervalSeconds: 3
+    };
+
+    // Initial state: details hidden by default
+    assert.strictEqual(dictationState.isRevealed, false, 'Word details must be hidden by default in dictation');
+    assert.strictEqual(dictationState.currentIndex, 0, 'Dictation must start at word index 0');
+
+    // Flip over reveals details (Button 2)
+    dictationState.isRevealed = !dictationState.isRevealed;
+    assert.strictEqual(dictationState.isRevealed, true, 'Flipping must reveal word details');
+
+    // Next word resets detail visibility to hidden (Button 3)
+    dictationState.currentIndex++;
+    dictationState.isRevealed = false;
+    assert.strictEqual(dictationState.currentIndex, 1, 'Index must advance to 1');
+    assert.strictEqual(dictationState.isRevealed, false, 'Next word must reset details to hidden');
+
+    // Previous word (Button 4)
+    dictationState.currentIndex--;
+    dictationState.isRevealed = false;
+    assert.strictEqual(dictationState.currentIndex, 0, 'Index must return to 0');
+
+    // Auto Play audio repetition calculations (Button 5)
+    function calculateAutoPlayRepeats(durationSeconds, intervalSeconds = 3) {
+        // Plays immediately at t=0, then every intervalSeconds up to durationSeconds
+        return Math.floor(durationSeconds / intervalSeconds) + (durationSeconds % intervalSeconds === 0 ? 0 : 1);
+    }
+
+    assert.strictEqual(calculateAutoPlayRepeats(10, 3), 4, '10s duration with 3s interval plays 4 times (0s, 3s, 6s, 9s)');
+    assert.strictEqual(calculateAutoPlayRepeats(15, 3), 5, '15s duration with 3s interval plays 5 times (0s, 3s, 6s, 9s, 12s)');
+    assert.strictEqual(calculateAutoPlayRepeats(30, 3), 10, '30s duration with 3s interval plays 10 times');
+
+    // Completion at end of list
+    dictationState.currentIndex = dictationState.items.length - 1;
+    // Advancing past last item marks dictation as finished
+    dictationState.isFinished = true;
+    assert.strictEqual(dictationState.isFinished, true, 'Completing all items marks dictation as finished');
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

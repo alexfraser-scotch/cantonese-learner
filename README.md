@@ -23,6 +23,7 @@ An interactive, open-source Cantonese Vocabulary Learning platform featuring **3
 - 📊 **SRS Retention Analytics Bar:** Dashboard stats bar visualizing card distribution across Leitner Box 1–5 retention tiers and tracking cards due for review today.
 - 🖨️ **Printable Flashcard Sheet Generator:** Generate beautifully formatted 3x3 print-ready physical flashcard sheets with cut-lines and `@media print` CSS rules for offline study or classroom handouts.
 - 📥 **Anki Deck Export (.csv / .txt):** Export any custom vocabulary profile into Anki-compatible TSV/CSV format with custom tags (`Cantonese::Category`) and formatted card notes for seamless import into Anki and CrowdAnki.
+- ✍️ **Cantonese Dictation Mode (默書模式):** Comprehensive listening dictation system that randomizes all words in a deck at once with hidden details by default. Includes audio playback, flip-to-check answers, previous/next navigation, configurable auto-play interval timer (plays audio repeatedly every 3 seconds per word), and a complete end-of-session review list in one page.
 - 🌐 **Crowdsourced Deck & Profile Sharing:** Public community REST API allowing users to create, upvote (👍), upload, and share custom Cantonese vocabulary decks.
 - 🎯 **Mastery & Favoriting System:** Track your learning progress with card completion toggles and favorite quick-lists.
 - ⚡ **Lightweight & Dependency-Free:** Built with vanilla modern JavaScript, HTML5/CSS3, and native Node.js HTTP API server.
