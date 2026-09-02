@@ -453,12 +453,20 @@
         <!-- ========================================== -->
         <section id="view-dictation-mode" class="max-w-2xl mx-auto space-y-6 hidden">
             <!-- Header Bar -->
-            <div class="flex items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <button onclick="window.UIManager.exitDictationMode()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-medium transition-all flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     Exit Dictation / 退出默書
                 </button>
-                <span id="dictation-progress-text" class="text-xs font-bold text-slate-300">Word 1 of 10</span>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Live Stopwatch Badge -->
+                    <span id="dictation-stopwatch-badge" class="px-3 py-1.5 bg-slate-900 border border-slate-800 text-amber-300 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 shadow-inner" title="Dictation Session Timer">
+                        <span>⏱️</span> <span id="dictation-stopwatch-timer">00:00</span>
+                    </span>
+                    <span id="dictation-progress-text" class="text-xs font-bold text-slate-300 px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl">Word 1 of 10</span>
+                </div>
+
                 <span id="dictation-mode-badge" class="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full text-xs font-bold flex items-center gap-1.5">
                     <span>✍️</span> 默書中 In Progress
                 </span>
@@ -532,13 +540,13 @@
                     <!-- Button 1: Listen (Details hidden) -->
                     <button id="btn-dictation-listen" onclick="window.UIManager.playDictationCurrentWord()" class="p-4 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm rounded-2xl shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-                        Button 1: 🔊 聽音 Listen Word
+                        <span>🔊 聽音 Listen Word</span>
                     </button>
 
                     <!-- Button 2: Flip over / Toggle details -->
                     <button id="btn-dictation-flip" onclick="window.UIManager.toggleDictationFlip()" class="p-4 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-bold text-sm rounded-2xl transition-all flex items-center justify-center gap-2">
                         <span id="dictation-flip-icon">👀</span>
-                        <span id="dictation-flip-text">Button 2: 翻牌對答案 Flip Details</span>
+                        <span id="dictation-flip-text">翻牌對答案 Flip Details</span>
                     </button>
                 </div>
 
@@ -546,12 +554,12 @@
                 <div class="flex items-center justify-between gap-4 pt-2">
                     <!-- Button 4: Previous Word -->
                     <button id="btn-dictation-prev" onclick="window.UIManager.navigateDictation(-1)" class="px-5 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl border border-slate-800 text-xs font-semibold transition-all flex items-center gap-2">
-                        ← Button 4: 上一個 Prev Word
+                        ← 上一個 Prev Word
                     </button>
 
                     <!-- Button 3: Next Word -->
                     <button id="btn-dictation-next" onclick="window.UIManager.navigateDictation(1)" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2">
-                        <span id="btn-dictation-next-text">Button 3: 下一個 Next Word →</span>
+                        <span id="btn-dictation-next-text">下一個 Next Word →</span>
                     </button>
                 </div>
             </div>
@@ -563,6 +571,10 @@
                         <span class="text-2xl">🎉</span>
                     </div>
                     <h3 class="text-2xl font-extrabold text-slate-100 font-cantonese">默書完成！ Dictation Completed!</h3>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-xl text-xs font-mono font-bold">
+                        <span>⏱️ Total Time Spent / 總用時:</span>
+                        <span id="dictation-summary-time">00:00</span>
+                    </div>
                     <p class="text-slate-400 text-xs">Review the complete word list from this dictation session:</p>
                 </div>
 

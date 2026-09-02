@@ -332,6 +332,18 @@ test('Dictation Mode (默書) Word Randomization & State Flow', (t) => {
     assert.strictEqual(calculateAutoPlayRepeats(15, 3), 5, '15s duration with 3s interval plays 5 times (0s, 3s, 6s, 9s, 12s)');
     assert.strictEqual(calculateAutoPlayRepeats(30, 3), 10, '30s duration with 3s interval plays 10 times');
 
+    // Stopwatch formatting verification
+    function formatStopwatchTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    assert.strictEqual(formatStopwatchTime(0), '00:00', '0s formats to 00:00');
+    assert.strictEqual(formatStopwatchTime(45), '00:45', '45s formats to 00:45');
+    assert.strictEqual(formatStopwatchTime(125), '02:05', '125s formats to 02:05');
+    assert.strictEqual(formatStopwatchTime(3600), '60:00', '3600s formats to 60:00');
+
     // Completion at end of list
     dictationState.currentIndex = dictationState.items.length - 1;
     // Advancing past last item marks dictation as finished

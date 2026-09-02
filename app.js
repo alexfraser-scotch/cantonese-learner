@@ -1697,7 +1697,10 @@ class UIManager {
             autoPlayTimer: null,
             autoPlaySubTimer: null,
             countdownTimer: null,
-            remainingSeconds: 10
+            remainingSeconds: 10,
+            startTime: null,
+            elapsedSeconds: 0,
+            stopwatchTimer: null
         };
 
         try {
@@ -3027,6 +3030,7 @@ class UIManager {
     initDictationMode() {
         if (!this.activeProfile || !this.activeProfile.items || this.activeProfile.items.length === 0) return;
         this.stopDictationAutoPlay();
+        this.stopDictationStopwatch();
 
         // 1. Randomize all words at once for dictation
         const itemsCopy = [...this.activeProfile.items];
@@ -3038,9 +3042,44 @@ class UIManager {
         this.dictationState.isFinished = false;
         this.dictationState.remainingSeconds = this.dictationState.autoPlaySeconds;
 
+        // Start Stopwatch
+        this.startDictationStopwatch();
+
         this.renderDictationCard();
         // Play word audio on initial entry
         setTimeout(() => this.playDictationCurrentWord(), 300);
+    }
+
+    startDictationStopwatch() {
+        this.stopDictationStopwatch();
+        this.dictationState.startTime = Date.now();
+        this.dictationState.elapsedSeconds = 0;
+        this.updateStopwatchDisplay();
+
+        this.dictationState.stopwatchTimer = setInterval(() => {
+            this.dictationState.elapsedSeconds++;
+            this.updateStopwatchDisplay();
+        }, 1000);
+    }
+
+    stopDictationStopwatch() {
+        if (this.dictationState.stopwatchTimer) {
+            clearInterval(this.dictationState.stopwatchTimer);
+            this.dictationState.stopwatchTimer = null;
+        }
+    }
+
+    formatStopwatchTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    updateStopwatchDisplay() {
+        const timerElem = document.getElementById('dictation-stopwatch-timer');
+        if (timerElem) {
+            timerElem.textContent = this.formatStopwatchTime(this.dictationState.elapsedSeconds);
+        }
     }
 
     renderDictationCard() {
@@ -3050,6 +3089,7 @@ class UIManager {
 
         if (this.dictationState.isFinished) {
             this.stopDictationAutoPlay();
+            this.stopDictationStopwatch();
             cardContainer.classList.add('hidden');
             summaryContainer.classList.remove('hidden');
 
@@ -3061,6 +3101,12 @@ class UIManager {
 
             const progressText = document.getElementById('dictation-progress-text');
             if (progressText) progressText.textContent = `Completed ${this.dictationState.items.length} words`;
+
+            // Display total elapsed time spent
+            const summaryTime = document.getElementById('dictation-summary-time');
+            if (summaryTime) {
+                summaryTime.textContent = this.formatStopwatchTime(this.dictationState.elapsedSeconds);
+            }
 
             // Render complete word list in one page
             const summaryList = document.getElementById('dictation-summary-list');
@@ -3117,9 +3163,9 @@ class UIManager {
         const nextBtnText = document.getElementById('btn-dictation-next-text');
         if (nextBtnText) {
             if (this.dictationState.currentIndex === this.dictationState.items.length - 1) {
-                nextBtnText.textContent = 'Button 3: 完成默書 Finish Dictation 🏁';
+                nextBtnText.textContent = '完成默書 Finish Dictation 🏁';
             } else {
-                nextBtnText.textContent = 'Button 3: 下一個 Next Word →';
+                nextBtnText.textContent = '下一個 Next Word →';
             }
         }
 
@@ -3132,7 +3178,7 @@ class UIManager {
         if (this.dictationState.isRevealed) {
             if (hiddenView) hiddenView.classList.add('hidden');
             if (revealedView) revealedView.classList.remove('hidden');
-            if (flipText) flipText.textContent = 'Button 2: 隱藏答案 Hide Details';
+            if (flipText) flipText.textContent = '隱藏答案 Hide Details';
             if (flipIcon) flipIcon.textContent = '🙈';
 
             document.getElementById('dictation-word-text').textContent = currentItem.word;
@@ -3151,7 +3197,7 @@ class UIManager {
         } else {
             if (hiddenView) hiddenView.classList.remove('hidden');
             if (revealedView) revealedView.classList.add('hidden');
-            if (flipText) flipText.textContent = 'Button 2: 翻牌對答案 Flip Details';
+            if (flipText) flipText.textContent = '翻牌對答案 Flip Details';
             if (flipIcon) flipIcon.textContent = '👀';
         }
     }
@@ -3299,6 +3345,7 @@ class UIManager {
 
     exitDictationMode() {
         this.stopDictationAutoPlay();
+        this.stopDictationStopwatch();
         this.switchView('profile-detail', { profileId: this.activeProfile ? this.activeProfile.id : null });
     }
 
