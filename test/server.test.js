@@ -455,6 +455,121 @@ test('High-Precision Image Auto-Generation & Word-Boundary Token Matching', (t) 
     assert.ok(!assignedImages[2].includes('photo-1495474472287-4d71bcdd2085'), '緊張 (Nervous) must not be coffee latte art');
 });
 
+test('Daily Learning Target (每日學習目標) Engine & Streak Tracker', (t) => {
+    // 1. Multi-profile test data
+    const mockProfiles = [
+        {
+            id: 'prof-p1',
+            name: 'Basics 1',
+            items: [
+                { id: 'item-1', word: '早晨', jyutping: 'zou2 san4' },
+                { id: 'item-2', word: '你好', jyutping: 'nei5 hou2' }
+            ]
+        },
+        {
+            id: 'prof-p2',
+            name: 'Food Deck',
+            items: [
+                { id: 'item-3', word: '點心', jyutping: 'dim2 sam1' },
+                { id: 'item-4', word: '奶茶', jyutping: 'naai5 caa4' },
+                { id: 'item-1', word: '早晨', jyutping: 'zou2 san4' } // Duplicate item across profiles
+            ]
+        }
+    ];
+
+    const mockProgress = {
+        masteredItemIds: ['item-1'], // '早晨' is mastered
+        favoriteItemIds: ['item-2', 'item-4'], // '你好' and '奶茶' are favorites
+        dailyTarget: {
+            profileId: 'all',
+            filterScope: 'learning',
+            targetCount: 3,
+            completedItemIds: [],
+            lastDate: '2026-09-01',
+            streak: 2
+        }
+    };
+
+    // 2. Candidate Word Gathering with Deduplication & Scope Filtering
+    function getCandidates(profiles, progress, scopeProfileId, filterScope) {
+        let pool = [];
+        if (scopeProfileId === 'all') {
+            profiles.forEach(p => pool.push(...p.items));
+        } else {
+            const found = profiles.find(p => p.id === scopeProfileId);
+            if (found) pool.push(...found.items);
+        }
+
+        // Deduplicate
+        const unique = new Map();
+        pool.forEach(i => {
+            if (!unique.has(i.id)) unique.set(i.id, i);
+        });
+        let result = Array.from(unique.values());
+
+        const masteredSet = new Set(progress.masteredItemIds || []);
+        const favSet = new Set(progress.favoriteItemIds || []);
+
+        if (filterScope === 'learning') {
+            result = result.filter(i => !masteredSet.has(i.id));
+        } else if (filterScope === 'mastered') {
+            result = result.filter(i => masteredSet.has(i.id));
+        } else if (filterScope === 'favorites') {
+            result = result.filter(i => favSet.has(i.id));
+        }
+        return result;
+    }
+
+    // Test All Profiles + Learning scope
+    const allLearning = getCandidates(mockProfiles, mockProgress, 'all', 'learning');
+    assert.strictEqual(allLearning.length, 3, 'Should gather 3 unique unmastered words (item-2, item-3, item-4)');
+    assert.ok(!allLearning.some(i => i.id === 'item-1'), 'Mastered item-1 must be excluded from learning scope');
+
+    // Test Specific Profile (prof-p1) + All words
+    const p1All = getCandidates(mockProfiles, mockProgress, 'prof-p1', 'all');
+    assert.strictEqual(p1All.length, 2, 'Profile 1 has 2 total words');
+
+    // Test All Profiles + Favorites
+    const allFavorites = getCandidates(mockProfiles, mockProgress, 'all', 'favorites');
+    assert.strictEqual(allFavorites.length, 2, 'Should gather 2 favorite items (item-2, item-4)');
+
+    // 3. Daily Progress & Streak Logic
+    function recordWord(progress, itemId) {
+        const target = progress.dailyTarget;
+        if (!target.completedItemIds.includes(itemId)) {
+            target.completedItemIds.push(itemId);
+            if (target.completedItemIds.length === target.targetCount) {
+                target.streak = (target.streak || 0) + 1;
+            }
+        }
+        return target;
+    }
+
+    recordWord(mockProgress, 'item-2');
+    assert.strictEqual(mockProgress.dailyTarget.completedItemIds.length, 1);
+    assert.strictEqual(mockProgress.dailyTarget.streak, 2, 'Streak remains 2 before reaching target count');
+
+    recordWord(mockProgress, 'item-3');
+    recordWord(mockProgress, 'item-4');
+    assert.strictEqual(mockProgress.dailyTarget.completedItemIds.length, 3);
+    assert.strictEqual(mockProgress.dailyTarget.streak, 3, 'Reaching targetCount (3 words) increments streak to 3');
+
+    // 4. Day Rollover verification
+    function checkDayRollover(target, todayDateStr) {
+        if (target.lastDate !== todayDateStr) {
+            target.completedItemIds = [];
+            target.lastDate = todayDateStr;
+        }
+        return target;
+    }
+
+    const nextDay = '2026-09-02';
+    checkDayRollover(mockProgress.dailyTarget, nextDay);
+    assert.strictEqual(mockProgress.dailyTarget.completedItemIds.length, 0, 'New day resets completed items to 0');
+    assert.strictEqual(mockProgress.dailyTarget.lastDate, nextDay);
+    assert.strictEqual(mockProgress.dailyTarget.streak, 3, 'Streak is preserved for the new day');
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

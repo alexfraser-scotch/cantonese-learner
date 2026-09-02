@@ -1431,6 +1431,113 @@ class StorageManager {
         } catch (e) {}
     }
 
+    // ==========================================
+    // Daily Learning Target System
+    // ==========================================
+    static getDefaultDailyTarget() {
+        return {
+            profileId: 'all',
+            filterScope: 'learning',
+            targetCount: 10,
+            completedItemIds: [],
+            lastDate: new Date().toISOString().slice(0, 10),
+            streak: 0
+        };
+    }
+
+    static getTodayDateStr() {
+        return new Date().toISOString().slice(0, 10);
+    }
+
+    static getDailyTarget() {
+        if (!this.userProgress.dailyTarget) {
+            this.userProgress.dailyTarget = this.getDefaultDailyTarget();
+        }
+        const target = this.userProgress.dailyTarget;
+        const today = this.getTodayDateStr();
+
+        if (target.lastDate !== today) {
+            const yesterdayDate = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+            if (target.lastDate === yesterdayDate && target.completedItemIds.length >= target.targetCount) {
+                // Streak preserved from yesterday!
+            } else if (target.lastDate !== yesterdayDate) {
+                // Inactive for more than 1 day: reset streak
+                target.streak = 0;
+            }
+            target.completedItemIds = [];
+            target.lastDate = today;
+            this.saveUserProgress();
+        }
+        return target;
+    }
+
+    static saveDailyTargetConfig(config) {
+        const target = this.getDailyTarget();
+        target.profileId = config.profileId || 'all';
+        target.filterScope = config.filterScope || 'learning';
+        target.targetCount = Math.max(1, parseInt(config.targetCount, 10) || 10);
+        this.saveUserProgress();
+        return target;
+    }
+
+    static recordDailyWordProgress(itemId) {
+        if (!itemId) return;
+        const target = this.getDailyTarget();
+        if (!target.completedItemIds) target.completedItemIds = [];
+        
+        if (!target.completedItemIds.includes(itemId)) {
+            target.completedItemIds.push(itemId);
+            if (target.completedItemIds.length === target.targetCount) {
+                target.streak = (target.streak || 0) + 1;
+            }
+            this.saveUserProgress();
+            if (window.UIManager && typeof window.UIManager.renderDailyTargetWidget === 'function') {
+                window.UIManager.renderDailyTargetWidget();
+            }
+        }
+    }
+
+    static getCandidateWordsForDailyTarget() {
+        const target = this.getDailyTarget();
+        const profiles = this.getAllProfiles();
+        const masteredSet = new Set(this.userProgress.masteredItemIds || []);
+        const favSet = new Set(this.userProgress.favoriteItemIds || []);
+
+        let candidates = [];
+        if (target.profileId === 'all') {
+            profiles.forEach(p => {
+                if (p.items && Array.isArray(p.items)) {
+                    candidates.push(...p.items);
+                }
+            });
+        } else {
+            const p = this.getProfileById(target.profileId);
+            if (p && p.items && Array.isArray(p.items)) {
+                candidates.push(...p.items);
+            }
+        }
+
+        // Deduplicate words by ID
+        const uniqueMap = new Map();
+        candidates.forEach(item => {
+            if (item && item.id && !uniqueMap.has(item.id)) {
+                uniqueMap.set(item.id, item);
+            }
+        });
+        candidates = Array.from(uniqueMap.values());
+
+        // Filter by word list scope
+        if (target.filterScope === 'learning') {
+            candidates = candidates.filter(i => !masteredSet.has(i.id));
+        } else if (target.filterScope === 'mastered') {
+            candidates = candidates.filter(i => masteredSet.has(i.id));
+        } else if (target.filterScope === 'favorites') {
+            candidates = candidates.filter(i => favSet.has(i.id));
+        }
+
+        return candidates;
+    }
+
     static formatForSupabase(p) {
         return {
             id: p.id,
@@ -1601,6 +1708,9 @@ class StorageManager {
     }
 
     static getProfileById(id) {
+        if (id === 'daily-target-session' && window.UIManager && window.UIManager.activeProfile && window.UIManager.activeProfile.id === 'daily-target-session') {
+            return window.UIManager.activeProfile;
+        }
         const profiles = this.getProfiles();
         return profiles.find(p => p.id === id);
     }
@@ -2115,6 +2225,7 @@ class UIManager {
         this.speechWarningBanner = document.getElementById('speech-warning-banner');
         this.modalCreateProfile = document.getElementById('modal-create-profile');
         this.modalDictationSetup = document.getElementById('modal-dictation-setup');
+        this.modalDailyTargetSetup = document.getElementById('modal-daily-target-setup');
         this.modalDetail = document.getElementById('modal-detail');
         this.modalVoiceHelp = document.getElementById('modal-voice-help');
         this.modalImagePicker = document.getElementById('modal-image-picker');
@@ -2590,6 +2701,9 @@ class UIManager {
         if (box24Elem) box24Elem.textContent = srsStats.box2 + srsStats.box3 + srsStats.box4;
         if (box5Elem) box5Elem.textContent = srsStats.box5;
         if (dueElem) dueElem.textContent = `${srsStats.due} Due Today`;
+
+        // Render Daily Learning Target Widget
+        this.renderDailyTargetWidget();
 
         const gridContainer = document.getElementById('dashboard-profiles-grid');
         gridContainer.innerHTML = '';
@@ -3418,6 +3532,8 @@ class UIManager {
         const item = this.activeProfile.items[this.studyIndex];
         if (!item) return;
 
+        StorageManager.recordDailyWordProgress(item.id);
+
         const result = SRSEngine.processReview(item, rating);
         StorageManager.updateProfile(this.activeProfile);
 
@@ -3435,6 +3551,9 @@ class UIManager {
         if (cardInner) {
             cardInner.classList.toggle('is-flipped', this.studyCardFlipped);
         }
+        if (this.activeProfile && this.activeProfile.items && this.activeProfile.items[this.studyIndex]) {
+            StorageManager.recordDailyWordProgress(this.activeProfile.items[this.studyIndex].id);
+        }
     }
 
     navigateStudyCard(direction) {
@@ -3443,6 +3562,9 @@ class UIManager {
         if (this.studyIndex < 0) this.studyIndex = this.activeProfile.items.length - 1;
         if (this.studyIndex >= this.activeProfile.items.length) this.studyIndex = 0;
         this.renderStudyCard();
+        if (this.activeProfile.items[this.studyIndex]) {
+            StorageManager.recordDailyWordProgress(this.activeProfile.items[this.studyIndex].id);
+        }
     }
 
     initQuizMode() {
@@ -3560,6 +3682,11 @@ class UIManager {
         const allBtns = document.querySelectorAll('#quiz-options-grid button');
         allBtns.forEach(b => b.disabled = true);
 
+        // Record daily target progress
+        if (currentQ && currentQ.item) {
+            StorageManager.recordDailyWordProgress(currentQ.item.id);
+        }
+
         setTimeout(() => {
             this.quizState.currentIndex++;
             if (this.quizState.currentIndex >= this.quizState.questions.length) {
@@ -3567,6 +3694,212 @@ class UIManager {
             }
             this.renderQuizQuestion();
         }, 1000);
+    }
+
+    // ==========================================
+    // Daily Learning Target (每日學習目標) Handlers
+    // ==========================================
+    renderDailyTargetWidget() {
+        const target = StorageManager.getDailyTarget();
+
+        // 1. Streak count
+        const streakElem = document.getElementById('daily-target-streak-count');
+        if (streakElem) streakElem.textContent = target.streak || 0;
+
+        // 2. Scope label
+        const scopeElem = document.getElementById('daily-target-scope-text');
+        if (scopeElem) {
+            if (target.profileId === 'all') {
+                scopeElem.textContent = 'All Profiles (全部詞庫)';
+            } else {
+                const prof = StorageManager.getProfileById(target.profileId);
+                scopeElem.textContent = prof ? prof.name : 'Specific Profile';
+            }
+        }
+
+        // 3. Filter label
+        const filterElem = document.getElementById('daily-target-filter-text');
+        if (filterElem) {
+            const labels = {
+                'learning': 'Learning 學習中',
+                'all': 'All Words 全部',
+                'mastered': 'Mastered 已掌握',
+                'favorites': 'Favorites 我的最愛'
+            };
+            filterElem.textContent = labels[target.filterScope] || target.filterScope;
+        }
+
+        // 4. Count label
+        const countElem = document.getElementById('daily-target-count-text');
+        if (countElem) {
+            countElem.textContent = `${target.targetCount} words/day`;
+        }
+
+        // 5. Progress text & progress bar
+        const completedCount = (target.completedItemIds || []).length;
+        const progressText = document.getElementById('daily-target-progress-text');
+        const pctElem = document.getElementById('daily-target-pct');
+        const barElem = document.getElementById('daily-target-progress-bar');
+        const btnText = document.getElementById('btn-start-daily-text');
+
+        const pct = Math.min(100, Math.round((completedCount / target.targetCount) * 100));
+        if (progressText) progressText.textContent = `Today's Progress: ${completedCount} / ${target.targetCount} words`;
+        if (pctElem) pctElem.textContent = `${pct}%`;
+
+        if (barElem) {
+            barElem.style.width = `${pct}%`;
+            if (pct >= 100) {
+                barElem.className = 'bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500';
+            } else {
+                barElem.className = 'bg-gradient-to-r from-purple-500 via-indigo-500 to-pink-500 h-full rounded-full transition-all duration-500';
+            }
+        }
+
+        if (btnText) {
+            if (pct >= 100) {
+                btnText.textContent = '🎉 Goal Met! (Practice More)';
+            } else {
+                btnText.textContent = 'Start Daily Target';
+            }
+        }
+    }
+
+    openDailyTargetSetupModal() {
+        const target = StorageManager.getDailyTarget();
+        const profiles = StorageManager.getProfiles();
+
+        const profileSelect = document.getElementById('select-daily-target-profile');
+        if (profileSelect) {
+            profileSelect.innerHTML = '<option value="all">🌐 All Profiles (全部詞庫 - 跨詞庫隨機學習)</option>';
+            profiles.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `📁 ${p.name} (${p.items ? p.items.length : 0} words)`;
+                profileSelect.appendChild(opt);
+            });
+            profileSelect.value = target.profileId || 'all';
+        }
+
+        // Set radio filter
+        const radios = document.querySelectorAll('input[name="daily-word-filter"]');
+        radios.forEach(r => {
+            r.checked = (r.value === (target.filterScope || 'learning'));
+        });
+
+        // Set count
+        const countInput = document.getElementById('input-daily-target-count');
+        if (countInput) countInput.value = target.targetCount || 10;
+
+        this.updateDailyTargetCandidatePreview();
+
+        const modal = document.getElementById('modal-daily-target-setup');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    closeDailyTargetSetupModal() {
+        const modal = document.getElementById('modal-daily-target-setup');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    updateDailyTargetCandidatePreview() {
+        const profileSelect = document.getElementById('select-daily-target-profile');
+        const selectedProfile = profileSelect ? profileSelect.value : 'all';
+
+        const checkedRadio = document.querySelector('input[name="daily-word-filter"]:checked');
+        const selectedFilter = checkedRadio ? checkedRadio.value : 'learning';
+
+        // Calculate candidate count on the fly
+        const profiles = StorageManager.getAllProfiles();
+        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+
+        let pool = [];
+        if (selectedProfile === 'all') {
+            profiles.forEach(p => {
+                if (p.items) pool.push(...p.items);
+            });
+        } else {
+            const p = StorageManager.getProfileById(selectedProfile);
+            if (p && p.items) pool.push(...p.items);
+        }
+
+        const uniqueMap = new Map();
+        pool.forEach(i => {
+            if (i && i.id && !uniqueMap.has(i.id)) uniqueMap.set(i.id, i);
+        });
+        pool = Array.from(uniqueMap.values());
+
+        if (selectedFilter === 'learning') {
+            pool = pool.filter(i => !masteredSet.has(i.id));
+        } else if (selectedFilter === 'mastered') {
+            pool = pool.filter(i => masteredSet.has(i.id));
+        } else if (selectedFilter === 'favorites') {
+            pool = pool.filter(i => favSet.has(i.id));
+        }
+
+        const previewElem = document.getElementById('daily-target-available-count');
+        if (previewElem) {
+            previewElem.textContent = `Available: ${pool.length} words`;
+        }
+    }
+
+    setDailyTargetCountValue(val) {
+        const countInput = document.getElementById('input-daily-target-count');
+        if (countInput) {
+            countInput.value = val;
+        }
+    }
+
+    handleSaveDailyTarget(event) {
+        if (event) event.preventDefault();
+
+        const profileSelect = document.getElementById('select-daily-target-profile');
+        const profileId = profileSelect ? profileSelect.value : 'all';
+
+        const checkedRadio = document.querySelector('input[name="daily-word-filter"]:checked');
+        const filterScope = checkedRadio ? checkedRadio.value : 'learning';
+
+        const countInput = document.getElementById('input-daily-target-count');
+        const targetCount = countInput ? parseInt(countInput.value, 10) || 10 : 10;
+
+        StorageManager.saveDailyTargetConfig({
+            profileId,
+            filterScope,
+            targetCount
+        });
+
+        this.closeDailyTargetSetupModal();
+        this.renderDailyTargetWidget();
+        this.showToast(`Daily target set to ${targetCount} words! 🎯`, 'success');
+
+        // Launch daily target session
+        this.startDailyTargetSession();
+    }
+
+    startDailyTargetSession() {
+        const candidates = StorageManager.getCandidateWordsForDailyTarget();
+        if (candidates.length === 0) {
+            this.showToast('No matching words found for your daily target. Try adjusting target settings!', 'warning');
+            this.openDailyTargetSetupModal();
+            return;
+        }
+
+        const target = StorageManager.getDailyTarget();
+        const shuffled = [...candidates].sort(() => 0.5 - Math.random());
+        const sessionWords = shuffled.slice(0, Math.min(target.targetCount, shuffled.length));
+
+        const sessionProfile = {
+            id: 'daily-target-session',
+            name: '🎯 今日學習目標 Daily Target',
+            category: 'Daily Target',
+            description: `Daily Goal: ${sessionWords.length} words (${target.filterScope})`,
+            items: sessionWords
+        };
+
+        this.activeProfile = sessionProfile;
+        this.initStudyMode();
+        this.switchView('study-mode', { profileId: 'daily-target-session' });
+        this.showToast(`Started Daily Target session: ${sessionWords.length} words 🚀`, 'info');
     }
 
     // ==========================================
@@ -3859,6 +4192,11 @@ class UIManager {
     navigateDictation(direction) {
         if (this.dictationState.isAutoPlaying) {
             this.stopDictationAutoPlay();
+        }
+
+        const currentItem = this.dictationState.items[this.dictationState.currentIndex];
+        if (currentItem) {
+            StorageManager.recordDailyWordProgress(currentItem.id);
         }
 
         if (direction === 1) {
@@ -4249,6 +4587,7 @@ class UIManager {
             } else {
                 masteredIds.push(itemId);
                 item.mastered = true;
+                StorageManager.recordDailyWordProgress(itemId);
             }
             StorageManager.userProgress.masteredItemIds = masteredIds;
             StorageManager.saveUserProgress();

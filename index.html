@@ -192,6 +192,52 @@
                         <span id="srs-due-badge" class="px-3 py-1 bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded-lg">0 Due Today</span>
                     </div>
                 </div>
+
+                <!-- Daily Learning Target Widget (🎯 每日學習目標) -->
+                <div id="dashboard-daily-target-card" class="mt-4 p-5 sm:p-6 bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-slate-900/60 rounded-2xl border border-purple-500/30 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+                        <div class="space-y-2 max-w-xl flex-1">
+                            <div class="flex items-center gap-2.5">
+                                <span class="p-2 bg-gradient-to-tr from-purple-600 to-pink-600 text-white rounded-xl text-base shadow-md shadow-purple-500/20">🎯</span>
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 class="text-sm sm:text-base font-bold text-slate-100 font-cantonese">每日學習目標 Daily Learning Target</h3>
+                                        <span id="daily-target-streak-badge" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-[11px] font-bold flex items-center gap-1">
+                                            🔥 <span id="daily-target-streak-count">0</span> Day Streak
+                                        </span>
+                                    </div>
+                                    <p id="daily-target-desc" class="text-xs text-slate-400 mt-0.5">
+                                        Scope: <span id="daily-target-scope-text" class="text-purple-300 font-semibold">All Profiles</span> • Filter: <span id="daily-target-filter-text" class="text-indigo-300 font-semibold">Learning</span> • Goal: <span id="daily-target-count-text" class="text-sky-300 font-semibold">10 words/day</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar Container -->
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between text-xs font-mono font-bold">
+                                    <span id="daily-target-progress-text" class="text-slate-300">Today's Progress: 0 / 10 words</span>
+                                    <span id="daily-target-pct" class="text-purple-300">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800 p-0.5">
+                                    <div id="daily-target-progress-bar" class="bg-gradient-to-r from-purple-500 via-indigo-500 to-pink-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-2.5 shrink-0">
+                            <button id="btn-start-daily-session" onclick="window.UIManager.startDailyTargetSession()" class="px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all flex items-center gap-2">
+                                <span>🚀</span>
+                                <span id="btn-start-daily-text">Start Daily Target</span>
+                            </button>
+                            <button onclick="window.UIManager.openDailyTargetSetupModal()" class="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1.5" title="Customize Target">
+                                <span>⚙️</span> Set Target
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Profiles Section Header & Community Filter Toolbar -->
@@ -1495,6 +1541,108 @@
                     Cancel 取消
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 9.5: DAILY LEARNING TARGET SETUP -->
+    <!-- ========================================== -->
+    <div id="modal-daily-target-setup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-card rounded-3xl border border-purple-500/30 max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl relative my-8">
+            <!-- Close Button -->
+            <button onclick="window.UIManager.closeDailyTargetSetupModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-100 p-2 rounded-xl bg-slate-900/60 hover:bg-slate-800 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Header -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-tr from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-purple-500/20">
+                    🎯
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold text-slate-100 font-cantonese">每日學習目標設置 Daily Target</h3>
+                    <p class="text-xs text-slate-400">Configure your personalized daily Cantonese study routine:</p>
+                </div>
+            </div>
+
+            <form onsubmit="window.UIManager.handleSaveDailyTarget(event)" class="space-y-5">
+                <!-- 1. Profile Scope Selection -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-200 block">
+                        1. 詞庫範圍 Profile Scope
+                    </label>
+                    <select id="select-daily-target-profile" onchange="window.UIManager.updateDailyTargetCandidatePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500 transition-all">
+                        <option value="all">🌐 All Profiles (全部詞庫 - 跨詞庫隨機學習)</option>
+                    </select>
+                </div>
+
+                <!-- 2. Word List Type Selection -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-200 block">
+                        2. 詞語類型 Word List Type
+                    </label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="p-3 bg-slate-900/90 border border-slate-800 hover:border-purple-500/40 rounded-xl flex items-center gap-2 cursor-pointer transition-all">
+                            <input type="radio" name="daily-word-filter" value="learning" checked onchange="window.UIManager.updateDailyTargetCandidatePreview()" class="accent-purple-500">
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">📖 Learning</span>
+                                <span class="text-[10px] text-slate-400">學習中 (In progress)</span>
+                            </div>
+                        </label>
+                        <label class="p-3 bg-slate-900/90 border border-slate-800 hover:border-purple-500/40 rounded-xl flex items-center gap-2 cursor-pointer transition-all">
+                            <input type="radio" name="daily-word-filter" value="all" onchange="window.UIManager.updateDailyTargetCandidatePreview()" class="accent-purple-500">
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">📚 All Words</span>
+                                <span class="text-[10px] text-slate-400">全部詞語 (All items)</span>
+                            </div>
+                        </label>
+                        <label class="p-3 bg-slate-900/90 border border-slate-800 hover:border-purple-500/40 rounded-xl flex items-center gap-2 cursor-pointer transition-all">
+                            <input type="radio" name="daily-word-filter" value="mastered" onchange="window.UIManager.updateDailyTargetCandidatePreview()" class="accent-purple-500">
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">✅ Mastered</span>
+                                <span class="text-[10px] text-slate-400">已掌握 (Retention)</span>
+                            </div>
+                        </label>
+                        <label class="p-3 bg-slate-900/90 border border-slate-800 hover:border-purple-500/40 rounded-xl flex items-center gap-2 cursor-pointer transition-all">
+                            <input type="radio" name="daily-word-filter" value="favorites" onchange="window.UIManager.updateDailyTargetCandidatePreview()" class="accent-purple-500">
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">⭐ Favorites</span>
+                                <span class="text-[10px] text-slate-400">我的最愛 (Starred)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3. Daily Word Target Count -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-slate-200">
+                            3. 每日目標數量 Words Per Day
+                        </label>
+                        <span id="daily-target-available-count" class="text-[11px] text-purple-300 font-mono">Available: 0 words</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="grid grid-cols-4 gap-2 flex-1">
+                            <button type="button" onclick="window.UIManager.setDailyTargetCountValue(5)" class="daily-count-btn py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-slate-300 transition-all">5</button>
+                            <button type="button" onclick="window.UIManager.setDailyTargetCountValue(10)" class="daily-count-btn py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-slate-300 transition-all">10</button>
+                            <button type="button" onclick="window.UIManager.setDailyTargetCountValue(20)" class="daily-count-btn py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-slate-300 transition-all">20</button>
+                            <button type="button" onclick="window.UIManager.setDailyTargetCountValue(30)" class="daily-count-btn py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-slate-300 transition-all">30</button>
+                        </div>
+                        <input id="input-daily-target-count" type="number" min="1" max="500" value="10" required class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-center text-xs font-mono font-bold text-purple-300 focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-800">
+                    <button type="button" onclick="window.UIManager.closeDailyTargetSetupModal()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold rounded-xl border border-slate-800 transition-all">
+                        Cancel 取消
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+                        💾 儲存並開始 Save & Start
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
