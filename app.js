@@ -1434,6 +1434,12 @@ class StorageManager {
     // ==========================================
     // Daily Learning Target System
     // ==========================================
+    static dailyTargetSessionProfile = null;
+
+    static getAllProfiles() {
+        return this.getProfiles();
+    }
+
     static getDefaultDailyTarget() {
         return {
             profileId: 'all',
@@ -1454,6 +1460,19 @@ class StorageManager {
             this.userProgress.dailyTarget = this.getDefaultDailyTarget();
         }
         const target = this.userProgress.dailyTarget;
+        if (!Array.isArray(target.completedItemIds)) {
+            target.completedItemIds = [];
+        }
+        if (typeof target.targetCount !== 'number' || target.targetCount < 1) {
+            target.targetCount = 10;
+        }
+        if (!target.filterScope) {
+            target.filterScope = 'learning';
+        }
+        if (!target.profileId) {
+            target.profileId = 'all';
+        }
+
         const today = this.getTodayDateStr();
 
         if (target.lastDate !== today) {
@@ -1483,7 +1502,7 @@ class StorageManager {
     static recordDailyWordProgress(itemId) {
         if (!itemId) return;
         const target = this.getDailyTarget();
-        if (!target.completedItemIds) target.completedItemIds = [];
+        if (!Array.isArray(target.completedItemIds)) target.completedItemIds = [];
         
         if (!target.completedItemIds.includes(itemId)) {
             target.completedItemIds.push(itemId);
@@ -1499,14 +1518,14 @@ class StorageManager {
 
     static getCandidateWordsForDailyTarget() {
         const target = this.getDailyTarget();
-        const profiles = this.getAllProfiles();
+        const profiles = this.getProfiles();
         const masteredSet = new Set(this.userProgress.masteredItemIds || []);
         const favSet = new Set(this.userProgress.favoriteItemIds || []);
 
         let candidates = [];
         if (target.profileId === 'all') {
             profiles.forEach(p => {
-                if (p.items && Array.isArray(p.items)) {
+                if (p && p.items && Array.isArray(p.items)) {
                     candidates.push(...p.items);
                 }
             });
@@ -1708,8 +1727,8 @@ class StorageManager {
     }
 
     static getProfileById(id) {
-        if (id === 'daily-target-session' && window.UIManager && window.UIManager.activeProfile && window.UIManager.activeProfile.id === 'daily-target-session') {
-            return window.UIManager.activeProfile;
+        if (id === 'daily-target-session') {
+            return this.dailyTargetSessionProfile || (window.UIManager ? window.UIManager.activeProfile : null);
         }
         const profiles = this.getProfiles();
         return profiles.find(p => p.id === id);
@@ -3802,44 +3821,48 @@ class UIManager {
     }
 
     updateDailyTargetCandidatePreview() {
-        const profileSelect = document.getElementById('select-daily-target-profile');
-        const selectedProfile = profileSelect ? profileSelect.value : 'all';
+        try {
+            const profileSelect = document.getElementById('select-daily-target-profile');
+            const selectedProfile = profileSelect ? profileSelect.value : 'all';
 
-        const checkedRadio = document.querySelector('input[name="daily-word-filter"]:checked');
-        const selectedFilter = checkedRadio ? checkedRadio.value : 'learning';
+            const checkedRadio = document.querySelector('input[name="daily-word-filter"]:checked');
+            const selectedFilter = checkedRadio ? checkedRadio.value : 'learning';
 
-        // Calculate candidate count on the fly
-        const profiles = StorageManager.getAllProfiles();
-        const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
-        const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+            // Calculate candidate count on the fly
+            const profiles = StorageManager.getProfiles();
+            const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+            const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
 
-        let pool = [];
-        if (selectedProfile === 'all') {
-            profiles.forEach(p => {
-                if (p.items) pool.push(...p.items);
+            let pool = [];
+            if (selectedProfile === 'all') {
+                profiles.forEach(p => {
+                    if (p && p.items) pool.push(...p.items);
+                });
+            } else {
+                const p = StorageManager.getProfileById(selectedProfile);
+                if (p && p.items) pool.push(...p.items);
+            }
+
+            const uniqueMap = new Map();
+            pool.forEach(i => {
+                if (i && i.id && !uniqueMap.has(i.id)) uniqueMap.set(i.id, i);
             });
-        } else {
-            const p = StorageManager.getProfileById(selectedProfile);
-            if (p && p.items) pool.push(...p.items);
-        }
+            pool = Array.from(uniqueMap.values());
 
-        const uniqueMap = new Map();
-        pool.forEach(i => {
-            if (i && i.id && !uniqueMap.has(i.id)) uniqueMap.set(i.id, i);
-        });
-        pool = Array.from(uniqueMap.values());
+            if (selectedFilter === 'learning') {
+                pool = pool.filter(i => !masteredSet.has(i.id));
+            } else if (selectedFilter === 'mastered') {
+                pool = pool.filter(i => masteredSet.has(i.id));
+            } else if (selectedFilter === 'favorites') {
+                pool = pool.filter(i => favSet.has(i.id));
+            }
 
-        if (selectedFilter === 'learning') {
-            pool = pool.filter(i => !masteredSet.has(i.id));
-        } else if (selectedFilter === 'mastered') {
-            pool = pool.filter(i => masteredSet.has(i.id));
-        } else if (selectedFilter === 'favorites') {
-            pool = pool.filter(i => favSet.has(i.id));
-        }
-
-        const previewElem = document.getElementById('daily-target-available-count');
-        if (previewElem) {
-            previewElem.textContent = `Available: ${pool.length} words`;
+            const previewElem = document.getElementById('daily-target-available-count');
+            if (previewElem) {
+                previewElem.textContent = `Available: ${pool.length} words`;
+            }
+        } catch (e) {
+            console.warn('updateDailyTargetCandidatePreview error:', e);
         }
     }
 
@@ -3853,53 +3876,61 @@ class UIManager {
     handleSaveDailyTarget(event) {
         if (event) event.preventDefault();
 
-        const profileSelect = document.getElementById('select-daily-target-profile');
-        const profileId = profileSelect ? profileSelect.value : 'all';
+        try {
+            const profileSelect = document.getElementById('select-daily-target-profile');
+            const profileId = profileSelect ? profileSelect.value : 'all';
 
-        const checkedRadio = document.querySelector('input[name="daily-word-filter"]:checked');
-        const filterScope = checkedRadio ? checkedRadio.value : 'learning';
+            const checkedRadio = document.querySelector('input[name="daily-word-filter"]:checked');
+            const filterScope = checkedRadio ? checkedRadio.value : 'learning';
 
-        const countInput = document.getElementById('input-daily-target-count');
-        const targetCount = countInput ? parseInt(countInput.value, 10) || 10 : 10;
+            const countInput = document.getElementById('input-daily-target-count');
+            const targetCount = countInput ? parseInt(countInput.value, 10) || 10 : 10;
 
-        StorageManager.saveDailyTargetConfig({
-            profileId,
-            filterScope,
-            targetCount
-        });
+            StorageManager.saveDailyTargetConfig({
+                profileId,
+                filterScope,
+                targetCount
+            });
 
-        this.closeDailyTargetSetupModal();
-        this.renderDailyTargetWidget();
-        this.showToast(`Daily target set to ${targetCount} words! 🎯`, 'success');
+            this.closeDailyTargetSetupModal();
+            this.renderDailyTargetWidget();
+            this.showToast(`Daily target set to ${targetCount} words! 🎯`, 'success');
 
-        // Launch daily target session
-        this.startDailyTargetSession();
+            // Launch daily target session
+            this.startDailyTargetSession();
+        } catch (e) {
+            console.warn('handleSaveDailyTarget error:', e);
+        }
     }
 
     startDailyTargetSession() {
-        const candidates = StorageManager.getCandidateWordsForDailyTarget();
-        if (candidates.length === 0) {
-            this.showToast('No matching words found for your daily target. Try adjusting target settings!', 'warning');
-            this.openDailyTargetSetupModal();
-            return;
+        try {
+            const candidates = StorageManager.getCandidateWordsForDailyTarget();
+            if (candidates.length === 0) {
+                this.showToast('No matching words found for your daily target. Try adjusting target settings!', 'warning');
+                this.openDailyTargetSetupModal();
+                return;
+            }
+
+            const target = StorageManager.getDailyTarget();
+            const shuffled = [...candidates].sort(() => 0.5 - Math.random());
+            const sessionWords = shuffled.slice(0, Math.min(target.targetCount, shuffled.length));
+
+            const sessionProfile = {
+                id: 'daily-target-session',
+                name: '🎯 今日學習目標 Daily Target',
+                category: 'Daily Target',
+                description: `Daily Goal: ${sessionWords.length} words (${target.filterScope})`,
+                items: sessionWords
+            };
+
+            StorageManager.dailyTargetSessionProfile = sessionProfile;
+            this.activeProfile = sessionProfile;
+            this.switchView('study-mode', { profileId: 'daily-target-session' });
+            this.showToast(`Started Daily Target session: ${sessionWords.length} words 🚀`, 'info');
+        } catch (e) {
+            console.warn('startDailyTargetSession error:', e);
         }
-
-        const target = StorageManager.getDailyTarget();
-        const shuffled = [...candidates].sort(() => 0.5 - Math.random());
-        const sessionWords = shuffled.slice(0, Math.min(target.targetCount, shuffled.length));
-
-        const sessionProfile = {
-            id: 'daily-target-session',
-            name: '🎯 今日學習目標 Daily Target',
-            category: 'Daily Target',
-            description: `Daily Goal: ${sessionWords.length} words (${target.filterScope})`,
-            items: sessionWords
-        };
-
-        this.activeProfile = sessionProfile;
-        this.initStudyMode();
-        this.switchView('study-mode', { profileId: 'daily-target-session' });
-        this.showToast(`Started Daily Target session: ${sessionWords.length} words 🚀`, 'info');
     }
 
     // ==========================================
