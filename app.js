@@ -1204,9 +1204,15 @@ class AuthManager {
             }
 
             if (data && data.user) {
+                // Always sync newly registered user to backend user directory
+                try {
+                    await this.syncUserBackend(data.user);
+                } catch (syncErr) {
+                    console.warn('Registration syncUserBackend warning:', syncErr);
+                }
+
                 if (data.session && data.session.user) {
                     this.saveSession(data.session.user);
-                    await this.syncUserBackend(data.session.user);
                     await StorageManager.fetchUserProgress();
                     if (window.UIManager && typeof window.UIManager.handleAuthChange === 'function') {
                         window.UIManager.handleAuthChange(this.currentUser);
@@ -4889,6 +4895,28 @@ class UIManager {
     async loadAdminData() {
         const user = AuthManager.currentUser;
         if (!user || !user.email) return;
+
+        // 1. Sync any existing registered cloud users from Supabase into backend user directory
+        StorageManager.initSupabase();
+        if (StorageManager.supabaseClient) {
+            try {
+                const { data: cloudProgress } = await StorageManager.supabaseClient.from('user_progress').select('user_id, updated_at');
+                if (cloudProgress && Array.isArray(cloudProgress)) {
+                    for (const cp of cloudProgress) {
+                        if (cp.user_id && cp.user_id !== 'guest') {
+                            const emailIdentifier = cp.user_id.includes('@') ? cp.user_id : `user-${cp.user_id.slice(0, 8)}@supabase.user`;
+                            await AuthManager.syncUserBackend({
+                                uid: cp.user_id,
+                                email: emailIdentifier,
+                                displayName: `Learner (${cp.user_id.slice(0, 6)})`
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Supabase cloud user discovery notice:', e);
+            }
+        }
 
         try {
             const resp = await fetch(`/api/admin/users?adminEmail=${encodeURIComponent(user.email)}`);
