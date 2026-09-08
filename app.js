@@ -4132,46 +4132,46 @@ class UIManager {
                     const isFav = favSet.has(item.id);
 
                     const row = document.createElement('div');
-                    row.className = 'p-4 bg-slate-900/80 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-purple-500/30 transition-all';
+                    row.className = 'p-4 bg-slate-900/80 rounded-2xl border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 hover:border-purple-500/30 transition-all';
                     row.id = `dictation-summary-row-${item.id}`;
                     row.innerHTML = `
-                        <div class="flex items-start sm:items-center gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center text-xs font-bold font-mono shrink-0">${idx + 1}</span>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xl font-bold text-slate-100 font-cantonese">${this.escapeHTML(item.word)}</span>
-                                    <span class="jyutping-badge px-2.5 py-0.5 rounded-lg text-xs font-mono font-semibold">${this.escapeHTML(item.jyutping)}</span>
+                        <div class="flex items-start gap-3 min-w-0 flex-1">
+                            <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center text-xs font-bold font-mono shrink-0 mt-0.5">${idx + 1}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 flex-wrap mb-1">
+                                    <span class="text-xl font-extrabold text-slate-100 font-cantonese whitespace-nowrap">${this.escapeHTML(item.word)}</span>
+                                    <span class="jyutping-badge px-2.5 py-0.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap shrink-0">${this.escapeHTML(item.jyutping)}</span>
                                 </div>
-                                <div class="text-xs text-slate-300 font-medium mt-0.5">
+                                <div class="text-xs text-slate-300 font-medium">
                                     <span>${this.escapeHTML(item.meaning_zh || '')}</span>
                                     <span class="text-slate-400 text-[11px] ml-1.5">(${this.escapeHTML(item.meaning || '')})</span>
                                 </div>
-                                ${item.example ? `<p class="text-[11px] text-purple-300 font-cantonese mt-1">${this.escapeHTML(item.example)} <span class="text-slate-500 text-[10px]">(${this.escapeHTML(item.example_meaning || '')})</span></p>` : ''}
+                                ${item.example ? `<p class="text-[11px] text-purple-300 font-cantonese mt-1 break-words">${this.escapeHTML(item.example)} <span class="text-slate-500 text-[10px]">(${this.escapeHTML(item.example_meaning || '')})</span></p>` : ''}
                             </div>
                         </div>
 
                         <!-- Instant Category Action Buttons + Listen Button -->
-                        <div class="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
+                        <div class="flex items-center gap-1.5 self-start lg:self-auto shrink-0 flex-wrap">
                             <!-- Favorite Button -->
-                            <button onclick="window.UIManager.toggleDictationWordFavorite('${this.escapeQuotes(item.id)}')" title="Toggle Favorite / 收藏" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${isFav ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-amber-400 hover:bg-slate-700/50'}">
+                            <button onclick="window.UIManager.toggleDictationWordFavorite('${this.escapeQuotes(item.id)}')" title="Toggle Favorite / 收藏" class="px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1 whitespace-nowrap shrink-0 ${isFav ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-amber-400 hover:bg-slate-700/50'}">
                                 <span>${isFav ? '⭐' : '☆'}</span>
                                 <span>${isFav ? 'Favorited' : 'Favorite'}</span>
                             </button>
 
                             <!-- Learn Button -->
-                            <button onclick="window.UIManager.setDictationWordStatus('${this.escapeQuotes(item.id)}', 'learning')" title="Mark as Learning / 學習中" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${!isMastered ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-sky-300 hover:bg-slate-700/50'}">
+                            <button onclick="window.UIManager.setDictationWordStatus('${this.escapeQuotes(item.id)}', 'learning')" title="Mark as Learning / 學習中" class="px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1 whitespace-nowrap shrink-0 ${!isMastered ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-sky-300 hover:bg-slate-700/50'}">
                                 <span>📖</span>
                                 <span>Learn</span>
                             </button>
 
                             <!-- Master Button -->
-                            <button onclick="window.UIManager.setDictationWordStatus('${this.escapeQuotes(item.id)}', 'mastered')" title="Mark as Mastered / 已掌握" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${isMastered ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-emerald-300 hover:bg-slate-700/50'}">
+                            <button onclick="window.UIManager.setDictationWordStatus('${this.escapeQuotes(item.id)}', 'mastered')" title="Mark as Mastered / 已掌握" class="px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1 whitespace-nowrap shrink-0 ${isMastered ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-emerald-300 hover:bg-slate-700/50'}">
                                 <span>🏆</span>
                                 <span>Master</span>
                             </button>
 
                             <!-- Listen Button -->
-                            <button onclick="window.UIManager.playAudioText('${this.escapeQuotes(item.word)}')" class="p-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-xl border border-sky-500/30 transition-all text-xs flex items-center gap-1 shrink-0" title="Listen Audio">
+                            <button onclick="window.UIManager.playAudioText('${this.escapeQuotes(item.word)}')" class="p-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-xl border border-sky-500/30 transition-all text-xs flex items-center gap-1 shrink-0 whitespace-nowrap" title="Listen Audio">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
                                 <span>Listen</span>
                             </button>
