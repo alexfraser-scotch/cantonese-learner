@@ -380,6 +380,89 @@ test('Dictation Mode (默書) Word Randomization & State Flow', (t) => {
     assert.strictEqual(dictationState.isFinished, true, 'Completing all items marks dictation as finished');
 });
 
+test('Dictation Instant Category Actions (Learn, Master, Favorite)', (t) => {
+    let mockUserProgress = {
+        masteredItemIds: ['w1'],
+        favoriteItemIds: ['w2']
+    };
+
+    const mockItem = { id: 'w3', word: '多謝', mastered: false, favorite: false };
+
+    // Function simulating setDictationWordStatus
+    function setWordStatus(itemId, status, item) {
+        const masteredIds = mockUserProgress.masteredItemIds;
+        const idx = masteredIds.indexOf(itemId);
+        if (status === 'mastered') {
+            if (idx === -1) masteredIds.push(itemId);
+            if (item) item.mastered = true;
+        } else if (status === 'learning') {
+            if (idx !== -1) masteredIds.splice(idx, 1);
+            if (item) item.mastered = false;
+        }
+    }
+
+    // Function simulating toggleDictationWordFavorite
+    function toggleWordFavorite(itemId, item) {
+        const favIds = mockUserProgress.favoriteItemIds;
+        const idx = favIds.indexOf(itemId);
+        if (idx !== -1) {
+            favIds.splice(idx, 1);
+            if (item) item.favorite = false;
+        } else {
+            favIds.push(itemId);
+            if (item) item.favorite = true;
+        }
+    }
+
+    // 1. Initial State Check
+    assert.strictEqual(mockUserProgress.masteredItemIds.includes('w3'), false, 'w3 is initially not mastered');
+    assert.strictEqual(mockUserProgress.favoriteItemIds.includes('w3'), false, 'w3 is initially not favorite');
+
+    // 2. Mark w3 as Mastered
+    setWordStatus('w3', 'mastered', mockItem);
+    assert.strictEqual(mockUserProgress.masteredItemIds.includes('w3'), true, 'w3 should be in masteredItemIds');
+    assert.strictEqual(mockItem.mastered, true, 'mockItem.mastered should be true');
+
+    // 3. Move w3 back to Learning
+    setWordStatus('w3', 'learning', mockItem);
+    assert.strictEqual(mockUserProgress.masteredItemIds.includes('w3'), false, 'w3 should be removed from masteredItemIds');
+    assert.strictEqual(mockItem.mastered, false, 'mockItem.mastered should be false');
+
+    // 4. Toggle Favorite on w3
+    toggleWordFavorite('w3', mockItem);
+    assert.strictEqual(mockUserProgress.favoriteItemIds.includes('w3'), true, 'w3 should be added to favoriteItemIds');
+    assert.strictEqual(mockItem.favorite, true, 'mockItem.favorite should be true');
+
+    // Toggle Favorite off on w3
+    toggleWordFavorite('w3', mockItem);
+    assert.strictEqual(mockUserProgress.favoriteItemIds.includes('w3'), false, 'w3 should be removed from favoriteItemIds');
+    assert.strictEqual(mockItem.favorite, false, 'mockItem.favorite should be false');
+
+    // 5. Verify Visual Status Logic
+    function getButtonHighlights(itemId, currentProgress) {
+        const isMastered = currentProgress.masteredItemIds.includes(itemId);
+        const isFav = currentProgress.favoriteItemIds.includes(itemId);
+        return {
+            learnActive: !isMastered,
+            masterActive: isMastered,
+            favoriteActive: isFav
+        };
+    }
+
+    const state1 = getButtonHighlights('w3', mockUserProgress);
+    assert.strictEqual(state1.learnActive, true, 'Unmastered word must have Learn highlighted');
+    assert.strictEqual(state1.masterActive, false, 'Unmastered word must NOT have Master highlighted');
+    assert.strictEqual(state1.favoriteActive, false, 'Unfavorited word must NOT have Favorite highlighted');
+
+    setWordStatus('w3', 'mastered', mockItem);
+    toggleWordFavorite('w3', mockItem);
+
+    const state2 = getButtonHighlights('w3', mockUserProgress);
+    assert.strictEqual(state2.learnActive, false, 'Mastered word must NOT have Learn highlighted');
+    assert.strictEqual(state2.masterActive, true, 'Mastered word must have Master highlighted');
+    assert.strictEqual(state2.favoriteActive, true, 'Favorited word must have Favorite highlighted');
+});
+
 test('High-Precision Image Auto-Generation & Word-Boundary Token Matching', (t) => {
     // Helper replicating safeMatch logic
     function safeMatch(text, wordsZh = [], wordsEn = []) {

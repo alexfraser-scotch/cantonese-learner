@@ -4124,9 +4124,16 @@ class UIManager {
             const summaryList = document.getElementById('dictation-summary-list');
             if (summaryList) {
                 summaryList.innerHTML = '';
+                const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+                const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+
                 this.dictationState.items.forEach((item, idx) => {
+                    const isMastered = masteredSet.has(item.id);
+                    const isFav = favSet.has(item.id);
+
                     const row = document.createElement('div');
-                    row.className = 'p-4 bg-slate-900/80 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-purple-500/30 transition-all';
+                    row.className = 'p-4 bg-slate-900/80 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-purple-500/30 transition-all';
+                    row.id = `dictation-summary-row-${item.id}`;
                     row.innerHTML = `
                         <div class="flex items-start sm:items-center gap-3">
                             <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center text-xs font-bold font-mono shrink-0">${idx + 1}</span>
@@ -4142,10 +4149,33 @@ class UIManager {
                                 ${item.example ? `<p class="text-[11px] text-purple-300 font-cantonese mt-1">${this.escapeHTML(item.example)} <span class="text-slate-500 text-[10px]">(${this.escapeHTML(item.example_meaning || '')})</span></p>` : ''}
                             </div>
                         </div>
-                        <button onclick="window.UIManager.playAudioText('${this.escapeQuotes(item.word)}')" class="p-2.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-xl border border-sky-500/30 transition-all text-xs flex items-center gap-1.5 self-end sm:self-auto shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-                            Listen
-                        </button>
+
+                        <!-- Instant Category Action Buttons + Listen Button -->
+                        <div class="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
+                            <!-- Favorite Button -->
+                            <button onclick="window.UIManager.toggleDictationWordFavorite('${this.escapeQuotes(item.id)}')" title="Toggle Favorite / 收藏" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${isFav ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-amber-400 hover:bg-slate-700/50'}">
+                                <span>${isFav ? '⭐' : '☆'}</span>
+                                <span>${isFav ? 'Favorited' : 'Favorite'}</span>
+                            </button>
+
+                            <!-- Learn Button -->
+                            <button onclick="window.UIManager.setDictationWordStatus('${this.escapeQuotes(item.id)}', 'learning')" title="Mark as Learning / 學習中" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${!isMastered ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-sky-300 hover:bg-slate-700/50'}">
+                                <span>📖</span>
+                                <span>Learn</span>
+                            </button>
+
+                            <!-- Master Button -->
+                            <button onclick="window.UIManager.setDictationWordStatus('${this.escapeQuotes(item.id)}', 'mastered')" title="Mark as Mastered / 已掌握" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${isMastered ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-emerald-300 hover:bg-slate-700/50'}">
+                                <span>🏆</span>
+                                <span>Master</span>
+                            </button>
+
+                            <!-- Listen Button -->
+                            <button onclick="window.UIManager.playAudioText('${this.escapeQuotes(item.word)}')" class="p-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-xl border border-sky-500/30 transition-all text-xs flex items-center gap-1 shrink-0" title="Listen Audio">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                <span>Listen</span>
+                            </button>
+                        </div>
                     `;
                     summaryList.appendChild(row);
                 });
@@ -4206,11 +4236,113 @@ class UIManager {
             } else if (exampleBox) {
                 exampleBox.classList.add('hidden');
             }
+
+            // Update Instant Category Action Buttons on Revealed Card
+            const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
+            const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
+            const isMastered = masteredSet.has(currentItem.id);
+            const isFav = favSet.has(currentItem.id);
+
+            const btnFav = document.getElementById('dictation-card-btn-fav');
+            const favIcon = document.getElementById('dictation-card-fav-icon');
+            const favText = document.getElementById('dictation-card-fav-text');
+            if (btnFav) {
+                btnFav.className = `px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${isFav ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-amber-400 hover:bg-slate-700/50'}`;
+                if (favIcon) favIcon.textContent = isFav ? '⭐' : '☆';
+                if (favText) favText.textContent = isFav ? 'Favorited / 已收藏' : 'Favorite / 收藏';
+            }
+
+            const btnLearn = document.getElementById('dictation-card-btn-learn');
+            if (btnLearn) {
+                btnLearn.className = `px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${!isMastered ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-sky-300 hover:bg-slate-700/50'}`;
+            }
+
+            const btnMaster = document.getElementById('dictation-card-btn-master');
+            if (btnMaster) {
+                btnMaster.className = `px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 ${isMastered ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm font-bold' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-emerald-400 hover:bg-slate-700/50'}`;
+            }
         } else {
             if (hiddenView) hiddenView.classList.remove('hidden');
             if (revealedView) revealedView.classList.add('hidden');
             if (flipText) flipText.textContent = '翻牌對答案 Flip Details';
             if (flipIcon) flipIcon.textContent = '👀';
+        }
+    }
+
+    setDictationWordStatus(itemId, status) {
+        if (!itemId) return;
+        const item = (this.dictationState.items && this.dictationState.items.find(i => i.id === itemId)) ||
+                     (this.activeProfile && this.activeProfile.items && this.activeProfile.items.find(i => i.id === itemId)) ||
+                     { id: itemId, word: 'Word' };
+
+        const masteredIds = StorageManager.userProgress.masteredItemIds || [];
+        const idx = masteredIds.indexOf(itemId);
+
+        if (status === 'mastered') {
+            if (idx === -1) {
+                masteredIds.push(itemId);
+            }
+            if (item) item.mastered = true;
+            StorageManager.recordDailyWordProgress(itemId);
+            this.showToast(`Marked "${item.word || 'Word'}" as Mastered! 🏆`, 'success');
+        } else if (status === 'learning') {
+            if (idx !== -1) {
+                masteredIds.splice(idx, 1);
+            }
+            if (item) item.mastered = false;
+            this.showToast(`Moved "${item.word || 'Word'}" back to Learning 📖`, 'info');
+        }
+
+        StorageManager.userProgress.masteredItemIds = masteredIds;
+        StorageManager.saveUserProgress();
+
+        if (this.dictationState.isFinished) {
+            this.renderDictationCard();
+        } else if (this.dictationState.isRevealed) {
+            this.renderDictationCard();
+        }
+    }
+
+    toggleDictationWordFavorite(itemId) {
+        if (!itemId) return;
+        const item = (this.dictationState.items && this.dictationState.items.find(i => i.id === itemId)) ||
+                     (this.activeProfile && this.activeProfile.items && this.activeProfile.items.find(i => i.id === itemId)) ||
+                     { id: itemId, word: 'Word' };
+
+        const favIds = StorageManager.userProgress.favoriteItemIds || [];
+        const idx = favIds.indexOf(itemId);
+
+        if (idx !== -1) {
+            favIds.splice(idx, 1);
+            if (item) item.favorite = false;
+            this.showToast(`Removed "${item.word || 'Word'}" from Favorites.`, 'info');
+        } else {
+            favIds.push(itemId);
+            if (item) item.favorite = true;
+            this.showToast(`Added "${item.word || 'Word'}" to Favorites! ⭐`, 'success');
+        }
+
+        StorageManager.userProgress.favoriteItemIds = favIds;
+        StorageManager.saveUserProgress();
+
+        if (this.dictationState.isFinished) {
+            this.renderDictationCard();
+        } else if (this.dictationState.isRevealed) {
+            this.renderDictationCard();
+        }
+    }
+
+    setCurrentDictationWordStatus(status) {
+        const currentItem = this.dictationState.items[this.dictationState.currentIndex];
+        if (currentItem && currentItem.id) {
+            this.setDictationWordStatus(currentItem.id, status);
+        }
+    }
+
+    toggleCurrentDictationWordFavorite() {
+        const currentItem = this.dictationState.items[this.dictationState.currentIndex];
+        if (currentItem && currentItem.id) {
+            this.toggleDictationWordFavorite(currentItem.id);
         }
     }
 
