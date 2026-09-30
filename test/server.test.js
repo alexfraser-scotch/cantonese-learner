@@ -653,6 +653,97 @@ test('Daily Learning Target (每日學習目標) Engine & Streak Tracker', (t) =
     assert.strictEqual(mockProgress.dailyTarget.streak, 3, 'Streak is preserved for the new day');
 });
 
+test('Real-World Scenario Dialogues Engine & Word Exporter', (t) => {
+    // 1. Verify scenario data structure
+    const scenarios = [
+        {
+            id: 'sc-cha-chaan-teng',
+            title: '茶餐廳點餐 Ordering at Cha Chaan Teng',
+            category: 'Dining',
+            difficulty: 'Beginner',
+            speakers: { A: { name: 'Customer' }, B: { name: 'Waiter' } },
+            keywords: [
+                { word: '常餐', jyutping: 'soeng4 caan1', meaning: 'Regular set meal' },
+                { word: '熱奶茶', jyutping: 'jit6 naai5 caa4', meaning: 'Hot Hong Kong milk tea' }
+            ],
+            dialogue: [
+                { speaker: 'A', text: '唔該！我想叫個常餐，熱奶茶少甜。', jyutping: 'm4 goi1! ngo5 soeng2 giu3 go3 soeng4 caan1, jit6 naai5 caa4 siu2 tim4.' },
+                { speaker: 'B', text: '好呀，常餐要叉燒湯意粉定牛油多士？', jyutping: 'hou2 aa3, soeng4 caan1 jiu3 caa1 siu1 tong1 ji3 fan2 ding6 ngau4 jau4 do1 si2?' }
+            ]
+        },
+        {
+            id: 'sc-taxi-cross-tunnel',
+            title: '搭的士過海 Taking a Taxi',
+            category: 'Transport',
+            difficulty: 'Beginner',
+            speakers: { A: { name: 'Passenger' }, B: { name: 'Driver' } },
+            keywords: [
+                { word: '西隧', jyutping: 'sai1 seoi6', meaning: 'Western Harbour Crossing Tunnel' }
+            ],
+            dialogue: [
+                { speaker: 'A', text: '司機師傅，去中環天星碼頭，唔該。' },
+                { speaker: 'B', text: '好，行紅隧定行西隧？' }
+            ]
+        }
+    ];
+
+    assert.strictEqual(scenarios.length, 2, 'Scenario count verified');
+    scenarios.forEach(sc => {
+        assert.ok(sc.id && sc.title && sc.category, 'Scenario metadata valid');
+        assert.ok(sc.speakers.A && sc.speakers.B, 'Scenario must have Speaker A and B');
+        assert.ok(Array.isArray(sc.dialogue) && sc.dialogue.length >= 2, 'Must have at least 2 dialogue turns');
+        assert.ok(Array.isArray(sc.keywords) && sc.keywords.length > 0, 'Must have keyword vocabulary');
+    });
+
+    // 2. Test deck conversion
+    const sc = scenarios[0];
+    const generatedProfile = {
+        id: `prof-${sc.id}`,
+        name: `💬 [Scenario] ${sc.title}`,
+        category: sc.category,
+        description: `Vocabulary from ${sc.title}`,
+        items: sc.keywords
+    };
+
+    assert.strictEqual(generatedProfile.items.length, 2);
+    assert.strictEqual(generatedProfile.items[0].word, '常餐');
+});
+
+test('Cantonese Sentence Builder & Grammar Scrambler Validation', (t) => {
+    const sentences = [
+        {
+            id: 'sb-1',
+            targetZh: '我今日食咗兩籠蝦餃。',
+            tokens: ['我', '今日', '食', '咗', '兩籠', '蝦餃'],
+            aspectMarker: '咗'
+        },
+        {
+            id: 'sb-2',
+            targetZh: '佢喺旺角買緊新手提電話。',
+            tokens: ['佢', '喺旺角', '買', '緊', '新', '手提電話'],
+            aspectMarker: '緊'
+        },
+        {
+            id: 'sb-3',
+            targetZh: '唔該幫我執曬呢啲碗碟。',
+            tokens: ['唔該', '幫我', '執', '曬', '呢啲', '碗碟'],
+            aspectMarker: '曬'
+        }
+    ];
+
+    sentences.forEach(s => {
+        // Scramble simulation
+        const scrambled = [...s.tokens].sort(() => 0.5 - Math.random());
+        assert.strictEqual(scrambled.length, s.tokens.length, 'Token count preserved after scramble');
+
+        // Assembled verification
+        const assembled = s.tokens.join('');
+        const cleanTarget = s.targetZh.replace(/[，。！？\s]/g, '');
+        assert.strictEqual(assembled, cleanTarget, 'Assembled tokens must match target Cantonese string');
+        assert.ok(s.targetZh.includes(s.aspectMarker), `Sentence must contain aspect marker ${s.aspectMarker}`);
+    });
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

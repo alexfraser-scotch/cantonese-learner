@@ -2244,6 +2244,8 @@ class UIManager {
         this.viewQuizMode = document.getElementById('view-quiz-mode');
         this.viewDictationMode = document.getElementById('view-dictation-mode');
         this.viewToneQuiz = document.getElementById('view-tone-quiz');
+        this.viewScenarios = document.getElementById('view-scenarios');
+        this.viewSentenceBuilder = document.getElementById('view-sentence-builder');
         this.viewAdminPortal = document.getElementById('view-admin-portal');
         this.viewPrintSheet = document.getElementById('view-print-sheet');
 
@@ -2597,6 +2599,8 @@ class UIManager {
         this.viewQuizMode.classList.add('hidden');
         if (this.viewDictationMode) this.viewDictationMode.classList.add('hidden');
         if (this.viewToneQuiz) this.viewToneQuiz.classList.add('hidden');
+        if (this.viewScenarios) this.viewScenarios.classList.add('hidden');
+        if (this.viewSentenceBuilder) this.viewSentenceBuilder.classList.add('hidden');
         if (this.viewAdminPortal) this.viewAdminPortal.classList.add('hidden');
         if (this.viewPrintSheet) this.viewPrintSheet.classList.add('hidden');
 
@@ -2660,6 +2664,12 @@ class UIManager {
         } else if (targetView === 'tone-quiz') {
             this.initToneQuizMode();
             if (this.viewToneQuiz) this.viewToneQuiz.classList.remove('hidden');
+        } else if (targetView === 'scenarios') {
+            this.initScenariosMode();
+            if (this.viewScenarios) this.viewScenarios.classList.remove('hidden');
+        } else if (targetView === 'sentence-builder') {
+            this.initSentenceBuilderMode();
+            if (this.viewSentenceBuilder) this.viewSentenceBuilder.classList.remove('hidden');
         }
     }
 
@@ -5556,7 +5566,623 @@ class UIManager {
         setTimeout(() => {
             toast.classList.add('opacity-0', '-translate-y-2');
             setTimeout(() => toast.remove(), 300);
-        }, 3000);
+    }
+
+    // ==========================================
+    // MODULE 1: REAL-WORLD CANTONESE SCENARIOS & ROLEPLAY (情景對話模擬器)
+    // ==========================================
+    getScenariosData() {
+        return [
+            {
+                id: 'sc-cha-chaan-teng',
+                title: '茶餐廳點餐 Ordering at Cha Chaan Teng',
+                titleEn: 'Ordering Food & Drinks at a Traditional Hong Kong Cafe',
+                category: 'Dining',
+                difficulty: 'Beginner',
+                emoji: '🥟',
+                description: 'Master how to order regular breakfast sets, customize egg styles, and order hot milk tea with less sugar.',
+                speakers: {
+                    A: { name: 'Customer 顧客', avatar: '👤' },
+                    B: { name: 'Waiter 侍應', avatar: '👨‍🍳' }
+                },
+                keywords: [
+                    { word: '常餐', jyutping: 'soeng4 caan1', meaning_zh: '常餐 / 早餐套餐', meaning: 'Regular set meal', example: '唔該，我想要個常餐。', example_meaning: 'Excuse me, I would like a regular set meal.', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80' },
+                    { word: '熱奶茶', jyutping: 'jit6 naai5 caa4', meaning_zh: '熱奶茶 / 港式奶茶', meaning: 'Hot Hong Kong milk tea', example: '一杯熱奶茶少甜，唔該。', example_meaning: 'A cup of hot milk tea with less sugar, please.', image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80' },
+                    { word: '少甜', jyutping: 'siu2 tim4', meaning_zh: '少甜 / 少糖', meaning: 'Less sweet / less sugar', example: '凍檸茶要少甜走冰。', example_meaning: 'Iced lemon tea with less sugar and no ice.', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80' },
+                    { word: '太陽蛋', jyutping: 'taai3 joeng4 daan2', meaning_zh: '太陽蛋 / 煎單面蛋', meaning: 'Sunny-side up fried egg', example: '煎蛋我要太陽蛋。', example_meaning: 'For the fried egg, I want sunny-side up.', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '唔該！我想叫個常餐，熱奶茶少甜。', jyutping: 'm4 goi1! ngo5 soeng2 giu3 go3 soeng4 caan1, jit6 naai5 caa4 siu2 tim4.', translation: 'Excuse me! I would like a regular set meal, hot milk tea with less sugar.' },
+                    { speaker: 'B', text: '好呀，常餐要叉燒湯意粉定牛油多士？', jyutping: 'hou2 aa3, soeng4 caan1 jiu3 caa1 siu1 tong1 ji3 fan2 ding6 ngau4 jau4 do1 si2?', translation: 'Sure, for the set meal do you want char siu soup spaghetti or butter toast?' },
+                    { speaker: 'A', text: '叉燒湯意，煎蛋要太陽蛋，唔該曬。', jyutping: 'caa1 siu1 tong1 ji3, zin1 daan2 jiu3 taai3 joeng4 daan2, m4 goi1 saai3.', translation: 'Char siu soup spaghetti, fried egg sunny-side up please, thanks a lot.' },
+                    { speaker: 'B', text: '冇問題，寫好咗，陣間幫你送過嚟！', jyutping: 'mou5 man6 tai4, se2 hou2 zo2, zan6 gaan1 bong1 nei5 sung3 gwo3 lai4!', translation: 'No problem, written down, will serve it to you shortly!' }
+                ]
+            },
+            {
+                id: 'sc-taxi-cross-tunnel',
+                title: '搭的士過海 Taking a Taxi Across Harbour',
+                titleEn: 'Giving Directions to a Hong Kong Red Taxi Driver',
+                category: 'Transport',
+                difficulty: 'Beginner',
+                emoji: '🚕',
+                description: 'Learn how to give exact destinations, choose harbour tunnels, and request drop-off spots.',
+                speakers: {
+                    A: { name: 'Passenger 乘客', avatar: '👤' },
+                    B: { name: 'Taxi Driver 司機', avatar: '🚕' }
+                },
+                keywords: [
+                    { word: '司機師傅', jyutping: 'si1 gei1 si1 fu2', meaning_zh: '司機師傅 / 的士師傅', meaning: 'Taxi driver (polite title)', example: '司機師傅，去中環碼頭。', example_meaning: 'Taxi driver, to Central Ferry Pier.', image: 'https://images.unsplash.com/photo-1557223562-6c77ef16210f?auto=format&fit=crop&w=600&q=80' },
+                    { word: '西隧', jyutping: 'sai1 seoi6', meaning_zh: '西隧 / 西區海底隧道', meaning: 'Western Harbour Crossing Tunnel', example: '行西隧冇咁塞車。', example_meaning: 'Taking the Western Tunnel has less traffic.', image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=600&q=80' },
+                    { word: '塞車', jyutping: 'sak1 ce1', meaning_zh: '塞車 / 交通堵塞', meaning: 'Traffic jam / congested', example: '放工時間好塞車。', example_meaning: 'Traffic is very congested during rush hour.', image: 'https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=600&q=80' },
+                    { word: '落車', jyutping: 'lok6 ce1', meaning_zh: '落車 / 下車', meaning: 'Get off / drop off', example: '前面燈位有落，唔該！', example_meaning: 'Drop off at the traffic light ahead, please!', image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '司機師傅，去中環天星碼頭，唔該。', jyutping: 'si1 gei1 si1 fu2, heoi3 zung1 waan4 tin1 sing1 maa5 tau4, m4 goi1.', translation: 'Taxi driver, to Central Star Ferry Pier please.' },
+                    { speaker: 'B', text: '好，行紅隧定行西隧？而家西隧冇咁塞車。', jyutping: 'hou2, haang4 hung4 seoi6 ding6 haang4 sai1 seoi6? ji4 gaa1 sai1 seoi6 mou5 gam3 sak1 ce1.', translation: 'Okay, take Cross-Harbour Tunnel or Western Tunnel? Western Tunnel is less congested right now.' },
+                    { speaker: 'A', text: '行西隧啦，我趕時間，唔該。', jyutping: 'haang4 sai1 seoi6 laa1, ngo5 gon2 si4 gaan3, m4 goi1.', translation: "Let's take Western Tunnel, I'm in a rush, thanks." },
+                    { speaker: 'B', text: '收到！前面路口落車得唔得？', jyutping: 'sau1 dou2! cin4 min6 lou6 hau2 lok6 ce1 dak1 m4 dak1?', translation: 'Got it! Is it okay to drop you off at the intersection ahead?' },
+                    { speaker: 'A', text: '得㗎，呢度停就得，唔該曬！', jyutping: 'dak1 gaa3, ni1 dou6 ting4 zau6 dak1, m4 goi1 saai3!', translation: 'Sure, stopping here is perfect, thanks a lot!' }
+                ]
+            },
+            {
+                id: 'sc-mong-kok-shopping',
+                title: '旺角買嘢講價 Shopping & Bargaining in Mong Kok',
+                titleEn: 'Asking for Discounts & Bargaining at Local Markets',
+                category: 'Shopping',
+                difficulty: 'Intermediate',
+                emoji: '🛍️',
+                description: 'Practice natural street Cantonese bargaining expressions, asking prices, and closing friendly deals.',
+                speakers: {
+                    A: { name: 'Shopper 顧客', avatar: '🛍️' },
+                    B: { name: 'Shopkeeper 老闆', avatar: '🏪' }
+                },
+                keywords: [
+                    { word: '幾多錢', jyutping: 'gei2 do1 cin2', meaning_zh: '幾多錢 / 多少錢', meaning: 'How much money / cost', example: '呢件衫幾多錢啊？', example_meaning: 'How much is this shirt?', image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=600&q=80' },
+                    { word: '平啲', jyutping: 'peng4 di1', meaning_zh: '平啲 / 便宜一點', meaning: 'A bit cheaper / discount', example: '老闆，算平啲啦！', example_meaning: 'Boss, give me a discount please!', image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=600&q=80' },
+                    { word: '成交', jyutping: 'sing4 gaau1', meaning_zh: '成交 / 達成交易', meaning: 'Deal! / Agreed', example: '好，二百蚊成交！', example_meaning: 'Alright, 200 dollars, deal!', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '老闆，呢件外套幾多錢啊？', jyutping: 'lou5 baan2, ni1 gin6 ngoi6 tou3 gei2 do1 cin2 aa3?', translation: 'Boss, how much is this jacket?' },
+                    { speaker: 'B', text: '呢件好正㗎，原價三百八，算你三百啦！', jyutping: 'ni1 gin6 hou2 zeng3 gaa3, jyun4 gaa3 saam1 baak3 baat3, syun3 nei5 saam1 baak3 laa1!', translation: "This one is great quality, original price 380, I'll give it to you for 300!" },
+                    { speaker: 'A', text: '哇，平啲得唔得？二百五蚊得唔得呀？', jyutping: 'waa1, peng4 di1 dak1 m4 dak1? ji6 baak3 ng5 man1 dak1 m4 dak1 aa3?', translation: 'Wow, can it be cheaper? Can you do 250 dollars?' },
+                    { speaker: 'B', text: '唉，當交個朋友啦，二百六啦，成交！', jyutping: 'aai1, dong3 gaau1 go3 pang4 jau5 laa1, ji6 baak3 luk6 laa1, sing4 gaau1!', translation: "Alright, let's be friends, 260 dollars, deal!" }
+                ]
+            },
+            {
+                id: 'sc-doctor-clinic',
+                title: '診所睇醫生 Visiting the Clinic',
+                titleEn: 'Describing Symptoms & Doctor Instructions',
+                category: 'Medical',
+                difficulty: 'Intermediate',
+                emoji: '🏥',
+                description: 'Learn how to describe fever, sore throat, cough, and understand doctor medication instructions.',
+                speakers: {
+                    A: { name: 'Doctor 醫生', avatar: '👨‍⚕️' },
+                    B: { name: 'Patient 病人', avatar: '🤒' }
+                },
+                keywords: [
+                    { word: '發燒', jyutping: 'faat3 siu1', meaning_zh: '發燒 / 體溫升高', meaning: 'Fever / have a temperature', example: '我尋晚開始發燒。', example_meaning: 'I started having a fever last night.', image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80' },
+                    { word: '喉嚨痛', jyutping: 'hau4 lung4 tung3', meaning_zh: '喉嚨痛 / 咽喉腫痛', meaning: 'Sore throat', example: '食嘢嘅時候喉嚨好痛。', example_meaning: 'My throat hurts a lot when eating.', image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&w=600&q=80' },
+                    { word: '戒口', jyutping: 'gaai3 hau2', meaning_zh: '戒口 / 忌食避口', meaning: 'Avoid certain foods / dietary restrictions', example: '食藥期間記得要戒口。', example_meaning: 'Remember to watch your diet while taking medicine.', image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '你好，邊度唔舒服啊？', jyutping: 'nei5 hou2, bin1 dou6 m4 suk6 fuk6 aa3?', translation: 'Hello, where are you feeling unwell?' },
+                    { speaker: 'B', text: '我尋日起開始發燒、喉嚨痛同埋有啲咳。', jyutping: 'ngo5 cam4 jat6 hei2 hoi1 ci2 faat3 siu1, hau4 lung4 tung3 tung4 maai4 jau5 di1 kat1.', translation: 'I started having a fever, sore throat and coughing since yesterday.' },
+                    { speaker: 'A', text: '擘大口我睇下喉嚨，發炎幾犀利，我開三日消炎藥同退燒藥畀你。', jyutping: 'maak3 daai6 hau2 ngo5 tai2 haa5 hau4 lung4, faat3 jim4 gei2 sai1 lei6, ngo5 hoi1 saam1 jat6 siu1 jim4 joek6 tung4 teoi3 siu1 joek6 bei2 nei5.', translation: "Open your mouth let me check your throat, it's quite inflamed, I'll prescribe 3 days of medication for you." },
+                    { speaker: 'B', text: '唔該醫生，使唔使戒口？', jyutping: 'm4 goi1 ji1 sang1, sai2 m4 sai2 gaai3 hau2?', translation: 'Thank you doctor, do I need to avoid certain foods?' },
+                    { speaker: 'A', text: '飲多啲溫水，唔好食熱氣煎炸嘢。', jyutping: 'jam2 do1 di1 wan1 seoi2, m4 hou2 sik6 jit6 hei3 zin1 zaa3 je5.', translation: 'Drink plenty of warm water, avoid spicy and fried foods.' }
+                ]
+            },
+            {
+                id: 'sc-dim-sum-teahouse',
+                title: '飲茶搭檯叫點心 Dim Sum Table Sharing & Tea Ordering',
+                titleEn: 'Traditional Hong Kong Yum Cha Etiquette & Tea Service',
+                category: 'Dining',
+                difficulty: 'Beginner',
+                emoji: '🫖',
+                description: 'Order famous Chinese teas (Pu-erh, Jasmine, Tieguanyin), share tables politely, and request tea refills.',
+                speakers: {
+                    A: { name: 'Customer 茶客', avatar: '🍵' },
+                    B: { name: 'Host / Waiter 侍應', avatar: '👨‍🍳' }
+                },
+                keywords: [
+                    { word: '搭檯', jyutping: 'daap3 toi2', meaning_zh: '搭檯 / 併桌合坐', meaning: 'Share table (HK dining culture)', example: '唔該兩位，搭檯得唔得？', example_meaning: 'Two people, is sharing a table okay?', image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80' },
+                    { word: '香片', jyutping: 'hoeng1 pin2', meaning_zh: '香片 / 茉莉花茶', meaning: 'Jasmine tea', example: '我哋想飲壺香片茶。', example_meaning: 'We would like a pot of Jasmine tea.', image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80' },
+                    { word: '茶位', jyutping: 'caa4 wai2', meaning_zh: '茶位 / 茶水費', meaning: 'Tea cover charge per person', example: '請問茶位幾多錢一位？', example_meaning: 'How much is the tea charge per person?', image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '侍應，兩位，請問有冇位啊？', jyutping: 'si6 jing3, loeng5 wai2, cing2 man6 jau5 mou5 wai2 aa3?', translation: 'Waiter, table for two, any seats available please?' },
+                    { speaker: 'B', text: '大廳得返一張搭檯，介唔介意？', jyutping: 'daai6 teng1 dak1 faan1 jat1 zoeng1 daap3 toi2, gaai3 m4 gaai3 ji3?', translation: 'Only a shared table left in the main hall, do you mind?' },
+                    { speaker: 'A', text: '冇所謂，搭檯都得。請問今日有咩茶？', jyutping: 'mou5 so2 wai5, daap3 toi2 dou1 dak1. cing2 man6 gam1 jat1 jau5 me1 caa4?', translation: "Doesn't matter, sharing is fine. What teas do you have today?" },
+                    { speaker: 'B', text: '有普洱、香片、鐵觀音同菊普。', jyutping: 'jau5 pou2 nei2, hoeng1 pin2, tit3 gun1 jam1 tung4 guk1 pou2.', translation: "We have Pu'er, Jasmine, Tieguanyin, and Chrysanthemum Pu'er." },
+                    { speaker: 'A', text: '要一壺香片，再開兩位茶位，唔該！', jyutping: 'jiu3 jat1 wu4 hoeng1 pin2, zoi3 hoi1 loeng5 wai2 caa4 wai2, m4 goi1!', translation: 'A pot of Jasmine tea, and 2 tea covers please!' }
+                ]
+            }
+        ];
+    }
+
+    initScenariosMode() {
+        this.scenarioFilter = 'all';
+        this.activeScenario = null;
+        this.scenarioRoleplayMode = 'all';
+        this.revealedLines = new Set();
+        
+        const selectionView = document.getElementById('scenarios-selection-view');
+        const activeRoom = document.getElementById('scenario-active-room');
+        if (selectionView) selectionView.classList.remove('hidden');
+        if (activeRoom) activeRoom.classList.add('hidden');
+
+        this.renderScenariosGrid();
+    }
+
+    filterScenarioCategory(cat, btn) {
+        this.scenarioFilter = cat;
+        document.querySelectorAll('.scenario-cat-btn').forEach(b => {
+            b.className = 'scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all';
+        });
+        if (btn) {
+            btn.className = 'scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all';
+        }
+        this.renderScenariosGrid();
+    }
+
+    renderScenariosGrid() {
+        const grid = document.getElementById('scenarios-cards-grid');
+        if (!grid) return;
+
+        const scenarios = this.getScenariosData();
+        const filtered = this.scenarioFilter === 'all' 
+            ? scenarios 
+            : scenarios.filter(s => s.category === this.scenarioFilter);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 text-sm">No scenarios found in this category.</div>`;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(s => `
+            <div onclick="window.UIManager.openScenarioRoom('${s.id}')" class="glass-card rounded-3xl p-6 border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between group shadow-xl">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            ${s.emoji}
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-2.5 py-1 bg-slate-900 border border-slate-800 text-slate-400 rounded-lg text-[10px] font-mono font-bold">${s.category}</span>
+                            <span class="px-2.5 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 rounded-lg text-[10px] font-bold">${s.difficulty}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-100 group-hover:text-emerald-300 transition-colors font-cantonese">
+                            ${this.escapeHTML(s.title)}
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                            ${this.escapeHTML(s.description)}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 pt-2 border-t border-slate-800/60 text-[11px] text-slate-400">
+                        <span>💬 ${s.dialogue.length} dialogue turns</span>
+                        <span>•</span>
+                        <span>🔑 ${s.keywords.length} vocabulary terms</span>
+                    </div>
+                </div>
+                <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-300 font-medium">
+                        <span>${s.speakers.A.avatar} vs ${s.speakers.B.avatar}</span>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Start Dialogue →
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    openScenarioRoom(scenarioId) {
+        const scenarios = this.getScenariosData();
+        const scenario = scenarios.find(s => s.id === scenarioId);
+        if (!scenario) return;
+
+        this.activeScenario = scenario;
+        this.scenarioRoleplayMode = 'all';
+        this.revealedLines = new Set();
+
+        const selectionView = document.getElementById('scenarios-selection-view');
+        const activeRoom = document.getElementById('scenario-active-room');
+        if (selectionView) selectionView.classList.add('hidden');
+        if (activeRoom) activeRoom.classList.remove('hidden');
+
+        const titleElem = document.getElementById('scenario-room-title');
+        const descElem = document.getElementById('scenario-room-desc');
+        const badgeElem = document.getElementById('scenario-room-badge');
+
+        if (titleElem) titleElem.textContent = `${scenario.emoji} ${scenario.title}`;
+        if (descElem) descElem.textContent = scenario.description;
+        if (badgeElem) badgeElem.textContent = scenario.difficulty;
+
+        this.setScenarioRoleplayMode('all');
+        this.renderScenarioDialogue();
+    }
+
+    exitScenarioRoom() {
+        this.activeScenario = null;
+        const selectionView = document.getElementById('scenarios-selection-view');
+        const activeRoom = document.getElementById('scenario-active-room');
+        if (selectionView) selectionView.classList.remove('hidden');
+        if (activeRoom) activeRoom.classList.add('hidden');
+    }
+
+    setScenarioRoleplayMode(mode) {
+        this.scenarioRoleplayMode = mode;
+        const btnAll = document.getElementById('btn-roleplay-all');
+        const btnA = document.getElementById('btn-roleplay-a');
+        const btnB = document.getElementById('btn-roleplay-b');
+
+        const activeClass = 'px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-lg font-bold text-[11px] transition-all';
+        const inactiveClass = 'px-2.5 py-1 text-slate-400 hover:text-slate-200 rounded-lg text-[11px] transition-all';
+
+        if (btnAll) btnAll.className = mode === 'all' ? activeClass : inactiveClass;
+        if (btnA) btnA.className = mode === 'A' ? activeClass : inactiveClass;
+        if (btnB) btnB.className = mode === 'B' ? activeClass : inactiveClass;
+
+        this.renderScenarioDialogue();
+    }
+
+    revealScenarioLine(idx) {
+        this.revealedLines.add(idx);
+        this.renderScenarioDialogue();
+    }
+
+    renderScenarioDialogue() {
+        const stream = document.getElementById('scenario-chat-stream');
+        if (!stream || !this.activeScenario) return;
+
+        const { speakers, dialogue } = this.activeScenario;
+
+        stream.innerHTML = dialogue.map((line, idx) => {
+            const isSpeakerA = line.speaker === 'A';
+            const speakerInfo = isSpeakerA ? speakers.A : speakers.B;
+            const isHiddenRole = (this.scenarioRoleplayMode === 'A' && isSpeakerA) || (this.scenarioRoleplayMode === 'B' && !isSpeakerA);
+            const isRevealed = this.revealedLines.has(idx);
+
+            const bubbleAlign = isSpeakerA ? 'justify-start' : 'justify-end';
+            const bubbleBg = isSpeakerA 
+                ? 'bg-slate-900 border-slate-800 text-slate-100 rounded-tl-sm' 
+                : 'bg-emerald-950/40 border-emerald-500/30 text-emerald-100 rounded-tr-sm';
+
+            return `
+                <div class="flex items-start gap-3 ${bubbleAlign} transition-all">
+                    ${isSpeakerA ? `
+                        <div class="w-9 h-9 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shrink-0 shadow-md">
+                            ${speakerInfo.avatar}
+                        </div>
+                    ` : ''}
+
+                    <div class="max-w-lg space-y-1.5">
+                        <div class="flex items-center gap-2 text-[11px] text-slate-400 font-medium ${isSpeakerA ? '' : 'justify-end'}">
+                            <span>${speakerInfo.name}</span>
+                            ${isHiddenRole ? '<span class="text-[10px] text-amber-400 font-bold font-mono">🎭 Your Turn to Speak</span>' : ''}
+                        </div>
+
+                        <div class="p-4 rounded-3xl border ${bubbleBg} shadow-lg space-y-2">
+                            ${(isHiddenRole && !isRevealed) ? `
+                                <div class="py-2 px-1 text-center space-y-2">
+                                    <p class="text-xs text-amber-300/90 font-medium">💬 Practice speaking this line in Cantonese!</p>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="window.UIManager.revealScenarioLine(${idx})" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold transition-all">
+                                            👁️ Reveal Line 顯示台詞
+                                        </button>
+                                        <button onclick="AudioController.speak('${this.escapeQuotes(line.text)}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 rounded-xl border border-slate-700 transition-all text-xs" title="Listen Audio">
+                                            🔊
+                                        </button>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div>
+                                    <div class="flex items-start justify-between gap-3">
+                                        <p class="text-base sm:text-lg font-bold font-cantonese tracking-wide text-slate-100">
+                                            ${this.escapeHTML(line.text)}
+                                        </p>
+                                        <button onclick="AudioController.speak('${this.escapeQuotes(line.text)}')" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-sky-400 hover:text-white rounded-xl border border-slate-700 transition-all shrink-0" title="Play native audio">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs font-mono text-emerald-400/90 mt-1">${this.escapeHTML(line.jyutping)}</p>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed">
+                                    ${this.escapeHTML(line.translation)}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+
+                    ${!isSpeakerA ? `
+                        <div class="w-9 h-9 rounded-2xl bg-emerald-900/50 border border-emerald-500/40 flex items-center justify-center text-lg shrink-0 shadow-md">
+                            ${speakerInfo.avatar}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    async playFullScenarioAudio() {
+        if (!this.activeScenario || !this.activeScenario.dialogue) return;
+        this.showToast('Playing full dialogue stream...', 'info');
+
+        const dialogue = this.activeScenario.dialogue;
+        for (let i = 0; i < dialogue.length; i++) {
+            AudioController.speak(dialogue[i].text);
+            await new Promise(r => setTimeout(r, 2600));
+        }
+    }
+
+    async importScenarioKeywordsToDeck() {
+        if (!this.activeScenario) return;
+        const { title, category, keywords } = this.activeScenario;
+
+        try {
+            const newDeck = await StorageManager.createProfile(
+                `💬 [Scenario] ${title}`,
+                category,
+                `Vocabulary and phrases extracted from the ${title} dialogue.`,
+                keywords
+            );
+
+            this.showToast(`Imported ${keywords.length} words to new profile! 📚`, 'success');
+            this.switchView('profile-detail', { profileId: newDeck.id });
+        } catch (e) {
+            this.showToast('Failed to import scenario words: ' + e.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // MODULE 2: CANTONESE SENTENCE BUILDER & GRAMMAR SCRAMBLER (造句組句練習)
+    // ==========================================
+    getSentenceBuilderData() {
+        return [
+            {
+                id: 'sb-1',
+                targetZh: '我今日食咗兩籠蝦餃。',
+                targetEn: 'I ate two baskets of shrimp dumplings today.',
+                category: 'Aspect Marker: 咗 (zo2 - Completed Action)',
+                explanation: 'In Cantonese, the aspect particle "咗 (zo2)" directly follows the main verb "食 (sik6)" to indicate that an action has been completed.',
+                tokens: ['我', '今日', '食', '咗', '兩籠', '蝦餃']
+            },
+            {
+                id: 'sb-2',
+                targetZh: '佢喺旺角買緊新手提電話。',
+                targetEn: 'He is currently buying a new mobile phone in Mong Kok.',
+                category: 'Aspect Marker: 緊 (gan2 - Continuous Action)',
+                explanation: 'The marker "緊 (gan2)" attaches after a verb (買) to indicate ongoing/continuous action (equivalent to English "-ing"). Prepositional location "喺旺角" precedes the verb phrase.',
+                tokens: ['佢', '喺旺角', '買', '緊', '新', '手提電話']
+            },
+            {
+                id: 'sb-3',
+                targetZh: '唔該幫我執曬呢啲碗碟。',
+                targetEn: 'Please help me clear all of these dishes.',
+                category: 'Aspect Marker: 曬 (saai3 - Complete/All)',
+                explanation: 'The quantificational marker "曬 (saai3)" attaches after verbs to express completeness or "all/entirely" (e.g. 執曬 = clear all).',
+                tokens: ['唔該', '幫我', '執', '曬', '呢啲', '碗碟']
+            },
+            {
+                id: 'sb-4',
+                targetZh: '我聽日想同朋友去飲茶。',
+                targetEn: 'Tomorrow I want to go have dim sum with friends.',
+                category: 'Grammar: Prepositional "同" (With)',
+                explanation: 'In Cantonese grammar, the comitative marker "同 (with [someone])" comes before the motion/action verb phrase "去飲茶".',
+                tokens: ['我', '聽日', '想', '同朋友', '去', '飲茶']
+            },
+            {
+                id: 'sb-5',
+                targetZh: '呢間茶餐廳嘅凍奶茶好飲極喇！',
+                targetEn: "This cha chaan teng's iced milk tea is extremely delicious!",
+                category: 'Grammar: Superlative "極喇" (Extremely)',
+                explanation: 'Adjective + "極喇 (gik6 laa3)" is a typical Hong Kong conversational structure meaning "extremely / couldn\'t be more".',
+                tokens: ['呢間', '茶餐廳', '嘅', '凍奶茶', '好飲', '極喇']
+            },
+            {
+                id: 'sb-6',
+                targetZh: '你幾時去過香港旅行啊？',
+                targetEn: 'When have you been to Hong Kong for traveling?',
+                category: 'Aspect Marker: 過 (gwo3 - Past Experience)',
+                explanation: 'The experiential marker "過 (gwo3)" indicates past experience ("have been to / have tried doing").',
+                tokens: ['你', '幾時', '去', '過', '香港', '旅行', '啊']
+            },
+            {
+                id: 'sb-7',
+                targetZh: '大家坐埋一齊食飯啦！',
+                targetEn: "Let's all sit together and eat!",
+                category: 'Aspect Marker: 埋 (maai4 - Convergence/Together)',
+                explanation: 'The verbal particle "埋 (maai4)" indicates bringing people or things together into one place (坐埋一齊).',
+                tokens: ['大家', '坐', '埋', '一齊', '食飯', '啦']
+            },
+            {
+                id: 'sb-8',
+                targetZh: '司機師傅，請喺前面燈位停一停。',
+                targetEn: 'Taxi driver, please stop briefly at the traffic light ahead.',
+                category: 'Grammar: Verb Reduplication (停一停)',
+                explanation: 'Reduplicating a verb with "一" (e.g. 停一停, 試一試) indicates doing an action briefly or casually.',
+                tokens: ['司機師傅', '請', '喺前面', '燈位', '停一停']
+            }
+        ];
+    }
+
+    initSentenceBuilderMode() {
+        this.sentenceState = {
+            currentIndex: 0,
+            score: 0,
+            streak: 0,
+            placedTokens: [],
+            availableTokens: []
+        };
+        this.loadSentenceQuestion(0);
+    }
+
+    loadSentenceQuestion(index) {
+        const db = this.getSentenceBuilderData();
+        if (index >= db.length) {
+            index = 0;
+            this.sentenceState.currentIndex = 0;
+        }
+
+        const sentence = db[index];
+        this.sentenceState.currentSentence = sentence;
+        this.sentenceState.placedTokens = [];
+
+        // Scramble tokens
+        const tokensWithIds = sentence.tokens.map((word, idx) => ({ id: `token-${idx}-${word}`, word }));
+        this.sentenceState.availableTokens = [...tokensWithIds].sort(() => 0.5 - Math.random());
+
+        // Update UI
+        const tagElem = document.getElementById('sentence-category-tag');
+        const indicatorElem = document.getElementById('sentence-index-indicator');
+        const enElem = document.getElementById('sentence-target-english');
+        const zhElem = document.getElementById('sentence-target-zh');
+        const feedbackBox = document.getElementById('sentence-feedback-box');
+        const checkBtn = document.getElementById('btn-check-sentence');
+
+        if (tagElem) tagElem.textContent = sentence.category;
+        if (indicatorElem) indicatorElem.textContent = `Sentence ${index + 1} of ${db.length}`;
+        if (enElem) enElem.textContent = sentence.targetEn;
+        if (zhElem) zhElem.textContent = `Target: ${sentence.targetZh}`;
+        if (feedbackBox) feedbackBox.classList.add('hidden');
+
+        if (checkBtn) {
+            checkBtn.innerHTML = `<span>🔍</span> Check Answer 檢查答案`;
+            checkBtn.onclick = () => this.checkSentenceBuilderAnswer();
+            checkBtn.className = 'w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-extrabold rounded-xl shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-1.5';
+        }
+
+        this.renderSentenceTokens();
+    }
+
+    renderSentenceTokens() {
+        const placedZone = document.getElementById('sentence-placed-zone');
+        const wordBank = document.getElementById('sentence-word-bank');
+        if (!placedZone || !wordBank) return;
+
+        // Render Placed Slots
+        if (this.sentenceState.placedTokens.length === 0) {
+            placedZone.innerHTML = `<span id="sentence-placeholder-text" class="text-xs text-slate-500 italic">Tap words below to assemble the Cantonese sentence in correct order...</span>`;
+        } else {
+            placedZone.innerHTML = this.sentenceState.placedTokens.map((t, idx) => `
+                <button type="button" onclick="window.UIManager.removeSentenceToken(${idx})" class="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-sm sm:text-base rounded-2xl shadow-md border border-purple-400/40 hover:bg-rose-600 hover:border-rose-400 hover:from-rose-600 hover:to-pink-600 transition-all font-cantonese flex items-center gap-1 group">
+                    <span>${this.escapeHTML(t.word)}</span>
+                    <span class="text-[10px] text-purple-200 group-hover:text-white">✕</span>
+                </button>
+            `).join('');
+        }
+
+        // Render Available Word Bank
+        if (this.sentenceState.availableTokens.length === 0) {
+            wordBank.innerHTML = `<span class="text-xs text-slate-500 italic">All words placed. Click "Check Answer" to verify!</span>`;
+        } else {
+            wordBank.innerHTML = this.sentenceState.availableTokens.map((t, idx) => `
+                <button type="button" onclick="window.UIManager.placeSentenceToken(${idx})" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 hover:text-white font-bold text-sm sm:text-base rounded-2xl border border-slate-700 hover:border-purple-500/60 shadow-sm transition-all font-cantonese">
+                    ${this.escapeHTML(t.word)}
+                </button>
+            `).join('');
+        }
+    }
+
+    placeSentenceToken(availableIdx) {
+        const token = this.sentenceState.availableTokens.splice(availableIdx, 1)[0];
+        if (token) {
+            this.sentenceState.placedTokens.push(token);
+            this.renderSentenceTokens();
+        }
+    }
+
+    removeSentenceToken(placedIdx) {
+        const token = this.sentenceState.placedTokens.splice(placedIdx, 1)[0];
+        if (token) {
+            this.sentenceState.availableTokens.push(token);
+            this.renderSentenceTokens();
+        }
+    }
+
+    clearSentenceBuilderSlots() {
+        this.sentenceState.availableTokens.push(...this.sentenceState.placedTokens);
+        this.sentenceState.placedTokens = [];
+        this.renderSentenceTokens();
+    }
+
+    checkSentenceBuilderAnswer() {
+        const { currentSentence, placedTokens } = this.sentenceState;
+        if (!currentSentence) return;
+
+        const assembledStr = placedTokens.map(t => t.word).join('');
+        const cleanTarget = currentSentence.targetZh.replace(/[，。！？\s]/g, '');
+        const cleanAssembled = assembledStr.replace(/[，。！？\s]/g, '');
+
+        const feedbackBox = document.getElementById('sentence-feedback-box');
+        const feedbackTitle = document.getElementById('sentence-feedback-title');
+        const feedbackJyutping = document.getElementById('sentence-feedback-jyutping');
+        const feedbackExplanation = document.getElementById('sentence-feedback-explanation');
+        const scoreElem = document.getElementById('sentence-score-count');
+        const streakElem = document.getElementById('sentence-streak-count');
+        const checkBtn = document.getElementById('btn-check-sentence');
+
+        if (cleanAssembled === cleanTarget) {
+            // Success
+            this.sentenceState.score++;
+            this.sentenceState.streak++;
+            if (scoreElem) scoreElem.textContent = this.sentenceState.score;
+            if (streakElem) streakElem.textContent = `🔥 ${this.sentenceState.streak}`;
+
+            if (feedbackBox) {
+                feedbackBox.className = 'p-4 rounded-2xl border bg-emerald-950/40 border-emerald-500/40 text-emerald-200 space-y-1.5 transition-all';
+                feedbackBox.classList.remove('hidden');
+            }
+            if (feedbackTitle) feedbackTitle.innerHTML = `<span class="text-lg">🎉</span> Perfect Sentence! 答啱咗！`;
+            if (feedbackJyutping) feedbackJyutping.textContent = currentSentence.targetZh;
+            if (feedbackExplanation) feedbackExplanation.textContent = currentSentence.explanation;
+
+            AudioController.speak(currentSentence.targetZh);
+
+            if (checkBtn) {
+                checkBtn.innerHTML = `<span>➡️</span> Next Sentence 下一句`;
+                checkBtn.className = 'w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5';
+                checkBtn.onclick = () => {
+                    this.sentenceState.currentIndex++;
+                    this.loadSentenceQuestion(this.sentenceState.currentIndex);
+                };
+            }
+        } else {
+            // Incorrect
+            this.sentenceState.streak = 0;
+            if (streakElem) streakElem.textContent = `🔥 0`;
+
+            if (feedbackBox) {
+                feedbackBox.className = 'p-4 rounded-2xl border bg-rose-950/40 border-rose-500/40 text-rose-200 space-y-1.5 transition-all animate-bounce';
+                feedbackBox.classList.remove('hidden');
+            }
+            if (feedbackTitle) feedbackTitle.innerHTML = `<span>❌</span> Keep Trying! 未係最地道嘅句式。`;
+            if (feedbackJyutping) feedbackJyutping.textContent = `Tip: Check Cantonese aspect marker and preposition positions.`;
+            if (feedbackExplanation) feedbackExplanation.textContent = currentSentence.explanation;
+        }
+    }
+
+    giveSentenceHint() {
+        const { currentSentence, placedTokens, availableTokens } = this.sentenceState;
+        if (!currentSentence || availableTokens.length === 0) return;
+
+        const nextTargetWord = currentSentence.tokens[placedTokens.length];
+        if (!nextTargetWord) return;
+
+        const foundIdx = availableTokens.findIndex(t => t.word === nextTargetWord);
+        if (foundIdx !== -1) {
+            this.placeSentenceToken(foundIdx);
+            this.showToast(`Hint: placed "${nextTargetWord}"`, 'info');
+        }
+    }
+
+    playSentenceBuilderAudio() {
+        if (this.sentenceState && this.sentenceState.currentSentence) {
+            AudioController.speak(this.sentenceState.currentSentence.targetZh);
+        }
     }
 
     escapeHTML(str) {
