@@ -5566,6 +5566,7 @@ class UIManager {
         setTimeout(() => {
             toast.classList.add('opacity-0', '-translate-y-2');
             setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     // ==========================================
