@@ -1829,9 +1829,9 @@ class StorageManager {
 // ==========================================
 class SpeechEngine {
     constructor() {
-        this.synth = window.speechSynthesis;
+        this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
         this.cantoneseVoice = null;
-        this.isVoiceAvailable = true; // Always true because Cloud Audio Stream is active
+        this.isVoiceAvailable = true; // Always true because backend /api/tts Cloud Audio Stream is active
         this.speechRate = 0.9;
         this.currentAudio = null;
         this.init();
@@ -1846,7 +1846,7 @@ class SpeechEngine {
 
     updateVoiceList() {
         if (this.synth) {
-            const voices = this.synth.getVoices();
+            const voices = this.synth.getVoices ? this.synth.getVoices() : [];
             const hkVoice = voices.find(v => 
                 v.lang.toLowerCase().includes('zh-hk') ||
                 v.lang.toLowerCase().includes('zh_hk') ||
@@ -1862,7 +1862,6 @@ class SpeechEngine {
                 console.log('Native Cantonese (zh-HK) OS voice detected:', hkVoice.name);
             } else {
                 this.cantoneseVoice = null;
-                console.log('Native zh-HK OS voice not installed. Using Cloud Cantonese Audio Stream.');
             }
         }
 
@@ -1875,66 +1874,141 @@ class SpeechEngine {
         if (!text) return;
         this.stop();
 
-        // 1. If native OS Cantonese voice exists, use SpeechSynthesis
-        if (this.cantoneseVoice && this.synth) {
+        // 1. Try Native OS SpeechSynthesis if Cantonese voice is installed
+        if (this.synth && this.cantoneseVoice) {
             try {
+                if (this.synth.paused) {
+                    this.synth.resume();
+                }
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'zh-HK';
                 utterance.rate = this.speechRate;
                 utterance.voice = this.cantoneseVoice;
 
-                utterance.onstart = () => { if (onStartCallback) onStartCallback(); };
-                utterance.onend = () => { if (onEndCallback) onEndCallback(); };
+                let speechStarted = false;
+                utterance.onstart = () => {
+                    speechStarted = true;
+                    if (onStartCallback) onStartCallback();
+                };
+                utterance.onend = () => {
+                    if (onEndCallback) onEndCallback();
+                };
                 utterance.onerror = (e) => {
-                    console.warn('Native speech error, falling back to Cloud Audio Stream:', e);
+                    console.warn('Native speech error, switching to Audio Stream:', e);
                     this.playCloudAudio(text, onStartCallback, onEndCallback);
                 };
 
                 this.synth.speak(utterance);
                 return;
             } catch (err) {
-                console.warn('Native speech exception:', err);
+                console.warn('Native speech exception, falling back:', err);
             }
         }
 
-        // 2. Zero-installation Cloud Cantonese Audio Stream (Works 100% on all OS/devices!)
+        // 2. High-Fidelity Cantonese Audio Stream (via /api/tts proxy or direct fallback)
         this.playCloudAudio(text, onStartCallback, onEndCallback);
     }
 
     playCloudAudio(text, onStartCallback = null, onEndCallback = null) {
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-HK&client=tw-ob&q=${encodeURIComponent(text)}`;
-        const audio = new Audio(audioUrl);
+        this.stop();
+
+        const encodedText = encodeURIComponent(text);
+        const serverEndpoint = `/api/tts?text=${encodedText}`;
+        const directCloudUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-HK&client=tw-ob&q=${encodedText}`;
+
+        const audio = new Audio();
+        audio.referrerPolicy = 'no-referrer';
         this.currentAudio = audio;
 
-        if (onStartCallback) onStartCallback();
+        let hasFiredStart = false;
+        const notifyStart = () => {
+            if (!hasFiredStart) {
+                hasFiredStart = true;
+                if (onStartCallback) onStartCallback();
+            }
+        };
+
+        audio.onplay = notifyStart;
+        audio.onplaying = notifyStart;
 
         audio.onended = () => {
             this.currentAudio = null;
             if (onEndCallback) onEndCallback();
         };
 
-        audio.onerror = (e) => {
-            console.error('Cloud audio stream error:', e);
-            this.currentAudio = null;
-            if (onEndCallback) onEndCallback();
+        // Fallback chain: /api/tts -> direct stream -> graceful completion
+        audio.onerror = () => {
+            if (audio.src && audio.src.includes('/api/tts')) {
+                console.warn('Local /api/tts returned error, trying direct cloud stream...');
+                audio.src = directCloudUrl;
+                audio.play().catch(playErr => {
+                    console.warn('Direct stream also blocked:', playErr);
+                    this.currentAudio = null;
+                    if (onEndCallback) onEndCallback();
+                });
+            } else {
+                console.warn('Audio stream failed.');
+                this.currentAudio = null;
+                if (onEndCallback) onEndCallback();
+            }
         };
 
+        audio.src = serverEndpoint;
         audio.play().catch(err => {
-            console.warn('Browser auto-play policy prevented audio:', err);
-            if (onEndCallback) onEndCallback();
+            console.warn('Primary audio stream play() interrupted or blocked by browser policy:', err);
+            if (audio.src && audio.src.includes('/api/tts')) {
+                audio.src = directCloudUrl;
+                audio.play().catch(() => {
+                    this.currentAudio = null;
+                    if (onEndCallback) onEndCallback();
+                });
+            } else {
+                this.currentAudio = null;
+                if (onEndCallback) onEndCallback();
+            }
         });
     }
 
     stop() {
         if (this.synth) {
-            this.synth.cancel();
+            try {
+                this.synth.cancel();
+            } catch (e) {
+                // Ignore cancel errors
+            }
         }
         if (this.currentAudio) {
-            this.currentAudio.pause();
+            try {
+                this.currentAudio.pause();
+                this.currentAudio.currentTime = 0;
+            } catch (e) {
+                // Ignore pause errors
+            }
             this.currentAudio = null;
         }
     }
 }
+
+// Global AudioController wrapper ensuring seamless audio playback across all modules
+window.AudioController = {
+    speak(text, onStart = null, onEnd = null) {
+        if (window.UIManager && window.UIManager.speechEngine) {
+            window.UIManager.speechEngine.speak(text, onStart, onEnd);
+        } else if (window.globalSpeechEngine) {
+            window.globalSpeechEngine.speak(text, onStart, onEnd);
+        } else {
+            window.globalSpeechEngine = new SpeechEngine();
+            window.globalSpeechEngine.speak(text, onStart, onEnd);
+        }
+    },
+    stop() {
+        if (window.UIManager && window.UIManager.speechEngine) {
+            window.UIManager.speechEngine.stop();
+        } else if (window.globalSpeechEngine) {
+            window.globalSpeechEngine.stop();
+        }
+    }
+};
 
 // ==========================================
 // 4. Parser Engine (Pasted Text / CSV / JSON)
@@ -5991,7 +6065,7 @@ class UIManager {
                             ${isHiddenRole ? '<span class="text-[10px] text-amber-400 font-bold font-mono">🎭 Your Turn to Speak</span>' : ''}
                         </div>
 
-                        <div class="p-4 rounded-3xl border ${bubbleBg} shadow-lg space-y-2">
+                        <div id="scenario-bubble-${idx}" class="p-4 rounded-3xl border ${bubbleBg} shadow-lg space-y-2 transition-all duration-300">
                             ${(isHiddenRole && !isRevealed) ? `
                                 <div class="py-2 px-1 text-center space-y-2">
                                     <p class="text-xs text-amber-300/90 font-medium">💬 Practice speaking this line in Cantonese!</p>
@@ -5999,7 +6073,7 @@ class UIManager {
                                         <button onclick="window.UIManager.revealScenarioLine(${idx})" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold transition-all">
                                             👁️ Reveal Line 顯示台詞
                                         </button>
-                                        <button onclick="AudioController.speak('${this.escapeQuotes(line.text)}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 rounded-xl border border-slate-700 transition-all text-xs" title="Listen Audio">
+                                        <button onclick="window.UIManager.playScenarioLine(${idx}, '${this.escapeQuotes(line.text)}')" id="btn-scenario-audio-${idx}" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 rounded-xl border border-slate-700 transition-all text-xs" title="Listen Audio">
                                             🔊
                                         </button>
                                     </div>
@@ -6010,7 +6084,7 @@ class UIManager {
                                         <p class="text-base sm:text-lg font-bold font-cantonese tracking-wide text-slate-100">
                                             ${this.escapeHTML(line.text)}
                                         </p>
-                                        <button onclick="AudioController.speak('${this.escapeQuotes(line.text)}')" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-sky-400 hover:text-white rounded-xl border border-slate-700 transition-all shrink-0" title="Play native audio">
+                                        <button onclick="window.UIManager.playScenarioLine(${idx}, '${this.escapeQuotes(line.text)}')" id="btn-scenario-audio-${idx}" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-sky-400 hover:text-white rounded-xl border border-slate-700 transition-all shrink-0" title="Play native audio">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
                                         </button>
                                     </div>
@@ -6034,14 +6108,125 @@ class UIManager {
         }).join('');
     }
 
+    playScenarioLine(idx, text) {
+        if (!text) return;
+        const btn = document.getElementById(`btn-scenario-audio-${idx}`);
+        const bubble = document.getElementById(`scenario-bubble-${idx}`);
+
+        if (btn) {
+            btn.classList.add('scale-110', 'text-emerald-400', 'bg-emerald-500/20', 'ring-2', 'ring-emerald-400/50');
+        }
+        if (bubble) {
+            bubble.classList.add('ring-2', 'ring-emerald-400', 'shadow-lg', 'shadow-emerald-500/10');
+        }
+
+        const cleanup = () => {
+            if (btn) {
+                btn.classList.remove('scale-110', 'text-emerald-400', 'bg-emerald-500/20', 'ring-2', 'ring-emerald-400/50');
+            }
+            if (bubble) {
+                bubble.classList.remove('ring-2', 'ring-emerald-400', 'shadow-lg', 'shadow-emerald-500/10');
+            }
+        };
+
+        if (this.speechEngine) {
+            this.speechEngine.speak(text, null, cleanup);
+        } else if (window.AudioController) {
+            window.AudioController.speak(text, null, cleanup);
+        }
+    }
+
     async playFullScenarioAudio() {
         if (!this.activeScenario || !this.activeScenario.dialogue) return;
-        this.showToast('Playing full dialogue stream...', 'info');
+        const btn = document.getElementById('btn-play-full-scenario');
+
+        // Toggle Stop if currently running
+        if (this.isPlayingScenarioStream) {
+            this.isPlayingScenarioStream = false;
+            if (this.speechEngine) this.speechEngine.stop();
+            if (window.AudioController) window.AudioController.stop();
+            if (btn) {
+                btn.innerHTML = '<span>▶️</span> Play Full Dialogue 播放全對話';
+                btn.className = 'px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-2';
+            }
+            this.showToast('Dialogue playback stopped 已停止播放', 'info');
+            return;
+        }
+
+        this.isPlayingScenarioStream = true;
+        if (btn) {
+            btn.innerHTML = '<span class="animate-pulse">⏹️</span> Stop Dialogue 停止播放';
+            btn.className = 'px-4 py-2.5 bg-rose-950/70 hover:bg-rose-900 text-rose-300 border border-rose-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-2 animate-pulse';
+        }
+
+        this.showToast('Playing full dialogue stream... 正在播放對話', 'info');
 
         const dialogue = this.activeScenario.dialogue;
-        for (let i = 0; i < dialogue.length; i++) {
-            AudioController.speak(dialogue[i].text);
-            await new Promise(r => setTimeout(r, 2600));
+        try {
+            for (let i = 0; i < dialogue.length; i++) {
+                if (!this.isPlayingScenarioStream) break;
+
+                const line = dialogue[i];
+                const bubble = document.getElementById(`scenario-bubble-${i}`);
+                const lineBtn = document.getElementById(`btn-scenario-audio-${i}`);
+
+                if (bubble) {
+                    bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    bubble.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-950/80');
+                }
+                if (lineBtn) {
+                    lineBtn.classList.add('scale-110', 'text-emerald-400', 'bg-emerald-500/20');
+                }
+
+                await new Promise((resolve) => {
+                    let done = false;
+                    const finish = () => {
+                        if (!done) {
+                            done = true;
+                            resolve();
+                        }
+                    };
+                    const watchdog = setTimeout(finish, 5000);
+
+                    if (this.speechEngine) {
+                        this.speechEngine.speak(line.text, null, () => {
+                            clearTimeout(watchdog);
+                            finish();
+                        });
+                    } else if (window.AudioController) {
+                        window.AudioController.speak(line.text, null, () => {
+                            clearTimeout(watchdog);
+                            finish();
+                        });
+                    } else {
+                        clearTimeout(watchdog);
+                        finish();
+                    }
+                });
+
+                if (bubble) {
+                    bubble.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/80');
+                }
+                if (lineBtn) {
+                    lineBtn.classList.remove('scale-110', 'text-emerald-400', 'bg-emerald-500/20');
+                }
+
+                if (this.isPlayingScenarioStream && i < dialogue.length - 1) {
+                    await new Promise(r => setTimeout(r, 450));
+                }
+            }
+        } finally {
+            this.isPlayingScenarioStream = false;
+            if (btn) {
+                btn.innerHTML = '<span>▶️</span> Play Full Dialogue 播放全對話';
+                btn.className = 'px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-2';
+            }
+            for (let i = 0; i < dialogue.length; i++) {
+                const bubble = document.getElementById(`scenario-bubble-${i}`);
+                if (bubble) bubble.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/80');
+                const lineBtn = document.getElementById(`btn-scenario-audio-${i}`);
+                if (lineBtn) lineBtn.classList.remove('scale-110', 'text-emerald-400', 'bg-emerald-500/20');
+            }
         }
     }
 

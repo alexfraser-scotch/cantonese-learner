@@ -1,8 +1,12 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 8080;
+const ttsAudioCache = new Map();
+const MAX_TTS_CACHE = 500;
+
 
 const DATA_DIR = path.join(__dirname, 'data');
 const PROFILES_FILE = path.join(DATA_DIR, 'profiles.json');
@@ -602,6 +606,66 @@ const server = http.createServer((req, res) => {
     if (pathName === '/health' || pathName === '/_health' || pathName === '/api/health') {
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));
+        return;
+    }
+
+    // ==========================================
+    // API ENDPOINT: CANTONESE TTS PROXY (/api/tts)
+    // ==========================================
+    if (pathName === '/api/tts' && req.method === 'GET') {
+        const queryParams = new URLSearchParams(urlParts[1] || '');
+        const text = (queryParams.get('text') || '').trim();
+        if (!text) {
+            res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({ error: 'Text query parameter is required' }));
+            return;
+        }
+
+        const cacheKey = text.slice(0, 200);
+        if (ttsAudioCache.has(cacheKey)) {
+            const cachedBuffer = ttsAudioCache.get(cacheKey);
+            res.writeHead(200, {
+                'Content-Type': 'audio/mpeg',
+                'Cache-Control': 'public, max-age=604800, immutable',
+                'Access-Control-Allow-Origin': '*'
+            });
+            res.end(cachedBuffer);
+            return;
+        }
+
+        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-HK&client=tw-ob&q=${encodeURIComponent(text)}`;
+        https.get(ttsUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': '*/*'
+            }
+        }, (ttsRes) => {
+            if (ttsRes.statusCode === 200) {
+                const chunks = [];
+                ttsRes.on('data', chunk => chunks.push(chunk));
+                ttsRes.on('end', () => {
+                    const buffer = Buffer.concat(chunks);
+                    if (ttsAudioCache.size >= MAX_TTS_CACHE) {
+                        const firstKey = ttsAudioCache.keys().next().value;
+                        ttsAudioCache.delete(firstKey);
+                    }
+                    ttsAudioCache.set(cacheKey, buffer);
+
+                    res.writeHead(200, {
+                        'Content-Type': 'audio/mpeg',
+                        'Cache-Control': 'public, max-age=604800, immutable',
+                        'Access-Control-Allow-Origin': '*'
+                    });
+                    res.end(buffer);
+                });
+            } else {
+                res.writeHead(ttsRes.statusCode || 502, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ error: 'Failed to fetch Cantonese TTS audio from upstream' }));
+            }
+        }).on('error', (err) => {
+            res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({ error: 'TTS network error: ' + err.message }));
+        });
         return;
     }
 

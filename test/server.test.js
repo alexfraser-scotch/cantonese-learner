@@ -744,6 +744,30 @@ test('Cantonese Sentence Builder & Grammar Scrambler Validation', (t) => {
     });
 });
 
+test('Cantonese TTS Audio Proxy API validation', async (t) => {
+    const http = require('http');
+    const port = (server.address() && server.address().port) || 8080;
+
+    // Test 1: Missing text query returns 400
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/tts`, (res) => {
+            assert.strictEqual(res.statusCode, 400, 'Empty text query should return 400 Bad Request');
+            resolve();
+        }).on('error', reject);
+    });
+
+    // Test 2: Valid text query returns audio stream
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/tts?text=%E4%BD%A0%E5%A5%BD`, (res) => {
+            assert.ok([200, 502].includes(res.statusCode), 'Should return 200 (audio stream) or 502 if upstream network isolated');
+            if (res.statusCode === 200) {
+                assert.strictEqual(res.headers['content-type'], 'audio/mpeg');
+            }
+            resolve();
+        }).on('error', reject);
+    });
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();
