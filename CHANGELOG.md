@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.6.0] - 2026-10-03 - Hands-Free Voice Dictation & Audio Stream Proxy Release
+
+### 🌟 Added
+- **🎙️ Dictation Hands-Free Voice Control (默書免提聲控助手):**
+  - Continuous speech recognition engine powered by Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`).
+  - Automatic **keep-alive watchdog** that reliably re-arms the recognition pipeline when browser silence timeouts trigger.
+  - Built-in **700ms debounce buffer** prevents audio loop self-triggering from TTS sound output.
+  - Fully bilingual voice command parsing:
+    - ⏩ **"Next" / "下一個" / "下一句"**: Advances to the next word and automatically triggers native audio playback.
+    - 🔁 **"Repeat" / "再聽" / "聽多次"**: Replays the current word's Cantonese pronunciation.
+    - 👁️ **"Flip" / "睇答案" / "答案"**: Flips the dictation card to inspect the word and Jyutping.
+    - ⏪ **"Back" / "上一個" / "上一個字"**: Returns to the previous word.
+  - Dedicated Hands-Free toggle button card (`#dictation-handsfree-btn`) and live recognized speech badge pill (`#dictation-voice-pill`).
+  - Automatic teardown and cleanup upon session completion or navigation away from Dictation view.
+
+- **📋 Dictation Session Result History & Re-inspection (默書結果歷史檢視):**
+  - Automatic `sessionStorage` persistence preserving the full outcome of the user's latest dictation session.
+  - Added **"📋 Review Last Dictation (查看上次默書清單)"** button in the Dictation launch view, enabling users to re-open the complete result table even if the summary modal was closed accidentally.
+
+- **🔊 High-Fidelity Cantonese TTS Audio Proxy API (`/api/tts`):**
+  - Server-side streaming endpoint proxying and caching high-quality Cantonese speech.
+  - In-memory audio buffer caching for ultra-low latency response times.
+  - Seamless client-side fallback between local Web Speech Synthesis and remote TTS proxy streams.
+
+---
+
 ## [v1.5.0] - 2026-09-30 - Scenario Dialogues & Sentence Builder Release
 
 ### 🌟 Added

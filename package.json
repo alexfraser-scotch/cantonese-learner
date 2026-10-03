@@ -1,6 +1,6 @@
 {
   "name": "cantonese-learner",
-  "version": "1.0.0",
+  "version": "1.6.0",
   "description": "Cantonese Vocabulary Learner SPA with Web Speech API audio and 3D flashcards",
   "main": "server.js",
   "scripts": {
