@@ -847,6 +847,74 @@ test('Dictation Session Result Persistence and Retrieval Engine', (t) => {
     assert.strictEqual(getSession().profileId, 'deck-2', 'Global last points to most recent deck-2');
 });
 
+test('Dictation Hands-Free Voice Command Matching Engine', (t) => {
+    function parseCommand(text) {
+        if (!text || typeof text !== 'string') return null;
+        const normalized = text.toLowerCase().trim();
+
+        // 1. Previous Word
+        if (
+            /\b(back|previous|return|prev)\b/i.test(normalized) ||
+            /(上一個|上一題|上一條|上邊|上一張)/.test(normalized)
+        ) {
+            return { action: 'previous', phrase: text.trim() };
+        }
+
+        // 2. Next Word
+        if (
+            /\b(next|next\s+word|forward|continue|nxt|necks|go\s+next)\b/i.test(normalized) ||
+            /(下一個|下一題|下一條|下邊|下一幅|下一句|下張|下一張)/.test(normalized)
+        ) {
+            return { action: 'next', phrase: text.trim() };
+        }
+
+        // 3. Repeat Audio
+        if (
+            /\b(repeat|again|replay|listen|hear|once\s+more)\b/i.test(normalized) ||
+            /(再聽|聽多次|重播|聽一次|讀多次|講多次|再讀)/.test(normalized)
+        ) {
+            return { action: 'repeat', phrase: text.trim() };
+        }
+
+        // 4. Flip / Check Answer
+        if (
+            /\b(flip|show|answer|check|reveal)\b/i.test(normalized) ||
+            /(睇答案|對答案|翻牌|睇下|睇下答案|答案)/.test(normalized)
+        ) {
+            return { action: 'flip', phrase: text.trim() };
+        }
+
+        return null;
+    }
+
+    // Next action tests
+    assert.strictEqual(parseCommand('next')?.action, 'next');
+    assert.strictEqual(parseCommand('please go to the next word')?.action, 'next');
+    assert.strictEqual(parseCommand('下一個')?.action, 'next');
+    assert.strictEqual(parseCommand('下一題唔該')?.action, 'next');
+
+    // Repeat action tests
+    assert.strictEqual(parseCommand('repeat')?.action, 'repeat');
+    assert.strictEqual(parseCommand('say it again')?.action, 'repeat');
+    assert.strictEqual(parseCommand('聽多次')?.action, 'repeat');
+    assert.strictEqual(parseCommand('唔該再聽一次')?.action, 'repeat');
+
+    // Flip action tests
+    assert.strictEqual(parseCommand('show me the answer')?.action, 'flip');
+    assert.strictEqual(parseCommand('睇答案')?.action, 'flip');
+    assert.strictEqual(parseCommand('翻牌')?.action, 'flip');
+
+    // Previous action tests
+    assert.strictEqual(parseCommand('go back')?.action, 'previous');
+    assert.strictEqual(parseCommand('上一個')?.action, 'previous');
+
+    // Irrelevant noise ignores cleanly
+    assert.strictEqual(parseCommand('hello there'), null);
+    assert.strictEqual(parseCommand('random speech test'), null);
+    assert.strictEqual(parseCommand(''), null);
+    assert.strictEqual(parseCommand(null), null);
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

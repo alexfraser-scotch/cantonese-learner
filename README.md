@@ -161,6 +161,7 @@ We welcome contributions from language learners, linguists, and software enginee
 - [x] High-Fidelity Cantonese TTS Audio Stream Proxy (`/api/tts` with in-memory cache & fallback)
 - [x] Interactive Real-World Scenario Dialogue Player with sequential audio stream and bubble highlighting
 - [x] Dictation Mode Result History & Re-inspection Engine (Persistent Session Storage)
+- [x] Hands-Free Voice Control Dictation Assistant (Continuous Web Speech API recognition for "Next" / "下一個")
 - [ ] Progressive Web App (PWA) offline service worker caching
 - [ ] AI-assisted example sentence & tone generation (OpenAI Codex API)
 

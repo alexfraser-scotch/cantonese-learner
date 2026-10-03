@@ -2287,11 +2287,163 @@ class VoiceRecorderEngine {
 }
 
 // ==========================================
+// 5.6 Hands-Free Voice Commander (SpeechRecognition API)
+// ==========================================
+class DictationVoiceCommander {
+    constructor(onCommandCallback = null, onStatusChangeCallback = null) {
+        this.recognition = null;
+        this.isListening = false;
+        this.shouldKeepListening = false;
+        this.onCommand = onCommandCallback;
+        this.onStatusChange = onStatusChangeCallback;
+        this.lastTriggerTime = 0;
+        this.debounceMs = 700;
+
+        const SpeechRec = typeof window !== 'undefined' ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
+        this.isSupported = !!SpeechRec;
+        this.SpeechRecClass = SpeechRec;
+    }
+
+    static parseCommand(text) {
+        if (!text || typeof text !== 'string') return null;
+        const normalized = text.toLowerCase().trim();
+
+        // 1. Previous Word (checked before next so "go back" isn't captured by "go")
+        if (
+            /\b(back|previous|return|prev)\b/i.test(normalized) ||
+            /(上一個|上一題|上一條|上邊|上一張)/.test(normalized)
+        ) {
+            return { action: 'previous', phrase: text.trim() };
+        }
+
+        // 2. Next Word
+        if (
+            /\b(next|next\s+word|forward|continue|nxt|necks|go\s+next)\b/i.test(normalized) ||
+            /(下一個|下一題|下一條|下邊|下一幅|下一句|下張|下一張)/.test(normalized)
+        ) {
+            return { action: 'next', phrase: text.trim() };
+        }
+
+        // 3. Repeat Audio
+        if (
+            /\b(repeat|again|replay|listen|hear|once\s+more)\b/i.test(normalized) ||
+            /(再聽|聽多次|重播|聽一次|讀多次|講多次|再讀)/.test(normalized)
+        ) {
+            return { action: 'repeat', phrase: text.trim() };
+        }
+
+        // 4. Flip / Check Answer
+        if (
+            /\b(flip|show|answer|check|reveal)\b/i.test(normalized) ||
+            /(睇答案|對答案|翻牌|睇下|睇下答案|答案)/.test(normalized)
+        ) {
+            return { action: 'flip', phrase: text.trim() };
+        }
+
+        return null;
+    }
+
+    start() {
+        if (!this.isSupported) {
+            console.warn('SpeechRecognition is not supported in this browser.');
+            return false;
+        }
+
+        this.shouldKeepListening = true;
+        this.initRecognition();
+        return true;
+    }
+
+    initRecognition() {
+        if (!this.SpeechRecClass || !this.shouldKeepListening) return;
+
+        try {
+            if (this.recognition) {
+                try { this.recognition.abort(); } catch (e) {}
+            }
+
+            const rec = new this.SpeechRecClass();
+            rec.continuous = true;
+            rec.interimResults = false;
+            rec.maxAlternatives = 3;
+
+            rec.onstart = () => {
+                this.isListening = true;
+                if (this.onStatusChange) this.onStatusChange('listening');
+            };
+
+            rec.onresult = (event) => {
+                const now = Date.now();
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const res = event.results[i];
+                    if (res && res[0]) {
+                        const transcript = res[0].transcript || '';
+                        const parsed = DictationVoiceCommander.parseCommand(transcript);
+
+                        if (parsed && (now - this.lastTriggerTime > this.debounceMs)) {
+                            this.lastTriggerTime = now;
+                            if (this.onCommand) {
+                                this.onCommand(parsed.action, parsed.phrase);
+                            }
+                            break;
+                        }
+                    }
+                }
+            };
+
+            rec.onerror = (event) => {
+                console.warn('SpeechRecognition error:', event.error);
+                if (event.error === 'not-allowed') {
+                    this.shouldKeepListening = false;
+                    this.isListening = false;
+                    if (this.onStatusChange) this.onStatusChange('permission_denied');
+                }
+            };
+
+            rec.onend = () => {
+                this.isListening = false;
+                if (this.shouldKeepListening) {
+                    setTimeout(() => {
+                        if (this.shouldKeepListening) {
+                            try { rec.start(); } catch (e) {
+                                this.initRecognition();
+                            }
+                        }
+                    }, 250);
+                } else {
+                    if (this.onStatusChange) this.onStatusChange('stopped');
+                }
+            };
+
+            this.recognition = rec;
+            rec.start();
+        } catch (err) {
+            console.warn('Failed to start SpeechRecognition:', err);
+            this.isListening = false;
+            if (this.onStatusChange) this.onStatusChange('error');
+        }
+    }
+
+    stop() {
+        this.shouldKeepListening = false;
+        this.isListening = false;
+        if (this.recognition) {
+            try {
+                this.recognition.stop();
+            } catch (e) {}
+            this.recognition = null;
+        }
+        if (this.onStatusChange) this.onStatusChange('stopped');
+    }
+}
+
+// ==========================================
 // 6. UI Manager (SPA Views & Component Controller)
 // ==========================================
 class UIManager {
     constructor() {
         this.speechEngine = new SpeechEngine();
+        this.dictationVoiceCommander = null;
         this.currentView = 'dashboard';
         this.activeProfile = null;
         this.activeWordIndex = 0;
@@ -2718,9 +2870,12 @@ class UIManager {
         if (this.viewAdminPortal) this.viewAdminPortal.classList.add('hidden');
         if (this.viewPrintSheet) this.viewPrintSheet.classList.add('hidden');
 
-        // Stop dictation auto-play if leaving dictation view
-        if (targetView !== 'dictation-mode' && this.dictationState && this.dictationState.isAutoPlaying) {
-            this.stopDictationAutoPlay();
+        // Stop dictation auto-play and hands-free voice if leaving dictation view
+        if (targetView !== 'dictation-mode') {
+            if (this.dictationState && this.dictationState.isAutoPlaying) {
+                this.stopDictationAutoPlay();
+            }
+            this.stopDictationHandsFree();
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4311,6 +4466,7 @@ class UIManager {
         if (this.dictationState.isFinished) {
             this.stopDictationAutoPlay();
             this.stopDictationStopwatch();
+            this.stopDictationHandsFree();
             cardContainer.classList.add('hidden');
             summaryContainer.classList.remove('hidden');
 
@@ -4727,9 +4883,135 @@ class UIManager {
         if (statusElem) statusElem.textContent = 'Play audio every 3s within duration';
     }
 
+    toggleDictationHandsFree() {
+        if (!this.dictationVoiceCommander) {
+            this.dictationVoiceCommander = new DictationVoiceCommander(
+                (action, phrase) => this.handleDictationVoiceCommand(action, phrase),
+                (status) => this.handleDictationVoiceStatusChange(status)
+            );
+        }
+
+        if (!this.dictationVoiceCommander.isSupported) {
+            this.showToast('Voice control requires Chrome, Edge, or Safari with Web Speech recognition support.', 'warning');
+            return;
+        }
+
+        if (this.dictationVoiceCommander.isListening || this.dictationVoiceCommander.shouldKeepListening) {
+            this.stopDictationHandsFree();
+            this.showToast('Hands-Free mode turned OFF 🎙️', 'info');
+        } else {
+            this.startDictationHandsFree();
+            this.showToast('Hands-Free listening active! Say "Next" or "下一個" 🗣️', 'success');
+        }
+    }
+
+    startDictationHandsFree() {
+        if (!this.dictationVoiceCommander) {
+            this.dictationVoiceCommander = new DictationVoiceCommander(
+                (action, phrase) => this.handleDictationVoiceCommand(action, phrase),
+                (status) => this.handleDictationVoiceStatusChange(status)
+            );
+        }
+        this.dictationVoiceCommander.start();
+        this.updateDictationHandsFreeUI(true);
+    }
+
+    stopDictationHandsFree() {
+        if (this.dictationVoiceCommander) {
+            this.dictationVoiceCommander.stop();
+        }
+        this.updateDictationHandsFreeUI(false);
+    }
+
+    handleDictationVoiceStatusChange(status) {
+        if (status === 'listening') {
+            this.updateDictationHandsFreeUI(true);
+        } else if (status === 'stopped') {
+            this.updateDictationHandsFreeUI(false);
+        } else if (status === 'permission_denied') {
+            this.updateDictationHandsFreeUI(false);
+            this.showToast('Microphone access was denied. Please allow microphone permissions in your browser.', 'error');
+        }
+    }
+
+    updateDictationHandsFreeUI(isActive) {
+        const iconWrap = document.getElementById('dictation-handsfree-icon-wrap');
+        const activeTag = document.getElementById('dictation-handsfree-active-tag');
+        const statusElem = document.getElementById('dictation-handsfree-status');
+        const btnIcon = document.getElementById('dictation-handsfree-btn-icon');
+        const btnText = document.getElementById('dictation-handsfree-btn-text');
+        const btn = document.getElementById('btn-dictation-toggle-handsfree');
+
+        if (isActive) {
+            if (iconWrap) {
+                iconWrap.className = 'p-2 bg-emerald-500/20 text-emerald-400 rounded-xl text-base ring-2 ring-emerald-500/50 animate-pulse';
+            }
+            if (activeTag) {
+                activeTag.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse';
+                activeTag.textContent = 'LISTENING 🎙️';
+            }
+            if (statusElem) {
+                statusElem.textContent = 'Speak "Next" / "下一個" to advance, "Repeat" / "再聽" to replay';
+            }
+            if (btnIcon) btnIcon.textContent = '🔴';
+            if (btnText) btnText.textContent = 'Pause Hands-Free';
+            if (btn) {
+                btn.className = 'px-3.5 py-1.5 bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-300 border border-emerald-500/50 font-bold text-xs rounded-xl shadow-md shadow-emerald-500/10 transition-all flex items-center gap-1.5 ring-1 ring-emerald-500/30 whitespace-nowrap';
+            }
+        } else {
+            if (iconWrap) {
+                iconWrap.className = 'p-2 bg-purple-500/10 text-purple-400 rounded-xl text-base transition-all';
+            }
+            if (activeTag) {
+                activeTag.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+                activeTag.textContent = 'OFF';
+            }
+            if (statusElem) {
+                statusElem.textContent = 'Say "next" or "下一個" to advance words';
+            }
+            if (btnIcon) btnIcon.textContent = '🎙️';
+            if (btnText) btnText.textContent = 'Enable Hands-Free 免提';
+            if (btn) {
+                btn.className = 'px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 whitespace-nowrap';
+            }
+        }
+    }
+
+    handleDictationVoiceCommand(action, phrase) {
+        if (!this.viewDictationMode || this.viewDictationMode.classList.contains('hidden')) return;
+        if (this.dictationState && this.dictationState.isFinished) return;
+
+        const pill = document.getElementById('dictation-voice-pill');
+        if (pill) {
+            let label = `🗣️ Heard: "${phrase}"`;
+            if (action === 'next') label += ' → Next Word ⏩';
+            else if (action === 'repeat') label += ' → Replaying 🔁';
+            else if (action === 'flip') label += ' → Flip Card 👁️';
+            else if (action === 'previous') label += ' → Prev Word ⏪';
+
+            pill.textContent = label;
+            pill.classList.remove('hidden');
+            clearTimeout(this._voicePillTimer);
+            this._voicePillTimer = setTimeout(() => {
+                if (pill) pill.classList.add('hidden');
+            }, 1800);
+        }
+
+        if (action === 'next') {
+            this.navigateDictation(1);
+        } else if (action === 'repeat') {
+            this.playDictationCurrentWord();
+        } else if (action === 'flip') {
+            this.toggleDictationFlip();
+        } else if (action === 'previous') {
+            this.navigateDictation(-1);
+        }
+    }
+
     exitDictationMode() {
         this.stopDictationAutoPlay();
         this.stopDictationStopwatch();
+        this.stopDictationHandsFree();
         this.switchView('profile-detail', { profileId: this.activeProfile ? this.activeProfile.id : null });
     }
 

@@ -603,26 +603,52 @@
                 </span>
             </div>
 
-            <!-- Auto-play Settings & Status Banner -->
-            <div class="glass-card rounded-2xl p-4 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2.5">
-                    <span class="p-2 bg-purple-500/10 text-purple-400 rounded-xl text-base">⏱️</span>
-                    <div>
-                        <span class="text-xs font-bold text-slate-200 block">Auto Play Settings / 自動播放</span>
-                        <span id="dictation-autoplay-status" class="text-[11px] text-slate-400">Play audio every 3s within duration</span>
+            <!-- Hands-Free Voice Control & Auto-Play Controls Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Card 1: Hands-Free Voice Controller -->
+                <div class="glass-card rounded-2xl p-4 border border-slate-800 flex flex-col justify-between gap-3 shadow-lg">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <span id="dictation-handsfree-icon-wrap" class="p-2 bg-purple-500/10 text-purple-400 rounded-xl text-base transition-all">🎙️</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-200">Hands-Free Control / 免提語音</span>
+                                    <span id="dictation-handsfree-active-tag" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">OFF</span>
+                                </div>
+                                <span id="dictation-handsfree-status" class="text-[11px] text-slate-400">Say "next" or "下一個" to advance</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+                        <span id="dictation-voice-pill" class="text-[11px] font-semibold px-2.5 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 rounded-xl hidden transition-all"></span>
+                        <button id="btn-dictation-toggle-handsfree" onclick="window.UIManager.toggleDictationHandsFree()" class="ml-auto px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 whitespace-nowrap">
+                            <span id="dictation-handsfree-btn-icon">🎙️</span>
+                            <span id="dictation-handsfree-btn-text">Enable Hands-Free 免提</span>
+                        </button>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <select id="dictation-autoplay-duration" onchange="window.UIManager.setDictationAutoPlayDuration(this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500">
-                        <option value="10">10s (Play ~3 times)</option>
-                        <option value="15">15s (Play ~5 times)</option>
-                        <option value="20">20s (Play ~6 times)</option>
-                        <option value="30">30s (Play ~10 times)</option>
-                    </select>
-                    <button id="btn-dictation-toggle-autoplay" onclick="window.UIManager.toggleDictationAutoPlay()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5">
-                        <span id="dictation-autoplay-btn-icon">▶️</span>
-                        <span id="dictation-autoplay-btn-text">Start Auto Play</span>
-                    </button>
+
+                <!-- Card 2: Auto-play Settings & Status Banner -->
+                <div class="glass-card rounded-2xl p-4 border border-slate-800 flex flex-col justify-between gap-3 shadow-lg">
+                    <div class="flex items-center gap-2.5">
+                        <span class="p-2 bg-purple-500/10 text-purple-400 rounded-xl text-base">⏱️</span>
+                        <div>
+                            <span class="text-xs font-bold text-slate-200 block">Auto Play / 自動循環播放</span>
+                            <span id="dictation-autoplay-status" class="text-[11px] text-slate-400">Play audio every 3s within duration</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 pt-1 border-t border-slate-800/60">
+                        <select id="dictation-autoplay-duration" onchange="window.UIManager.setDictationAutoPlayDuration(this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500">
+                            <option value="10">10s (~3x)</option>
+                            <option value="15">15s (~5x)</option>
+                            <option value="20">20s (~6x)</option>
+                            <option value="30">30s (~10x)</option>
+                        </select>
+                        <button id="btn-dictation-toggle-autoplay" onclick="window.UIManager.toggleDictationAutoPlay()" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 whitespace-nowrap">
+                            <span id="dictation-autoplay-btn-icon">▶️</span>
+                            <span id="dictation-autoplay-btn-text">Start Auto Play</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2016,6 +2042,6 @@
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- App JavaScript File -->
-    <script src="app.js?v=43_dictation_result_history"></script>
+    <script src="app.js?v=44_hands_free_dictation"></script>
 </body>
 </html>
