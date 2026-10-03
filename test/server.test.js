@@ -768,6 +768,85 @@ test('Cantonese TTS Audio Proxy API validation', async (t) => {
     });
 });
 
+test('Dictation Session Result Persistence and Retrieval Engine', (t) => {
+    const mockStorage = new Map();
+    const fakeLocalStorage = {
+        getItem: (k) => mockStorage.get(k) || null,
+        setItem: (k, v) => mockStorage.set(k, String(v)),
+        removeItem: (k) => mockStorage.delete(k)
+    };
+
+    const DICTATION_HISTORY_KEY = 'cantonese_dictation_history_v1';
+
+    function saveSession(session) {
+        if (!session || !Array.isArray(session.items) || session.items.length === 0) return;
+        const raw = fakeLocalStorage.getItem(DICTATION_HISTORY_KEY);
+        let history = {};
+        if (raw) {
+            try { history = JSON.parse(raw); } catch (e) {}
+        }
+        const profileKey = session.profileId || 'global';
+        history[profileKey] = session;
+        history['_last_global'] = session;
+        fakeLocalStorage.setItem(DICTATION_HISTORY_KEY, JSON.stringify(history));
+    }
+
+    function getSession(profileId = null) {
+        const raw = fakeLocalStorage.getItem(DICTATION_HISTORY_KEY);
+        if (!raw) return null;
+        const history = JSON.parse(raw);
+        if (profileId && history[profileId]) {
+            return history[profileId];
+        }
+        return history['_last_global'] || null;
+    }
+
+    // 1. Initial lookup is empty
+    assert.strictEqual(getSession('deck-1'), null);
+
+    // 2. Save session for deck-1
+    const mockSessionDeck1 = {
+        profileId: 'deck-1',
+        profileName: 'Dining & Food',
+        items: [
+            { id: 'w-1', word: '蛋撻', jyutping: 'daan6 taat3', meaning: 'Egg Tart' },
+            { id: 'w-2', word: '凍檸茶', jyutping: 'dung3 ning4 caa4', meaning: 'Iced Lemon Tea' }
+        ],
+        elapsedSeconds: 23,
+        filterScope: 'all',
+        completedAt: new Date().toISOString()
+    };
+    saveSession(mockSessionDeck1);
+
+    // 3. Retrieve deck-1 session and verify
+    const retrieved1 = getSession('deck-1');
+    assert.ok(retrieved1, 'Should retrieve deck-1 session');
+    assert.strictEqual(retrieved1.items.length, 2);
+    assert.strictEqual(retrieved1.elapsedSeconds, 23);
+    assert.strictEqual(retrieved1.items[0].word, '蛋撻');
+
+    // 4. Global fallback returns latest session
+    const globalRetrieved = getSession();
+    assert.ok(globalRetrieved);
+    assert.strictEqual(globalRetrieved.profileId, 'deck-1');
+
+    // 5. Save second session for deck-2
+    const mockSessionDeck2 = {
+        profileId: 'deck-2',
+        profileName: 'Greetings',
+        items: [{ id: 'w-3', word: '早晨', jyutping: 'zou2 san4', meaning: 'Good morning' }],
+        elapsedSeconds: 12,
+        filterScope: 'learning',
+        completedAt: new Date().toISOString()
+    };
+    saveSession(mockSessionDeck2);
+
+    // Deck-1 retains its own session; Deck-2 retrieves its session
+    assert.strictEqual(getSession('deck-1').items.length, 2);
+    assert.strictEqual(getSession('deck-2').items.length, 1);
+    assert.strictEqual(getSession().profileId, 'deck-2', 'Global last points to most recent deck-2');
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

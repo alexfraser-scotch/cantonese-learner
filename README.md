@@ -160,6 +160,7 @@ We welcome contributions from language learners, linguists, and software enginee
 - [x] Security Policy (`SECURITY.md`) and Code of Conduct (`CODE_OF_CONDUCT.md`)
 - [x] High-Fidelity Cantonese TTS Audio Stream Proxy (`/api/tts` with in-memory cache & fallback)
 - [x] Interactive Real-World Scenario Dialogue Player with sequential audio stream and bubble highlighting
+- [x] Dictation Mode Result History & Re-inspection Engine (Persistent Session Storage)
 - [ ] Progressive Web App (PWA) offline service worker caching
 - [ ] AI-assisted example sentence & tone generation (OpenAI Codex API)
 

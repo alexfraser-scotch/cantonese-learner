@@ -1297,6 +1297,7 @@ class StorageManager {
     static STORAGE_KEY = 'cantonese_learner_profiles_v1';
     static SETTINGS_KEY = 'cantonese_learner_settings_v1';
     static USER_PROGRESS_KEY = 'cantonese_user_progress_v1';
+    static DICTATION_HISTORY_KEY = 'cantonese_dictation_history_v1';
     static API_URL = '/api/profiles';
     static PROGRESS_API_URL = '/api/user/progress';
     static cachedProfiles = null;
@@ -1561,6 +1562,45 @@ class StorageManager {
         }
 
         return candidates;
+    }
+
+    static saveLastDictationSession(session) {
+        if (!session || !Array.isArray(session.items) || session.items.length === 0) return;
+        try {
+            const historyRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.DICTATION_HISTORY_KEY) : null;
+            let history = {};
+            if (historyRaw) {
+                try { history = JSON.parse(historyRaw); } catch (e) {}
+            }
+            if (!history || typeof history !== 'object') history = {};
+
+            const profileKey = session.profileId || 'global';
+            history[profileKey] = session;
+            history['_last_global'] = session;
+
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(this.DICTATION_HISTORY_KEY, JSON.stringify(history));
+            }
+        } catch (e) {
+            console.warn('Failed to save dictation session to storage:', e);
+        }
+    }
+
+    static getLastDictationSession(profileId = null) {
+        try {
+            const historyRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.DICTATION_HISTORY_KEY) : null;
+            if (!historyRaw) return null;
+            const history = JSON.parse(historyRaw);
+            if (!history || typeof history !== 'object') return null;
+
+            if (profileId && history[profileId]) {
+                return history[profileId];
+            }
+            return history['_last_global'] || null;
+        } catch (e) {
+            console.warn('Failed to read dictation session from storage:', e);
+            return null;
+        }
     }
 
     static formatForSupabase(p) {
@@ -2728,7 +2768,10 @@ class UIManager {
             }
         } else if (targetView === 'dictation-mode') {
             this.activeProfile = StorageManager.getProfileById(params.profileId) || this.activeProfile;
-            if (this.activeProfile && this.activeProfile.items.length > 0) {
+            if (params.viewResult && this.dictationState && this.dictationState.isFinished) {
+                this.renderDictationCard();
+                if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
+            } else if (this.activeProfile && this.activeProfile.items.length > 0) {
                 this.initDictationMode(params.scope || this.dictationState.filterScope || 'all');
                 if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
             } else {
@@ -2960,6 +3003,7 @@ class UIManager {
             };
         });
 
+        this.updateDictationButtonsVisibility();
         this.renderFilteredFlashcards();
     }
 
@@ -4057,6 +4101,8 @@ class UIManager {
         this.setDictationScopeBtnState('btn-dictation-scope-mastered', masteredCount);
         this.setDictationScopeBtnState('btn-dictation-scope-favorites', favCount);
 
+        this.updateDictationButtonsVisibility();
+
         const modal = document.getElementById('modal-dictation-setup');
         if (modal) modal.classList.remove('hidden');
     }
@@ -4078,6 +4124,85 @@ class UIManager {
     closeDictationSetupModal() {
         const modal = document.getElementById('modal-dictation-setup');
         if (modal) modal.classList.add('hidden');
+    }
+
+    viewLastDictationResult(profileId = null) {
+        const targetProfileId = profileId || (this.activeProfile ? this.activeProfile.id : null);
+        const session = StorageManager.getLastDictationSession(targetProfileId);
+
+        if (!session || !Array.isArray(session.items) || session.items.length === 0) {
+            this.showToast('No saved dictation results found for this deck yet. 📝', 'info');
+            return;
+        }
+
+        this.closeDictationSetupModal();
+
+        // Restore active profile if needed
+        if (session.profileId && (!this.activeProfile || this.activeProfile.id !== session.profileId)) {
+            const foundProfile = StorageManager.getProfileById(session.profileId);
+            if (foundProfile) {
+                this.activeProfile = foundProfile;
+            }
+        }
+
+        this.stopDictationAutoPlay();
+        this.stopDictationStopwatch();
+
+        this.dictationState.items = session.items;
+        this.dictationState.currentIndex = session.items.length - 1;
+        this.dictationState.elapsedSeconds = session.elapsedSeconds || 0;
+        this.dictationState.filterScope = session.filterScope || 'all';
+        this.dictationState.isFinished = true;
+        this.dictationState.isRevealed = false;
+        this.dictationState.completedAt = session.completedAt || new Date().toISOString();
+
+        this.switchView('dictation-mode', { profileId: this.activeProfile ? this.activeProfile.id : null, viewResult: true });
+        this.renderDictationCard();
+
+        this.showToast(`Restored last dictation result (${session.items.length} words)! 📜`, 'success');
+    }
+
+    updateDictationButtonsVisibility() {
+        const profileId = this.activeProfile ? this.activeProfile.id : null;
+        const lastSession = StorageManager.getLastDictationSession(profileId);
+        const hasSession = !!(lastSession && Array.isArray(lastSession.items) && lastSession.items.length > 0);
+
+        // 1. Profile Detail View button
+        const btnProfileLast = document.getElementById('btn-profile-last-dictation');
+        if (btnProfileLast) {
+            if (hasSession) {
+                btnProfileLast.classList.remove('hidden');
+                btnProfileLast.onclick = () => this.viewLastDictationResult(profileId);
+            } else {
+                btnProfileLast.classList.add('hidden');
+            }
+        }
+
+        // 2. Dictation Setup Modal banner
+        const setupBox = document.getElementById('dictation-setup-last-result-box');
+        const setupDesc = document.getElementById('dictation-setup-last-result-desc');
+        if (setupBox) {
+            if (hasSession) {
+                setupBox.classList.remove('hidden');
+                if (setupDesc) {
+                    const elapsed = this.formatStopwatchTime(lastSession.elapsedSeconds || 0);
+                    setupDesc.textContent = `Previous session: ${lastSession.items.length} words • Total time: ${elapsed}`;
+                }
+            } else {
+                setupBox.classList.add('hidden');
+            }
+        }
+
+        // 3. Dictation View Header button
+        const btnDictationResult = document.getElementById('btn-dictation-view-result');
+        if (btnDictationResult) {
+            if (hasSession) {
+                btnDictationResult.classList.remove('hidden');
+                btnDictationResult.onclick = () => this.viewLastDictationResult(profileId);
+            } else {
+                btnDictationResult.classList.add('hidden');
+            }
+        }
     }
 
     confirmStartDictation(scope = 'all') {
@@ -4202,6 +4327,32 @@ class UIManager {
             const summaryTime = document.getElementById('dictation-summary-time');
             if (summaryTime) {
                 summaryTime.textContent = this.formatStopwatchTime(this.dictationState.elapsedSeconds);
+            }
+
+            // Auto-persist completed session to storage
+            const sessionPayload = {
+                profileId: this.activeProfile ? this.activeProfile.id : null,
+                profileName: this.activeProfile ? this.activeProfile.name : 'Deck',
+                items: this.dictationState.items,
+                elapsedSeconds: this.dictationState.elapsedSeconds,
+                filterScope: this.dictationState.filterScope,
+                completedAt: this.dictationState.completedAt || new Date().toISOString()
+            };
+            this.dictationState.completedAt = sessionPayload.completedAt;
+            StorageManager.saveLastDictationSession(sessionPayload);
+            this.updateDictationButtonsVisibility();
+
+            // Display completion date badge if available
+            const dateBadge = document.getElementById('dictation-summary-date-badge');
+            const dateElem = document.getElementById('dictation-summary-date');
+            if (dateBadge && dateElem) {
+                dateBadge.classList.remove('hidden');
+                try {
+                    const d = new Date(sessionPayload.completedAt);
+                    dateElem.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    dateElem.textContent = 'Completed Session';
+                }
             }
 
             // Render complete word list in one page
