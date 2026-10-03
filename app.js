@@ -5698,6 +5698,132 @@ class UIManager {
                     { speaker: 'B', text: '有普洱、香片、鐵觀音同菊普。', jyutping: 'jau5 pou2 nei2, hoeng1 pin2, tit3 gun1 jam1 tung4 guk1 pou2.', translation: "We have Pu'er, Jasmine, Tieguanyin, and Chrysanthemum Pu'er." },
                     { speaker: 'A', text: '要一壺香片，再開兩位茶位，唔該！', jyutping: 'jiu3 jat1 wu4 hoeng1 pin2, zoi3 hoi1 loeng5 wai2 caa4 wai2, m4 goi1!', translation: 'A pot of Jasmine tea, and 2 tea covers please!' }
                 ]
+            },
+            {
+                id: 'sc-mtr-directions',
+                title: '搭港鐵與問路 Taking the MTR & Directions',
+                titleEn: 'Navigating the Hong Kong Subway & Station Exits',
+                category: 'Transport',
+                difficulty: 'Beginner',
+                emoji: '🚇',
+                description: 'Ask for platform directions, interchange lines (轉綫), reload Octopus card (八達通增值), and find the right station exit.',
+                speakers: {
+                    A: { name: 'Commuter 乘客', avatar: '🎒' },
+                    B: { name: 'Station Staff 站務員', avatar: '👮' }
+                },
+                keywords: [
+                    { word: '八達通', jyutping: 'baat3 daat6 tung1', meaning_zh: '八達通 / 智能儲值卡', meaning: 'Octopus card (HK transit card)', example: '唔該幫我張八達通增值一百蚊。', example_meaning: 'Please top up 100 dollars on my Octopus card.', image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80' },
+                    { word: '轉綫', jyutping: 'zyun3 sin3', meaning_zh: '轉綫 / 換乘地鐵綫', meaning: 'Transfer / interchange train lines', example: '喺金鐘站轉港島綫好方便。', example_meaning: 'Transferring to the Island Line at Admiralty is very convenient.', image: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80' },
+                    { word: '出口', jyutping: 'ceot1 hau2', meaning_zh: '出口 / 車站出口', meaning: 'Station exit', example: '請問朗豪坊由邊個出口出？', example_meaning: 'Which exit should I take for Langham Place?', image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '唔該請問，去銅鑼灣應該喺邊個月台搭車？', jyutping: 'm4 goi1 cing2 man6, heoi3 tung4 lo4 waan1 jing1 goi1 hai2 bin1 go3 jyut6 toi4 daap3 ce1?', translation: 'Excuse me, which platform should I take to go to Causeway Bay?' },
+                    { speaker: 'B', text: '你搭荃灣綫去到金鐘站，行過對面月台轉港島綫就得喇。', jyutping: 'nei5 daap3 cyun4 waan1 sin3 heoi3 dou3 gam1 zung1 zaam6, haang4 gwo3 deoi3 min6 jyut6 toi4 zyun3 gong2 dou2 sin3 zau6 dak1 laa3.', translation: 'Take the Tsuen Wan Line to Admiralty station, then walk to the opposite platform to interchange to the Island Line.' },
+                    { speaker: 'A', text: '明白！另外請問八達通客服中心喺邊度？我想增值。', jyutping: 'ming4 baak6! ling6 ngoi6 cing2 man6 baat3 daat6 tung1 haak3 fuk6 zung1 sam1 hai2 bin1 dou6? ngo5 soeng2 zang1 zik6.', translation: 'Understood! Also, where is the Customer Service Centre? I would like to top up my Octopus card.' },
+                    { speaker: 'B', text: '直行到閘機旁邊就見到客服中心，或者用自動增值機都得。', jyutping: 'zik6 haang4 dou3 zaap6 gei1 pong4 bin1 zau6 gin3 dou2 haak3 fuk6 zung1 sam1, waak6 ze2 jung6 zi6 dung6 zang1 zik6 gei1 dou1 dak1.', translation: 'Walk straight past the turnstiles to see the service desk, or you can use the automatic top-up machine.' },
+                    { speaker: 'A', text: '好清晰，唔該曬你！', jyutping: 'hou2 cing1 sik1, m4 goi1 saai3 nei5!', translation: 'Very clear, thank you so much!' }
+                ]
+            },
+            {
+                id: 'sc-bubble-tea',
+                title: '茶飲店叫凍檸茶 / 珍珠奶茶 Ordering Bubble Tea',
+                titleEn: 'Customizing Sweetness & Ice Levels at Modern HK Drink Shops',
+                category: 'Dining',
+                difficulty: 'Beginner',
+                emoji: '🧋',
+                description: 'Customize sweetness (微糖/少甜), ice levels (去冰/少冰), and add toppings like pearls (珍珠) and coconut jelly (椰果).',
+                speakers: {
+                    A: { name: 'Customer 顧客', avatar: '🥤' },
+                    B: { name: 'Cashier 店員', avatar: '🧑‍🍳' }
+                },
+                keywords: [
+                    { word: '微糖', jyutping: 'mei4 tong4', meaning_zh: '微糖 / 三分甜', meaning: 'Quarter sweet / 30% sugar', example: '我要一杯黑糖珍奶，微糖。', example_meaning: 'I want a brown sugar pearl milk tea, quarter sugar.', image: 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=600&q=80' },
+                    { word: '走冰', jyutping: 'zau2 bing1', meaning_zh: '走冰 / 不加冰塊', meaning: 'No ice', example: '天氣凍，杯凍檸茶幫我走冰。', example_meaning: "It's cold today, make my iced lemon tea with no ice.", image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80' },
+                    { word: '珍珠', jyutping: 'zan1 zyu1', meaning_zh: '珍珠 / 波霸粉圓', meaning: 'Tapioca pearls (boba)', example: '加五蚊加珍珠。', example_meaning: 'Add 5 dollars for extra pearls.', image: 'https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '你好！我想叫一杯黑糖珍珠鮮奶，再要一杯港式凍檸茶。', jyutping: 'nei5 hou2! ngo5 soeng2 giu3 jat1 bui1 hak1 tong4 zan1 zyu1 sin1 naai5, zoi3 jiu3 jat1 bui1 gong2 sik1 dung3 ning4 caa4.', translation: 'Hello! I would like a brown sugar pearl fresh milk, and a Hong Kong iced lemon tea.' },
+                    { speaker: 'B', text: '好，甜度同冰量想點樣較？', jyutping: 'hou2, tim4 dou6 tung4 bing1 loeng6 soeng2 dim2 joeng2 gaau3?', translation: 'Sure, how would you like the sweetness and ice levels adjusted?' },
+                    { speaker: 'A', text: '珍珠鮮奶微糖少冰，凍檸茶半糖去冰，唔該。', jyutping: 'zan1 zyu1 sin1 naai5 mei4 tong4 siu2 bing1, dung3 ning4 caa4 bun3 tong4 heoi3 bing1, m4 goi1.', translation: 'Pearl fresh milk quarter sugar less ice, iced lemon tea half sugar no ice, please.' },
+                    { speaker: 'B', text: '冇問題，總共四十八蚊，請問八達通定現金比錢？', jyutping: 'mou5 man6 tai4, zung2 gung6 sei3 sap6 baat3 man1, cing2 man6 baat3 daat6 tung1 ding6 jin6 gam1 bei2 cin2?', translation: 'No problem, total is 48 dollars. Would you like to pay with Octopus or cash?' },
+                    { speaker: 'A', text: '嘟八達通，唔該！', jyutping: 'dut1 baat3 daat6 tung1, m4 goi1!', translation: 'Beep Octopus please!' }
+                ]
+            },
+            {
+                id: 'sc-job-interview',
+                title: '求職面試與職場交流 Job Interview & Workplace Greeting',
+                titleEn: 'Professional Cantonese Workplace Etiquette & Introductions',
+                category: 'Workplace',
+                difficulty: 'Advanced',
+                emoji: '💼',
+                description: 'Practice introducing past career experience, greeting hiring managers, discussing deadlines, and Hong Kong business terminology.',
+                speakers: {
+                    A: { name: 'Interviewer 面試官', avatar: '👩‍💼' },
+                    B: { name: 'Candidate 應徵者', avatar: '👨‍💼' }
+                },
+                keywords: [
+                    { word: '跟進', jyutping: 'gan1 zeon3', meaning_zh: '跟進 / 跟進項目進度', meaning: 'Follow up (office project/task)', example: '呢個項目由我親自跟進。', example_meaning: 'I will personally follow up on this project.', image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' },
+                    { word: '經驗', jyutping: 'ging1 jim6', meaning_zh: '經驗 / 工作資歷', meaning: 'Work experience', example: '我有五年數碼營銷嘅經驗。', example_meaning: 'I have 5 years of digital marketing experience.', image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80' },
+                    { word: '開會', jyutping: 'hoi1 wui2', meaning_zh: '開會 / 召開會議', meaning: 'Hold a meeting', example: '我哋聽朝十點開團隊會議。', example_meaning: "We will hold a team meeting tomorrow morning at 10 o'clock.", image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '陳先生早晨，請坐。請你先簡單介紹一下你自己嘅工作背景。', jyutping: 'can4 sin1 saang1 zou2 san4, cing2 co5. cing2 nei5 sin1 gaan2 daan1 gaai3 siu6 jat1 haa5 nei5 zi6 gei2 ge3 gung1 zok3 bui3 ging2.', translation: 'Good morning Mr. Chan, please have a seat. Please briefly introduce your professional background.' },
+                    { speaker: 'B', text: '面試官早晨，我喺科技行業有三年項目管理經驗，主要負責團隊協作同跟進客務。', jyutping: 'min6 si3 gun1 zou2 san4, ngo5 hai2 fo1 gei6 hong4 jip6 jau5 saam1 nin4 hong6 muk6 gun2 lei5 ging1 jim6, zyu2 jiu3 fu6 zaak3 tyun4 deoi2 hip3 zok3 tung4 gan1 zeon3 haak3 mou6.', translation: 'Good morning, I have 3 years of project management experience in the tech industry, mainly responsible for team collaboration and client follow-ups.' },
+                    { speaker: 'A', text: '如果遇到好趕嘅截止日期（Deadline），你平時會點樣處理？', jyutping: 'jyu4 gwo2 jyu6 dou2 hou2 gon2 ge3 kit3 zi2 jat6 kei4 (Deadline), nei5 ping4 si4 wui5 dim2 joeng2 cyu2 lei5?', translation: 'If you encounter a very tight deadline, how do you usually handle it?' },
+                    { speaker: 'B', text: '我會先按輕重緩急排好優先次序，主動同團隊開會溝通，確保準時交貨。', jyutping: 'ngo5 wui5 sin1 on3 hing1 zung6 wun6 gap1 paai4 hou2 jau1 sin1 ci3 zeoi6, zyu2 dung6 tung4 tyun4 deoi2 hoi1 wui2 kau1 tung1, kok3 bou2 zeon2 si4 gaau1 fo3.', translation: 'I will prioritize tasks by urgency and importance, proactively meet with the team to communicate, and ensure timely delivery.' },
+                    { speaker: 'A', text: '好好，我哋好欣賞你嘅溝通態度！', jyutping: 'hou2 hou2, ngo5 dei6 hou2 jan1 soeng2 nei5 ge3 kau1 tung1 taai3 dou6!', translation: 'Very good, we appreciate your communication attitude!' }
+                ]
+            },
+            {
+                id: 'sc-rent-apartment',
+                title: '地產代理租屋睇樓 Renting an Apartment & Flat Viewing',
+                titleEn: 'Inquiring About Flat Rentals, Utilities & Lease Terms',
+                category: 'Daily',
+                difficulty: 'Intermediate',
+                emoji: '🏠',
+                description: 'Ask about monthly rent (叫價), usable square feet (實用面積), clubhouse amenities (會所), and lease deposits (按金).',
+                speakers: {
+                    A: { name: 'Tenant 租客', avatar: '🙋‍♂️' },
+                    B: { name: 'Property Agent 地產經紀', avatar: '👩‍💼' }
+                },
+                keywords: [
+                    { word: '實用面積', jyutping: 'sat6 jung6 min6 zik1', meaning_zh: '實用面積 / 室內淨面積', meaning: 'Saleable / usable area (sq ft)', example: '呢間屋實用面積有四百五十呎。', example_meaning: 'This flat has a saleable area of 450 square feet.', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80' },
+                    { word: '按金', jyutping: 'on3 gam1', meaning_zh: '按金 / 押金保證金', meaning: 'Rental deposit (typically 2 months)', example: '租屋通常要交兩個月按金。', example_meaning: 'Renting a flat usually requires 2 months deposit.', image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80' },
+                    { word: '交通方便', jyutping: 'gaau1 tung1 fong1 bin6', meaning_zh: '交通方便 / 出行便捷', meaning: 'Convenient transportation', example: '行去地鐵站五分鐘，交通好方便。', example_meaning: '5 minutes walk to the MTR station, very convenient transport.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '陳小姐你好，我想睇下沙田附近兩房嘅租盤，預算萬四蚊左右。', jyutping: 'can4 siu2 ze2 nei5 hou2, ngo5 soeng2 tai2 haa5 saa1 tin4 fu6 gan6 loeng5 fong4 ge3 zou1 pun4, jyu6 syun3 maan6 sei3 man1 zo2 jau6.', translation: 'Hello Ms. Chan, I would like to look at two-bedroom rentals around Sha Tin, budget around $14,000.' },
+                    { speaker: 'B', text: '啱啱好！附近有一個高層筍盤，實用面積四百呎，叫價萬三千五。', jyutping: 'ngaam1 ngaam1 hou2! fu6 gan6 jau5 jat1 go3 gou1 cang4 seon2 pun4, sat6 jung6 min6 zik1 sei3 baak3 cek3, giu3 gaa3 maan6 saam1 cin1 ng5.', translation: 'Just right! There is a high-floor good deal nearby, 400 square feet usable, asking $13,500.' },
+                    { speaker: 'A', text: '請問包唔包差餉同管理費？大廈有冇電梯？', jyutping: 'cing2 man6 baau1 m4 baau1 caa1 hoeng3 tung4 gun2 lei5 fai3? daai6 haa6 jau5 mou5 din6 tai1?', translation: 'Does it include government rates and management fees? Does the building have an elevator?' },
+                    { speaker: 'B', text: '租金包管理費同差餉，大廈有二十四小時保安同新式電梯，行去地鐵站只要五分鐘。', jyutping: 'zou1 gam1 baau1 gun2 lei5 fai3 tung4 caa1 hoeng3, daai6 haa6 jau5 ji6 sap6 sei3 siu4 si4 bou2 on1 tung4 san1 sik1 din6 tai1, haang4 heoi3 dei6 tit3 zaam6 zi2 jiu3 ng5 fan1 zung1.', translation: 'Rent includes management fee and rates. Building has 24-hr security and modern elevators, only 5 mins walk to the station.' },
+                    { speaker: 'A', text: '環境聽落好理想，今日可唔可以約去睇樓？', jyutping: 'waan4 ging2 teng1 lok6 hou2 lei5 soeng2, gam1 jat1 ho2 m4 ho2 ji5 joek3 heoi3 tai2 lau2?', translation: 'Sounds very ideal, can we arrange a viewing today?' },
+                    { speaker: 'B', text: '冇問題，我即刻聯絡業主攞鎖匙！', jyutping: 'mou5 man6 tai4, ngo5 zik1 hak1 lyun4 lok3 jip6 zyu2 lo2 so2 si4!', translation: 'No problem, I will contact the landlord right away for keys!' }
+                ]
+            },
+            {
+                id: 'sc-hk-bakery',
+                title: '傳統餅店買蛋撻菠蘿油 Hong Kong Traditional Bakery',
+                titleEn: 'Ordering Fresh Warm Pastries at a Neighborhood Bakery',
+                category: 'Dining',
+                difficulty: 'Beginner',
+                emoji: '🍞',
+                description: 'Order fresh-out-of-the-oven pastries, choose egg tart crust styles (酥皮定牛油皮), and buy piping hot pineapple buns with thick butter slab (菠蘿油).',
+                speakers: {
+                    A: { name: 'Customer 顧客', avatar: '😋' },
+                    B: { name: 'Baker / Cashier 師傅', avatar: '👨‍🍳' }
+                },
+                keywords: [
+                    { word: '啱啱出爐', jyutping: 'ngaam1 ngaam1 ceot1 lou4', meaning_zh: '啱啱出爐 / 新鮮剛烘焙出爐', meaning: 'Freshly baked / hot out of the oven', example: '呢盤蛋撻啱啱出爐，熱辣辣。', example_meaning: 'This tray of egg tarts is fresh out of the oven, piping hot.', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80' },
+                    { word: '菠蘿油', jyutping: 'bo1 lo4 jau4', meaning_zh: '菠蘿油 / 菠蘿包夾厚切牛油', meaning: 'Pineapple bun with thick slab of cold butter', example: '食菠蘿油一定要趁熱食。', example_meaning: 'Pineapple bun with butter must be eaten while hot.', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80' },
+                    { word: '酥皮', jyutping: 'sou1 pei4', meaning_zh: '酥皮 / 千層酥脆撻皮', meaning: 'Flaky puff pastry crust', example: '我鍾意食酥皮蛋撻多過牛油皮。', example_meaning: 'I prefer flaky crust egg tarts over cookie butter crust.', image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80' }
+                ],
+                dialogue: [
+                    { speaker: 'A', text: '老闆，請問蛋撻係咪啱啱出爐？有冇酥皮？', jyutping: 'lou5 baan2, cing2 man6 daan2 taat3 hai6 mai6 ngaam1 ngaam1 ceot1 lou4? jau5 mou5 sou1 pei4?', translation: 'Boss, are the egg tarts fresh out of the oven? Do you have flaky crust?' },
+                    { speaker: 'B', text: '係呀，啱啱出爐熱辣辣！酥皮同牛油皮都有，幾多個？', jyutping: 'hai6 aa3, ngaam1 ngaam1 ceot1 lou4 jit6 laat6 laat6! sou1 pei4 tung4 ngau4 jau4 pei4 dou1 jau5, gei2 do1 go3?', translation: 'Yes, fresh out of the oven piping hot! Both flaky and butter cookie crust available, how many?' },
+                    { speaker: 'A', text: '要半打酥皮蛋撻，再加個菠蘿油夾厚牛油，唔該！', jyutping: 'jiu3 bun3 daa2 sou1 pei4 daan2 taat3, zoi3 gaa1 go3 bo1 lo4 jau4 gaap3 hau5 ngau4 jau4, m4 goi1!', translation: 'Half a dozen flaky crust egg tarts, and a pineapple bun with thick butter, please!' },
+                    { speaker: 'B', text: '好，幫你裝入紙袋。菠蘿油趁熱食，牛油溶咗最好食！', jyutping: 'hou2, bong1 nei5 zong1 jap6 zi2 doi6. bo1 lo4 jau4 can3 jit6 sik6, ngau4 jau4 jung4 zo2 zeoi3 hou2 sik6!', translation: 'Sure, packed in a paper bag for you. Eat the pineapple bun while hot, tastes best when the butter melts!' },
+                    { speaker: 'A', text: '多謝老闆，好香呀！', jyutping: 'do1 ze6 lou5 baan2, hou2 hoeng1 aa3!', translation: 'Thank you boss, smells amazing!' }
+                ]
             }
         ];
     }

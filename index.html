@@ -965,6 +965,8 @@
                     </div>
                 </div>
             </div>
+        </section>
+
         <!-- ========================================== -->
         <!-- VIEW 9: REAL-WORLD CANTONESE SCENARIOS & ROLEPLAY (情景對話模擬器) -->
         <!-- ========================================== -->
@@ -994,11 +996,13 @@
 
                 <!-- Scenario Category Filter Chips -->
                 <div id="scenario-category-filters" class="flex items-center gap-2 flex-wrap">
-                    <button data-cat="all" onclick="window.UIManager.filterScenarioCategory('all', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all">All Scenarios</button>
-                    <button data-cat="Dining" onclick="window.UIManager.filterScenarioCategory('Dining', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🥟 Dining & Food</button>
-                    <button data-cat="Transport" onclick="window.UIManager.filterScenarioCategory('Transport', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🚕 Transport & Directions</button>
-                    <button data-cat="Shopping" onclick="window.UIManager.filterScenarioCategory('Shopping', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🛍️ Shopping & Bargaining</button>
-                    <button data-cat="Medical" onclick="window.UIManager.filterScenarioCategory('Medical', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏥 Clinic & Health</button>
+                    <button data-cat="all" onclick="window.UIManager.filterScenarioCategory('all', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all">All Scenarios (全部情景)</button>
+                    <button data-cat="Dining" onclick="window.UIManager.filterScenarioCategory('Dining', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🥟 Dining & Food (餐飲美食)</button>
+                    <button data-cat="Transport" onclick="window.UIManager.filterScenarioCategory('Transport', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🚕 Transport & Transit (交通問路)</button>
+                    <button data-cat="Shopping" onclick="window.UIManager.filterScenarioCategory('Shopping', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🛍️ Shopping & Bargaining (購物講價)</button>
+                    <button data-cat="Medical" onclick="window.UIManager.filterScenarioCategory('Medical', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏥 Clinic & Health (睇醫生求診)</button>
+                    <button data-cat="Workplace" onclick="window.UIManager.filterScenarioCategory('Workplace', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">💼 Workplace & Office (求職職場)</button>
+                    <button data-cat="Daily" onclick="window.UIManager.filterScenarioCategory('Daily', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏠 Daily Life & Housing (租屋生活)</button>
                 </div>
 
                 <!-- Scenarios Grid -->
@@ -1986,6 +1990,6 @@
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- App JavaScript File -->
-    <script src="app.js?v=39_syntax_fix"></script>
+    <script src="app.js?v=40_scenarios_fix"></script>
 </body>
 </html>
