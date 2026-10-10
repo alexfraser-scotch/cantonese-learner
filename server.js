@@ -541,6 +541,49 @@ function writeProfiles(profiles) {
     }
 }
 
+const SCENARIOS_FILE = path.join(DATA_DIR, 'scenarios.json');
+const DYNAMIC_SCENARIOS_FILE = path.join(DATA_DIR, 'dynamic_community_scenarios.json');
+let inMemoryScenariosStore = null;
+
+function readScenarios() {
+    ensureDataFile();
+    if (inMemoryScenariosStore && inMemoryScenariosStore.length > 0) {
+        return inMemoryScenariosStore;
+    }
+    try {
+        let raw = null;
+        if (fs.existsSync(DYNAMIC_SCENARIOS_FILE)) {
+            raw = fs.readFileSync(DYNAMIC_SCENARIOS_FILE, 'utf-8');
+        } else if (fs.existsSync(SCENARIOS_FILE)) {
+            raw = fs.readFileSync(SCENARIOS_FILE, 'utf-8');
+        }
+
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                inMemoryScenariosStore = parsed;
+                return inMemoryScenariosStore;
+            }
+        }
+    } catch (e) {
+        console.error('Error reading scenarios file:', e);
+    }
+    return inMemoryScenariosStore || [];
+}
+
+function writeScenarios(scenarios) {
+    ensureDataFile();
+    inMemoryScenariosStore = scenarios;
+    try {
+        fs.writeFileSync(SCENARIOS_FILE, JSON.stringify(scenarios, null, 2), 'utf-8');
+        fs.writeFileSync(DYNAMIC_SCENARIOS_FILE, JSON.stringify(scenarios, null, 2), 'utf-8');
+        return true;
+    } catch (e) {
+        console.error('Error writing scenarios file:', e);
+        return true;
+    }
+}
+
 const USER_PROGRESS_FILE = path.join(DATA_DIR, 'user_progress.json');
 
 function readUserProgressMap() {
@@ -1159,6 +1202,152 @@ const server = http.createServer((req, res) => {
         }
     }
 
+    // ==========================================
+    // API ENDPOINTS FOR REAL-WORLD SCENARIOS (/api/scenarios)
+    // ==========================================
+    if (pathName === '/api/scenarios') {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        if (req.method === 'GET') {
+            const scenarios = readScenarios();
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify(scenarios));
+            return;
+        } else if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    let data = JSON.parse(body);
+                    if (data && data.data && typeof data.data === 'string') {
+                        try {
+                            const decoded = Buffer.from(data.data, 'base64').toString('utf-8');
+                            data = JSON.parse(decoded);
+                        } catch (b64Err) {
+                            console.warn('Failed to parse base64 scenario payload:', b64Err);
+                        }
+                    }
+
+                    let currentScenarios = readScenarios();
+
+                    if (Array.isArray(data)) {
+                        currentScenarios = data;
+                    } else if (data.action === 'create' || (data.scenario && !data.action)) {
+                        const sc = data.scenario || data;
+                        if (!sc.title || !sc.title.trim()) {
+                            res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                            res.end(JSON.stringify({ success: false, error: 'Scenario title is required' }));
+                            return;
+                        }
+                        if (!sc.dialogue || !Array.isArray(sc.dialogue) || sc.dialogue.length < 2) {
+                            res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                            res.end(JSON.stringify({ success: false, error: 'Scenario dialogue must contain at least 2 lines' }));
+                            return;
+                        }
+
+                        const newScenario = {
+                            id: sc.id || `sc-user-${Date.now()}`,
+                            title: sc.title.trim(),
+                            titleEn: sc.titleEn ? sc.titleEn.trim() : (sc.description || sc.title.trim()),
+                            category: sc.category || 'Daily',
+                            difficulty: sc.difficulty || 'Beginner',
+                            emoji: sc.emoji || '💬',
+                            description: sc.description ? sc.description.trim() : 'User contributed Cantonese scenario dialogue.',
+                            author: sc.author || (data.author || 'Community Learner'),
+                            createdAt: sc.createdAt || new Date().toISOString(),
+                            speakers: sc.speakers || {
+                                A: { name: 'Speaker A 第一者', avatar: '👤' },
+                                B: { name: 'Speaker B 第二者', avatar: '👥' }
+                            },
+                            keywords: Array.isArray(sc.keywords) ? sc.keywords : [],
+                            dialogue: sc.dialogue.map(d => ({
+                                speaker: d.speaker === 'B' ? 'B' : 'A',
+                                text: (d.text || '').trim(),
+                                jyutping: (d.jyutping || '').trim(),
+                                translation: (d.translation || '').trim()
+                            }))
+                        };
+
+                        const existingIdx = currentScenarios.findIndex(s => s.id === newScenario.id);
+                        if (existingIdx !== -1) {
+                            currentScenarios[existingIdx] = newScenario;
+                        } else {
+                            currentScenarios.unshift(newScenario);
+                        }
+
+                        writeScenarios(currentScenarios);
+                        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: true, scenario: newScenario, scenarios: currentScenarios }));
+                        return;
+                    } else if (data.action === 'import') {
+                        const toImport = Array.isArray(data.scenarios) ? data.scenarios : (data.scenario ? [data.scenario] : []);
+                        let addedCount = 0;
+                        toImport.forEach(rawSc => {
+                            if (rawSc && rawSc.title && Array.isArray(rawSc.dialogue) && rawSc.dialogue.length >= 2) {
+                                const scId = rawSc.id || `sc-user-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+                                const formatted = {
+                                    id: scId,
+                                    title: rawSc.title.trim(),
+                                    titleEn: rawSc.titleEn ? rawSc.titleEn.trim() : (rawSc.description || rawSc.title.trim()),
+                                    category: rawSc.category || 'Daily',
+                                    difficulty: rawSc.difficulty || 'Beginner',
+                                    emoji: rawSc.emoji || '💬',
+                                    description: rawSc.description ? rawSc.description.trim() : 'Imported Cantonese scenario.',
+                                    author: rawSc.author || 'Community Learner',
+                                    createdAt: rawSc.createdAt || new Date().toISOString(),
+                                    speakers: rawSc.speakers || {
+                                        A: { name: 'Speaker A 第一者', avatar: '👤' },
+                                        B: { name: 'Speaker B 第二者', avatar: '👥' }
+                                    },
+                                    keywords: Array.isArray(rawSc.keywords) ? rawSc.keywords : [],
+                                    dialogue: rawSc.dialogue.map(d => ({
+                                        speaker: d.speaker === 'B' ? 'B' : 'A',
+                                        text: (d.text || '').trim(),
+                                        jyutping: (d.jyutping || '').trim(),
+                                        translation: (d.translation || '').trim()
+                                    }))
+                                };
+                                const idx = currentScenarios.findIndex(s => s.id === scId);
+                                if (idx !== -1) currentScenarios[idx] = formatted;
+                                else currentScenarios.unshift(formatted);
+                                addedCount++;
+                            }
+                        });
+                        writeScenarios(currentScenarios);
+                        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: true, importedCount: addedCount, scenarios: currentScenarios }));
+                        return;
+                    } else if (data.action === 'delete') {
+                        const targetId = data.scenarioId;
+                        const defaultIds = [
+                            'sc-cha-chaan-teng', 'sc-taxi-cross-tunnel', 'sc-mong-kok-shopping',
+                            'sc-doctor-clinic', 'sc-dim-sum-teahouse', 'sc-mtr-directions',
+                            'sc-bubble-tea', 'sc-job-interview', 'sc-rent-apartment', 'sc-hk-bakery'
+                        ];
+                        if (defaultIds.includes(targetId)) {
+                            res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+                            res.end(JSON.stringify({ success: false, error: 'Cannot delete default system scenarios' }));
+                            return;
+                        }
+                        currentScenarios = currentScenarios.filter(s => s.id !== targetId);
+                        writeScenarios(currentScenarios);
+                        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: true, scenarios: currentScenarios }));
+                        return;
+                    }
+
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid action or scenario payload' }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Invalid JSON: ' + e.message }));
+                }
+            });
+            return;
+        }
+    }
+
     // Static File Serving
     let filePath = pathName === '/' ? '/index.html' : pathName;
     const safePath = path.normalize(filePath).replace(/^(\.\.[\/\\])+/, '');
@@ -1214,6 +1403,8 @@ module.exports = {
     ensureUsersFile,
     readUsers,
     writeUsers,
+    readScenarios,
+    writeScenarios,
     ROOT_ADMIN_EMAILS,
     isAuthorizedAdmin
 };

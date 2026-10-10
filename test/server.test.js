@@ -915,6 +915,132 @@ test('Dictation Hands-Free Voice Command Matching Engine', (t) => {
     assert.strictEqual(parseCommand(null), null);
 });
 
+test('Scenario Creation, Persistence, and Validation Engine', async (t) => {
+    const http = require('http');
+    const { readScenarios, writeScenarios } = require('../server.js');
+    const port = (server.address() && server.address().port) || 8080;
+
+    // 1. Verify readScenarios returns default scenarios
+    const initialScenarios = readScenarios();
+    assert.ok(Array.isArray(initialScenarios), 'readScenarios should return an array');
+    assert.ok(initialScenarios.length >= 7, 'Should contain at least 7 baseline scenarios');
+    const teaScenario = initialScenarios.find(s => s.id === 'sc-cha-chaan-teng');
+    assert.ok(teaScenario, 'Must include baseline Cha Chaan Teng scenario');
+    assert.strictEqual(teaScenario.speakers.A.name, 'Customer 顧客');
+
+    // 2. Test GET /api/scenarios
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/scenarios`, (res) => {
+            assert.strictEqual(res.statusCode, 200);
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const list = JSON.parse(body);
+                assert.ok(Array.isArray(list), 'GET /api/scenarios must return array');
+                assert.ok(list.length >= 7);
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    // 3. Test POST /api/scenarios with missing title returns 400
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 400, 'Empty title should fail with 400');
+            resolve();
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ action: 'create', scenario: { title: '', dialogue: [] } }));
+        req.end();
+    });
+
+    // 4. Test POST /api/scenarios with valid scenario creation
+    const testScenarioId = `sc-test-${Date.now()}`;
+    const testPayload = {
+        action: 'create',
+        scenario: {
+            id: testScenarioId,
+            title: '深水埗買電腦配件 Shopping for Tech in Sham Shui Po',
+            category: 'Shopping',
+            difficulty: 'Intermediate',
+            emoji: '💻',
+            description: 'Learn tech vocabulary and price bargaining in Sham Shui Po.',
+            author: 'Test User',
+            speakers: {
+                A: { name: 'Customer', avatar: '🙋‍♂️' },
+                B: { name: 'Vendor', avatar: '👨‍💻' }
+            },
+            dialogue: [
+                { speaker: 'A', text: '請問呢張卡幾多錢？', jyutping: 'cing2 man6 ni1 zoeng1 kaat1 gei2 do1 cin2?', translation: 'How much is this card?' },
+                { speaker: 'B', text: '呢張三千蚊，包保養。', jyutping: 'ni1 zoeng1 saam1 cin1 man1, baau1 bou2 joeng5.', translation: 'This is 3,000, warranty included.' }
+            ],
+            keywords: [
+                { word: '保養', jyutping: 'bou2 joeng5', meaning: 'Warranty' }
+            ]
+        }
+    };
+
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 200, 'Valid creation should return 200');
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const result = JSON.parse(body);
+                assert.strictEqual(result.success, true);
+                assert.strictEqual(result.scenario.id, testScenarioId);
+                assert.strictEqual(result.scenario.title, '深水埗買電腦配件 Shopping for Tech in Sham Shui Po');
+                resolve();
+            });
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify(testPayload));
+        req.end();
+    });
+
+    // 5. Test protected system scenario deletion returns 403
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 403, 'System scenarios cannot be deleted');
+            resolve();
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ action: 'delete', scenarioId: 'sc-cha-chaan-teng' }));
+        req.end();
+    });
+
+    // 6. Test custom scenario deletion succeeds
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 200, 'Custom scenario deletion should return 200');
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const result = JSON.parse(body);
+                assert.strictEqual(result.success, true);
+                const found = result.scenarios.find(s => s.id === testScenarioId);
+                assert.strictEqual(found, undefined, 'Deleted custom scenario should no longer exist');
+                resolve();
+            });
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ action: 'delete', scenarioId: testScenarioId }));
+        req.end();
+    });
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

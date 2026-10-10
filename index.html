@@ -1027,9 +1027,17 @@
                                 Practice authentic Hong Kong conversations step-by-step. Listen to native speech, practice roleplaying as either speaker, and import dialogue vocabulary directly into flashcard decks!
                             </p>
                         </div>
-                        <button onclick="window.UIManager.switchView('dashboard')" class="self-start md:self-auto px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-semibold transition-all flex items-center gap-1.5">
-                            ← Back to Dashboard
-                        </button>
+                        <div class="flex items-center gap-2 flex-wrap self-start md:self-auto">
+                            <button onclick="window.UIManager.openCreateScenarioModal('builder')" class="px-3.5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl shadow-lg shadow-emerald-500/20 text-xs font-bold transition-all flex items-center gap-1.5">
+                                <span>➕</span> Create Topic (新增情景)
+                            </button>
+                            <button onclick="window.UIManager.openCreateScenarioModal('upload')" class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 rounded-xl border border-emerald-500/30 text-xs font-semibold transition-all flex items-center gap-1.5">
+                                <span>📤</span> Upload JSON (上載情景)
+                            </button>
+                            <button onclick="window.UIManager.switchView('dashboard')" class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-semibold transition-all flex items-center gap-1.5">
+                                ← Dashboard
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1042,6 +1050,7 @@
                     <button data-cat="Medical" onclick="window.UIManager.filterScenarioCategory('Medical', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏥 Clinic & Health (睇醫生求診)</button>
                     <button data-cat="Workplace" onclick="window.UIManager.filterScenarioCategory('Workplace', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">💼 Workplace & Office (求職職場)</button>
                     <button data-cat="Daily" onclick="window.UIManager.filterScenarioCategory('Daily', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏠 Daily Life & Housing (租屋生活)</button>
+                    <button data-cat="Community" onclick="window.UIManager.filterScenarioCategory('Community', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🌟 Community / Custom (用戶自訂)</button>
                 </div>
 
                 <!-- Scenarios Grid -->
@@ -1077,9 +1086,19 @@
                             <button id="btn-roleplay-b" onclick="window.UIManager.setScenarioRoleplayMode('B')" class="px-2.5 py-1 text-slate-400 hover:text-slate-200 rounded-lg text-[11px] transition-all">👨‍🍳 Speaker B</button>
                         </div>
 
+                        <!-- Export Scenario JSON Button -->
+                        <button onclick="window.UIManager.exportActiveScenarioJSON()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5" title="Export this scenario as JSON">
+                            <span>💾</span> Export JSON
+                        </button>
+
                         <!-- Import Keywords Button -->
                         <button onclick="window.UIManager.importScenarioKeywordsToDeck()" class="px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5" title="Create Flashcard Deck from this scenario's words">
                             <span>📥</span> Add to Decks
+                        </button>
+
+                        <!-- Delete Custom Scenario Button -->
+                        <button id="btn-delete-scenario" onclick="window.UIManager.deleteActiveScenario()" class="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs rounded-xl shadow-md transition-all hidden items-center gap-1.5" title="Delete this custom scenario">
+                            <span>🗑️</span> Delete
                         </button>
                     </div>
                 </div>
@@ -1317,6 +1336,196 @@
                     <button type="submit" form="form-create-profile" class="px-6 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Save Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CREATE OR UPLOAD CANTONESE SCENARIO -->
+    <!-- ========================================== -->
+    <div id="modal-create-scenario" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto">
+        <div class="glass-modal w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border border-slate-800 shadow-2xl overflow-hidden my-auto">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90 shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-xl">💬</span>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 font-cantonese">Create / Upload Scenario (建立或上載情景)</h3>
+                        <p class="text-slate-400 text-xs">Build a customized roleplay dialogue with speakers, audio lines & vocabulary.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.UIManager.closeCreateScenarioModal()" class="p-2 text-slate-400 hover:text-slate-100 rounded-xl hover:bg-slate-800 transition-colors">✕</button>
+                </div>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="px-6 pt-3 pb-0 border-b border-slate-800/80 bg-slate-900/50 flex items-center justify-between gap-4 shrink-0">
+                <div class="flex items-center gap-2">
+                    <button id="tab-scenario-builder-btn" type="button" onclick="window.UIManager.switchScenarioModalTab('builder')" class="px-4 py-2 border-b-2 border-emerald-400 text-emerald-300 font-bold text-xs transition-all flex items-center gap-1.5">
+                        <span>📝</span> Visual Form Builder
+                    </button>
+                    <button id="tab-scenario-upload-btn" type="button" onclick="window.UIManager.switchScenarioModalTab('upload')" class="px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs transition-all flex items-center gap-1.5">
+                        <span>📤</span> JSON Uploader / Editor
+                    </button>
+                </div>
+                <button type="button" onclick="window.UIManager.loadSampleScenarioTemplate()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+                    <span>✨</span> Load Sample Template
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 space-y-6 overflow-y-auto flex-grow">
+                <!-- TAB 1: VISUAL BUILDER -->
+                <div id="tab-scenario-builder-content" class="space-y-6">
+                    <!-- Basic Information -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Scenario Title (廣東話 / 中文名稱) *</label>
+                            <input id="input-sc-title" type="text" required placeholder="e.g. 買菜講價 Wet Market Bargaining" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all font-cantonese">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Category (情景分類) *</label>
+                            <select id="input-sc-category" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all">
+                                <option value="Dining">🥟 Dining & Food (餐飲美食)</option>
+                                <option value="Transport">🚕 Transport & Transit (交通問路)</option>
+                                <option value="Shopping">🛍️ Shopping & Bargaining (購物講價)</option>
+                                <option value="Medical">🏥 Clinic & Health (睇醫生求診)</option>
+                                <option value="Workplace">💼 Workplace & Office (求職職場)</option>
+                                <option value="Daily" selected>🏠 Daily Life & Housing (租屋生活)</option>
+                                <option value="Community">🌟 Community & Custom (自訂情景)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Emoji Icon</label>
+                            <input id="input-sc-emoji" type="text" value="💬" placeholder="e.g. 🥬, 🚕, ☕" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 text-center text-lg focus:outline-none focus:border-emerald-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Difficulty (難度)</label>
+                            <select id="input-sc-difficulty" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all">
+                                <option value="Beginner" selected>Beginner (初級)</option>
+                                <option value="Intermediate">Intermediate (中級)</option>
+                                <option value="Advanced">Advanced (高級)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">English Title / Subtitle</label>
+                            <input id="input-sc-title-en" type="text" placeholder="e.g. Asking for Vegetable Discounts" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Description (情景簡介)</label>
+                        <textarea id="input-sc-desc" rows="2" placeholder="Brief context about what learners will practice in this conversation..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all resize-none"></textarea>
+                    </div>
+
+                    <!-- Speaker Profiles -->
+                    <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-200 flex items-center gap-2">
+                            <span>👥</span> Speaker Profiles (角色設定)
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Speaker A -->
+                            <div class="space-y-2 p-3 bg-slate-900/90 rounded-xl border border-slate-800/80">
+                                <span class="text-[11px] font-bold text-emerald-400">Speaker A (角色 A - 通常為顧客/求職者)</span>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="col-span-2">
+                                        <input id="input-sc-speaker-a-name" type="text" value="Customer 顧客" placeholder="Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200">
+                                    </div>
+                                    <div>
+                                        <input id="input-sc-speaker-a-avatar" type="text" value="👤" placeholder="Avatar" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-center text-base text-slate-200">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Speaker B -->
+                            <div class="space-y-2 p-3 bg-slate-900/90 rounded-xl border border-slate-800/80">
+                                <span class="text-[11px] font-bold text-sky-400">Speaker B (角色 B - 通常為店員/司機/考官)</span>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="col-span-2">
+                                        <input id="input-sc-speaker-b-name" type="text" value="Shopkeeper 店員" placeholder="Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200">
+                                    </div>
+                                    <div>
+                                        <input id="input-sc-speaker-b-avatar" type="text" value="🏪" placeholder="Avatar" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-center text-base text-slate-200">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dialogue Turns Editor -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                                    <span>💬</span> Dialogue Lines (逐句對話內容) *
+                                </h4>
+                                <p class="text-[11px] text-slate-400">Minimum 2 lines. Each line supports native Cantonese TTS audio playback.</p>
+                            </div>
+                            <button type="button" onclick="window.UIManager.addDialogueTurnRow()" class="px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1">
+                                <span>➕</span> Add Line (新增對話句)
+                            </button>
+                        </div>
+                        <div id="sc-dialogue-turns-list" class="space-y-3">
+                            <!-- Populated with dynamic turn rows -->
+                        </div>
+                    </div>
+
+                    <!-- Key Vocabulary Terms -->
+                    <div class="space-y-3 pt-2 border-t border-slate-800/80">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                                    <span>🔑</span> Key Vocabulary Terms (重點詞彙 - 可匯入字卡)
+                                </h4>
+                                <p class="text-[11px] text-slate-400">Add key terms from this scenario so learners can practice them with 3D flashcards.</p>
+                            </div>
+                            <button type="button" onclick="window.UIManager.addKeywordRow()" class="px-3 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1">
+                                <span>➕</span> Add Word (新增詞彙)
+                            </button>
+                        </div>
+                        <div id="sc-keywords-list" class="space-y-2">
+                            <!-- Populated with dynamic keyword rows -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: JSON UPLOAD & RAW PASTE -->
+                <div id="tab-scenario-upload-content" class="space-y-4 hidden">
+                    <!-- Dropzone -->
+                    <div id="scenario-dropzone" class="p-6 border-2 border-dashed border-slate-800 hover:border-emerald-500/50 rounded-2xl bg-slate-900/40 text-center transition-all cursor-pointer">
+                        <input id="input-scenario-file-upload" type="file" accept=".json" class="hidden" onchange="window.UIManager.handleScenarioFileUpload(event)">
+                        <div class="space-y-2" onclick="document.getElementById('input-scenario-file-upload').click()">
+                            <span class="text-3xl block">📁</span>
+                            <div class="text-xs font-semibold text-slate-200">Click to choose or Drag & Drop a scenario <span class="font-mono text-emerald-400">.json</span> file</div>
+                            <div class="text-[11px] text-slate-400">Supports single scenario objects or an array of scenarios.</div>
+                        </div>
+                    </div>
+
+                    <!-- Direct JSON Textarea -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-xs font-semibold text-slate-300">Or Paste / Edit Scenario JSON Directly:</label>
+                            <span id="scenario-json-status" class="text-[11px] font-mono text-slate-400">Ready</span>
+                        </div>
+                        <textarea id="textarea-scenario-json" rows="12" placeholder='{\n  "title": "情景名稱",\n  "category": "Dining",\n  "difficulty": "Beginner",\n  "emoji": "🥟",\n  "speakers": { ... },\n  "dialogue": [ ... ],\n  "keywords": [ ... ]\n}' class="w-full bg-slate-950 font-mono text-xs text-slate-200 border border-slate-800 rounded-xl p-4 focus:outline-none focus:border-emerald-500 transition-all"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-slate-800 bg-slate-900/90 flex items-center justify-between gap-4 shrink-0">
+                <div class="text-xs text-slate-400">
+                    <span>💡 Once saved, your new topic will immediately appear in the scenarios gallery.</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="window.UIManager.closeCreateScenarioModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 transition-all">Cancel</button>
+                    <button type="button" onclick="window.UIManager.saveNewScenario()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                        <span>💾</span> Save & Publish Topic
                     </button>
                 </div>
             </div>
@@ -2042,6 +2251,6 @@
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- App JavaScript File -->
-    <script src="app.js?v=44_hands_free_dictation"></script>
+    <script src="app.js?v=45_custom_scenarios"></script>
 </body>
 </html>

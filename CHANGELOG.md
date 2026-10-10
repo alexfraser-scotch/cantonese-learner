@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.7.0] - 2026-10-10 - Custom Scenario Creation & JSON Uploader Release
+
+### 🌟 Added
+- **💬 Custom Scenario Topic Creator & Builder (自訂情景主題建立器):**
+  - Interactive modal builder (`#modal-create-scenario`) allowing community members to design custom Cantonese roleplay dialogue scenarios from scratch.
+  - Multi-speaker configuration (Speaker A & B character names, avatars, and role assignments).
+  - Dynamic dialogue turn builder with Cantonese text input, Jyutping romanization, English translation, and live audio testing buttons (`🔊 Test Audio`).
+  - Key vocabulary terms creator to pair scenario words directly with 3D flashcards.
+  - Category assignment (`Dining`, `Transport`, `Shopping`, `Medical`, `Workplace`, `Daily`, `Community`).
+
+- **📤 JSON Scenario Uploader & Direct Code Editor (JSON 情景上載與匯入):**
+  - Drag-and-drop / file selector `.json` importer supporting single scenario objects or arrays of scenarios.
+  - Integrated raw JSON textarea editor with instant schema syntax validation and status reporting.
+  - One-click template populator (**✨ Load Sample Template**) providing a ready-to-publish scenario example.
+
+- **💾 Scenario JSON Exporter (情景 JSON 檔案匯出):**
+  - Added an **"💾 Export JSON"** action button inside active scenario rooms allowing learners to download and share dialogue topics offline.
+
+- **🌐 Backend REST API & Persistence (`/api/scenarios` & `data/scenarios.json`):**
+  - `GET /api/scenarios`: Returns combined default baseline and user-contributed community scenarios.
+  - `POST /api/scenarios`: Handles `create`, `import`, and `delete` actions with strict payload validation.
+  - Protected baseline scenario safeguards preventing deletion of core system dialogues.
+
+---
+
 ## [v1.6.0] - 2026-10-03 - Hands-Free Voice Dictation & Audio Stream Proxy Release
 
 ### 🌟 Added

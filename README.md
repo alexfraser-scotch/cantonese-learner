@@ -16,7 +16,7 @@ An interactive, open-source Cantonese Vocabulary Learning platform featuring **3
 ## ✨ Features
 
 - 🃏 **3D Interactive Flashcards:** Flip cards to toggle between Traditional Cantonese Characters, Jyutping Romanization, English Meanings, and Contextual Example Sentences.
-- 💬 **Real-World Scenario Dialogues & Roleplay (情景對話模擬器):** Interactive roleplay simulator covering authentic Hong Kong scenarios (茶餐廳點餐 Ordering at Cha Chaan Teng, 搭的士過海 Taking a Taxi, 旺角買嘢講價 Mong Kok Shopping, 睇醫生 Visiting the Clinic, 飲茶搭檯 Dim Sum Etiquette). Features turn-by-turn native Cantonese speech, roleplay practice mode (hide lines to test speaking), and 1-click vocabulary deck export!
+- 💬 **Real-World Scenario Dialogues & Roleplay (情景對話模擬器):** Interactive roleplay simulator covering authentic Hong Kong scenarios (茶餐廳點餐 Ordering at Cha Chaan Teng, 搭的士過海 Taking a Taxi, 旺角買嘢講價 Mong Kok Shopping, 睇醫生 Visiting the Clinic, 飲茶搭檯 Dim Sum Etiquette, 港鐵問路, 買蛋撻菠蘿油). Features turn-by-turn native Cantonese speech, roleplay practice mode (hide lines to test speaking), 1-click vocabulary deck export, and **Custom Scenario Topic Creation & JSON Upload** allowing community members to publish custom dialogue topics or upload `.json` scenario decks via interactive form builder!
 - 🧩 **Cantonese Sentence Builder & Grammar Scrambler (造句組句練習):** Dynamic sentence scrambler game designed to master Cantonese syntax and core aspect markers (`咗` zo2 - completed action, `緊` gan2 - continuous, `曬` saai3 - complete, `過` gwo3 - experiential, `埋` maai4 - convergence). Features clickable word chips, real-time grammar feedback, and audio playback.
 - 🎯 **Cantonese Tone Ear Training Quiz:** Interactive listening drills to practice distinguishing the 6 Cantonese pitch contours (Tone 1 – Tone 6).
 - 🧠 **Leitner Spaced Repetition (SRS):** Smart 5-box memory retention algorithm (1, 3, 7, 14, 30 days) with review ratings (🔴 Again, 🟡 Good, 🟢 Easy).
@@ -162,6 +162,7 @@ We welcome contributions from language learners, linguists, and software enginee
 - [x] Interactive Real-World Scenario Dialogue Player with sequential audio stream and bubble highlighting
 - [x] Dictation Mode Result History & Re-inspection Engine (Persistent Session Storage)
 - [x] Hands-Free Voice Control Dictation Assistant (Continuous Web Speech API recognition for "Next" / "下一個")
+- [x] Custom Scenario Dialogue Topic Creator & JSON Uploader (`/api/scenarios`, Visual Form Builder & Importer)
 - [ ] Progressive Web App (PWA) offline service worker caching
 - [ ] AI-assisted example sentence & tone generation (OpenAI Codex API)
 

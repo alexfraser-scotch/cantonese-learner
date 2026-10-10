@@ -6079,7 +6079,7 @@ class UIManager {
     // ==========================================
     // MODULE 1: REAL-WORLD CANTONESE SCENARIOS & ROLEPLAY (情景對話模擬器)
     // ==========================================
-    getScenariosData() {
+    getBuiltInScenariosData() {
         return [
             {
                 id: 'sc-cha-chaan-teng',
@@ -6335,7 +6335,43 @@ class UIManager {
         ];
     }
 
-    initScenariosMode() {
+    getScenariosData() {
+        if (this.scenariosList && Array.isArray(this.scenariosList) && this.scenariosList.length > 0) {
+            return this.scenariosList;
+        }
+        try {
+            const cached = localStorage.getItem('cantonese_scenarios_cache');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    this.scenariosList = parsed;
+                    return this.scenariosList;
+                }
+            }
+        } catch (e) {}
+        return this.getBuiltInScenariosData();
+    }
+
+    async loadScenariosData() {
+        try {
+            const res = await fetch('/api/scenarios');
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    this.scenariosList = data;
+                    try {
+                        localStorage.setItem('cantonese_scenarios_cache', JSON.stringify(data));
+                    } catch (e) {}
+                    return this.scenariosList;
+                }
+            }
+        } catch (err) {
+            console.warn('Could not fetch scenarios from /api/scenarios:', err.message);
+        }
+        return this.getScenariosData();
+    }
+
+    async initScenariosMode() {
         this.scenarioFilter = 'all';
         this.activeScenario = null;
         this.scenarioRoleplayMode = 'all';
@@ -6346,6 +6382,10 @@ class UIManager {
         if (selectionView) selectionView.classList.remove('hidden');
         if (activeRoom) activeRoom.classList.add('hidden');
 
+        this.renderScenariosGrid();
+
+        // Async sync with /api/scenarios
+        await this.loadScenariosData();
         this.renderScenariosGrid();
     }
 
@@ -6367,21 +6407,38 @@ class UIManager {
         const scenarios = this.getScenariosData();
         const filtered = this.scenarioFilter === 'all' 
             ? scenarios 
-            : scenarios.filter(s => s.category === this.scenarioFilter);
+            : (this.scenarioFilter === 'Community'
+                ? scenarios.filter(s => s.id.startsWith('sc-user-') || s.id.startsWith('sc-custom-') || s.category === 'Community' || (s.author && s.author !== 'Cantonese Community'))
+                : scenarios.filter(s => s.category === this.scenarioFilter));
 
         if (filtered.length === 0) {
-            grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 text-sm">No scenarios found in this category.</div>`;
+            grid.innerHTML = `
+                <div class="col-span-full py-12 text-center text-slate-500 text-sm glass-card rounded-3xl p-8 border border-slate-800">
+                    <p class="text-base text-slate-300 font-bold mb-2">No scenarios found in this category.</p>
+                    <p class="text-xs text-slate-500 mb-4">Be the first to create and publish a custom topic for the community!</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <button onclick="window.UIManager.openCreateScenarioModal('builder')" class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all">
+                            ➕ Create New Topic
+                        </button>
+                        <button onclick="window.UIManager.openCreateScenarioModal('upload')" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold transition-all">
+                            📤 Upload JSON
+                        </button>
+                    </div>
+                </div>`;
             return;
         }
 
-        grid.innerHTML = filtered.map(s => `
-            <div onclick="window.UIManager.openScenarioRoom('${s.id}')" class="glass-card rounded-3xl p-6 border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between group shadow-xl">
+        grid.innerHTML = filtered.map(s => {
+            const isCustom = s.id.startsWith('sc-user-') || s.id.startsWith('sc-custom-') || (s.author && s.author !== 'Cantonese Community');
+            return `
+            <div onclick="window.UIManager.openScenarioRoom('${s.id}')" class="glass-card rounded-3xl p-6 border ${isCustom ? 'border-emerald-500/40 bg-emerald-950/10' : 'border-slate-800'} hover:border-emerald-500/50 cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between group shadow-xl">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                            ${s.emoji}
+                            ${s.emoji || '💬'}
                         </span>
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                            ${isCustom ? '<span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-lg text-[9px] font-bold">🌟 User Created</span>' : ''}
                             <span class="px-2.5 py-1 bg-slate-900 border border-slate-800 text-slate-400 rounded-lg text-[10px] font-mono font-bold">${s.category}</span>
                             <span class="px-2.5 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 rounded-lg text-[10px] font-bold">${s.difficulty}</span>
                         </div>
@@ -6390,26 +6447,28 @@ class UIManager {
                         <h3 class="text-base font-extrabold text-slate-100 group-hover:text-emerald-300 transition-colors font-cantonese">
                             ${this.escapeHTML(s.title)}
                         </h3>
+                        ${s.author ? `<p class="text-[10px] text-slate-500 mt-0.5">Author: <span class="text-slate-400 font-medium">${this.escapeHTML(s.author)}</span></p>` : ''}
                         <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                            ${this.escapeHTML(s.description)}
+                            ${this.escapeHTML(s.description || '')}
                         </p>
                     </div>
                     <div class="flex items-center gap-2 pt-2 border-t border-slate-800/60 text-[11px] text-slate-400">
-                        <span>💬 ${s.dialogue.length} dialogue turns</span>
+                        <span>💬 ${(s.dialogue || []).length} dialogue turns</span>
                         <span>•</span>
-                        <span>🔑 ${s.keywords.length} vocabulary terms</span>
+                        <span>🔑 ${(s.keywords || []).length} vocabulary terms</span>
                     </div>
                 </div>
                 <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
                     <div class="flex items-center gap-1.5 text-xs text-slate-300 font-medium">
-                        <span>${s.speakers.A.avatar} vs ${s.speakers.B.avatar}</span>
+                        <span>${s.speakers?.A?.avatar || '👤'} vs ${s.speakers?.B?.avatar || '👥'}</span>
                     </div>
                     <span class="text-xs font-bold text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         Start Dialogue →
                     </span>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     openScenarioRoom(scenarioId) {
@@ -6429,10 +6488,22 @@ class UIManager {
         const titleElem = document.getElementById('scenario-room-title');
         const descElem = document.getElementById('scenario-room-desc');
         const badgeElem = document.getElementById('scenario-room-badge');
+        const deleteBtn = document.getElementById('btn-delete-scenario');
 
-        if (titleElem) titleElem.textContent = `${scenario.emoji} ${scenario.title}`;
-        if (descElem) descElem.textContent = scenario.description;
-        if (badgeElem) badgeElem.textContent = scenario.difficulty;
+        if (titleElem) titleElem.textContent = `${scenario.emoji || '💬'} ${scenario.title}`;
+        if (descElem) descElem.textContent = scenario.description || '';
+        if (badgeElem) badgeElem.textContent = scenario.difficulty || 'Beginner';
+
+        const isCustom = scenario.id.startsWith('sc-user-') || scenario.id.startsWith('sc-custom-') || (scenario.author && scenario.author !== 'Cantonese Community');
+        if (deleteBtn) {
+            if (isCustom) {
+                deleteBtn.classList.remove('hidden');
+                deleteBtn.classList.add('flex');
+            } else {
+                deleteBtn.classList.add('hidden');
+                deleteBtn.classList.remove('flex');
+            }
+        }
 
         this.setScenarioRoleplayMode('all');
         this.renderScenarioDialogue();
@@ -6679,6 +6750,459 @@ class UIManager {
             this.switchView('profile-detail', { profileId: newDeck.id });
         } catch (e) {
             this.showToast('Failed to import scenario words: ' + e.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // SCENARIO CREATION & JSON UPLOAD / EXPORT ENGINE
+    // ==========================================
+    openCreateScenarioModal(initialTab = 'builder') {
+        const modal = document.getElementById('modal-create-scenario');
+        if (!modal) return;
+
+        // Reset basic fields if empty
+        const titleInput = document.getElementById('input-sc-title');
+        if (titleInput && !titleInput.value) {
+            document.getElementById('input-sc-title').value = '';
+            document.getElementById('input-sc-title-en').value = '';
+            document.getElementById('input-sc-category').value = 'Daily';
+            document.getElementById('input-sc-difficulty').value = 'Beginner';
+            document.getElementById('input-sc-emoji').value = '💬';
+            document.getElementById('input-sc-desc').value = '';
+            document.getElementById('input-sc-speaker-a-name').value = 'Customer 顧客';
+            document.getElementById('input-sc-speaker-a-avatar').value = '👤';
+            document.getElementById('input-sc-speaker-b-name').value = 'Shopkeeper 店員';
+            document.getElementById('input-sc-speaker-b-avatar').value = '🏪';
+
+            // Clear dynamic lists and add starter rows
+            const turnsList = document.getElementById('sc-dialogue-turns-list');
+            if (turnsList) {
+                turnsList.innerHTML = '';
+                this.addDialogueTurnRow('A', '唔該，請問呢個幾多錢？', 'm4 goi1, cing2 man6 ni1 go3 gei2 do1 cin2?', 'Excuse me, how much is this one?');
+                this.addDialogueTurnRow('B', '呢個五十蚊，買兩個平五蚊！', 'ni1 go3 ng5 sap6 man1, maai5 loeng5 go3 peng4 ng5 man1!', 'This is 50 dollars, buy two get 5 dollars off!');
+            }
+
+            const kwList = document.getElementById('sc-keywords-list');
+            if (kwList) {
+                kwList.innerHTML = '';
+                this.addKeywordRow('幾多錢', 'gei2 do1 cin2', 'How much money / price');
+                this.addKeywordRow('平啲', 'peng4 di1', 'A bit cheaper / discount');
+            }
+
+            // Populate sample into textarea if empty
+            const jsonArea = document.getElementById('textarea-scenario-json');
+            if (jsonArea && !jsonArea.value) {
+                this.loadSampleScenarioTemplate(false);
+            }
+        }
+
+        this.switchScenarioModalTab(initialTab);
+        modal.classList.remove('hidden');
+    }
+
+    closeCreateScenarioModal() {
+        const modal = document.getElementById('modal-create-scenario');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    switchScenarioModalTab(tab = 'builder') {
+        this.scenarioModalActiveTab = tab;
+        const btnBuilder = document.getElementById('tab-scenario-builder-btn');
+        const btnUpload = document.getElementById('tab-scenario-upload-btn');
+        const contentBuilder = document.getElementById('tab-scenario-builder-content');
+        const contentUpload = document.getElementById('tab-scenario-upload-content');
+
+        if (tab === 'builder') {
+            if (btnBuilder) btnBuilder.className = 'px-4 py-2 border-b-2 border-emerald-400 text-emerald-300 font-bold text-xs transition-all flex items-center gap-1.5';
+            if (btnUpload) btnUpload.className = 'px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs transition-all flex items-center gap-1.5';
+            if (contentBuilder) contentBuilder.classList.remove('hidden');
+            if (contentUpload) contentUpload.classList.add('hidden');
+        } else {
+            if (btnBuilder) btnBuilder.className = 'px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs transition-all flex items-center gap-1.5';
+            if (btnUpload) btnUpload.className = 'px-4 py-2 border-b-2 border-emerald-400 text-emerald-300 font-bold text-xs transition-all flex items-center gap-1.5';
+            if (contentBuilder) contentBuilder.classList.add('hidden');
+            if (contentUpload) contentUpload.classList.remove('hidden');
+        }
+    }
+
+    loadSampleScenarioTemplate(showToastMessage = true) {
+        const sample = {
+            title: "深水埗買電腦嘢 Shopping for Tech in Sham Shui Po",
+            titleEn: "Buying Computer Parts & Electronics at Golden Computer Arcade",
+            category: "Shopping",
+            difficulty: "Intermediate",
+            emoji: "💻",
+            description: "Practice asking for computer parts, checking warranty, and bargaining politely in Sham Shui Po.",
+            speakers: {
+                A: { name: "Customer 顧客", avatar: "🙋‍♂️" },
+                B: { name: "Staff 店員", avatar: "👨‍💻" }
+            },
+            keywords: [
+                { word: "顯示卡", jyutping: "hin2 si6 kaat1", meaning: "Graphics card (GPU)", meaning_zh: "顯示卡 / 顯卡" },
+                { word: "保養", jyutping: "bou2 joeng5", meaning: "Warranty / maintenance", meaning_zh: "保養 / 保固期" },
+                { word: "行貨", jyutping: "hong4 fo3", meaning: "Official licensed HK goods (with warranty)", meaning_zh: "行貨 / 正品正貨" }
+            ],
+            dialogue: [
+                { speaker: "A", text: "唔該，請問呢張顯示卡幾多錢？有冇現貨？", jyutping: "m4 goi1, cing2 man6 ni1 zoeng1 hin2 si6 kaat1 gei2 do1 cin2? jau5 mou5 jin6 fo3?", translation: "Excuse me, how much is this graphics card? Do you have stock ready?" },
+                { speaker: "B", text: "原價四千二，今日優惠減兩百，包三年香港原廠行貨保養！", jyutping: "jyun4 gaa3 sei3 cin1 ji6, gam1 jat1 jau1 wai6 gaam2 loeng5 baak3, baau1 saam1 nin4 hoeng1 gong2 jyun4 cong2 hong4 fo3 bou2 joeng5!", translation: "Original price 4,200, special discount 200 off today, includes 3-year official HK warranty!" },
+                { speaker: "A", text: "好抵喎！用八達通定信用卡付款有冇手續費？", jyutping: "hou2 dai2 wo3! jung6 baat3 daat6 tung1 ding6 seon3 jung3 kaat1 fu6 fun2 jau5 mou5 sau2 suk6 fai3?", translation: "Good deal! Is there a surcharge for paying with Octopus or credit card?" },
+                { speaker: "B", text: "嘟八達通免手續費，送多塊滑鼠墊畀你！", jyutping: "dut1 baat3 daat6 tung1 min5 sau2 suk6 fai3, sung3 do1 faai3 waat6 syu2 din3 bei2 nei5!", translation: "Octopus has zero surcharge, and I'll throw in a free mousepad for you!" },
+                { speaker: "A", text: "正！咁我用八達通，唔該曬！", jyutping: "zeng3! gam2 ngo5 jung6 baat3 daat6 tung1, m4 goi1 saai3!", translation: "Awesome! Then I'll pay with Octopus, thanks a lot!" }
+            ]
+        };
+
+        // Populate Form
+        const titleInput = document.getElementById('input-sc-title');
+        if (titleInput) {
+            titleInput.value = sample.title;
+            document.getElementById('input-sc-title-en').value = sample.titleEn;
+            document.getElementById('input-sc-category').value = sample.category;
+            document.getElementById('input-sc-difficulty').value = sample.difficulty;
+            document.getElementById('input-sc-emoji').value = sample.emoji;
+            document.getElementById('input-sc-desc').value = sample.description;
+            document.getElementById('input-sc-speaker-a-name').value = sample.speakers.A.name;
+            document.getElementById('input-sc-speaker-a-avatar').value = sample.speakers.A.avatar;
+            document.getElementById('input-sc-speaker-b-name').value = sample.speakers.B.name;
+            document.getElementById('input-sc-speaker-b-avatar').value = sample.speakers.B.avatar;
+
+            const turnsList = document.getElementById('sc-dialogue-turns-list');
+            if (turnsList) {
+                turnsList.innerHTML = '';
+                sample.dialogue.forEach(d => {
+                    this.addDialogueTurnRow(d.speaker, d.text, d.jyutping, d.translation);
+                });
+            }
+
+            const kwList = document.getElementById('sc-keywords-list');
+            if (kwList) {
+                kwList.innerHTML = '';
+                sample.keywords.forEach(k => {
+                    this.addKeywordRow(k.word, k.jyutping, k.meaning);
+                });
+            }
+        }
+
+        // Populate JSON Textarea
+        const jsonArea = document.getElementById('textarea-scenario-json');
+        if (jsonArea) {
+            jsonArea.value = JSON.stringify(sample, null, 2);
+        }
+
+        if (showToastMessage) {
+            this.showToast('Sample scenario loaded! ✨ 可直接編輯或點擊發布', 'success');
+        }
+    }
+
+    addDialogueTurnRow(speaker = 'A', text = '', jyutping = '', translation = '') {
+        const list = document.getElementById('sc-dialogue-turns-list');
+        if (!list) return;
+
+        const row = document.createElement('div');
+        row.className = 'sc-turn-row p-3 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-2 relative group';
+        row.innerHTML = `
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-bold text-slate-400">Speaker:</span>
+                    <select class="sc-turn-speaker bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:border-emerald-500 outline-none">
+                        <option value="A" ${speaker === 'A' ? 'selected' : ''}>Speaker A</option>
+                        <option value="B" ${speaker === 'B' ? 'selected' : ''}>Speaker B</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.UIManager.playScenarioLineTest(this)" class="p-1.5 text-xs text-sky-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-all" title="Test Cantonese audio">
+                        🔊 Test Audio
+                    </button>
+                    <button type="button" onclick="window.UIManager.removeDialogueTurnRow(this)" class="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all text-xs" title="Remove line">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-1.5">
+                <input type="text" value="${this.escapeQuotes(text)}" placeholder="Cantonese text (廣東話對白) *" class="sc-turn-text w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 font-cantonese focus:border-emerald-500 outline-none">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" value="${this.escapeQuotes(jyutping)}" placeholder="Jyutping (粵拼, optional)" class="sc-turn-jyutping w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-emerald-400/90 font-mono focus:border-emerald-500 outline-none">
+                    <input type="text" value="${this.escapeQuotes(translation)}" placeholder="English translation (英文翻譯)" class="sc-turn-trans w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:border-emerald-500 outline-none">
+                </div>
+            </div>
+        `;
+        list.appendChild(row);
+    }
+
+    removeDialogueTurnRow(btn) {
+        const row = btn.closest('.sc-turn-row');
+        if (row) {
+            const list = document.getElementById('sc-dialogue-turns-list');
+            if (list && list.querySelectorAll('.sc-turn-row').length <= 2) {
+                this.showToast('Scenario must keep at least 2 dialogue turns', 'info');
+                return;
+            }
+            row.remove();
+        }
+    }
+
+    playScenarioLineTest(btn) {
+        const row = btn.closest('.sc-turn-row');
+        if (!row) return;
+        const textInput = row.querySelector('.sc-turn-text');
+        const text = textInput ? textInput.value.trim() : '';
+        if (!text) {
+            this.showToast('Please enter Cantonese text first to test audio', 'info');
+            return;
+        }
+        if (this.speechEngine) {
+            this.speechEngine.speak(text);
+        } else if (window.AudioController) {
+            window.AudioController.speak(text);
+        }
+    }
+
+    addKeywordRow(word = '', jyutping = '', meaning = '') {
+        const list = document.getElementById('sc-keywords-list');
+        if (!list) return;
+
+        const row = document.createElement('div');
+        row.className = 'sc-keyword-row grid grid-cols-1 sm:grid-cols-7 gap-2 p-2 bg-slate-900/60 rounded-xl border border-slate-800 items-center';
+        row.innerHTML = `
+            <div class="sm:col-span-2">
+                <input type="text" value="${this.escapeQuotes(word)}" placeholder="Word 詞彙 (e.g. 買菜)" class="sc-kw-word w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-100 font-cantonese focus:border-sky-500 outline-none">
+            </div>
+            <div class="sm:col-span-2">
+                <input type="text" value="${this.escapeQuotes(jyutping)}" placeholder="Jyutping (maai5 coi3)" class="sc-kw-jyutping w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-sky-400 font-mono focus:border-sky-500 outline-none">
+            </div>
+            <div class="sm:col-span-2">
+                <input type="text" value="${this.escapeQuotes(meaning)}" placeholder="Meaning (Buy veggies)" class="sc-kw-meaning w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:border-sky-500 outline-none">
+            </div>
+            <div class="flex justify-end">
+                <button type="button" onclick="window.UIManager.removeKeywordRow(this)" class="p-1 text-slate-500 hover:text-rose-400 text-xs rounded transition-colors" title="Remove keyword">✕</button>
+            </div>
+        `;
+        list.appendChild(row);
+    }
+
+    removeKeywordRow(btn) {
+        const row = btn.closest('.sc-keyword-row');
+        if (row) row.remove();
+    }
+
+    handleScenarioFileUpload(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                const jsonArea = document.getElementById('textarea-scenario-json');
+                if (jsonArea) {
+                    jsonArea.value = JSON.stringify(parsed, null, 2);
+                }
+                const status = document.getElementById('scenario-json-status');
+                if (status) {
+                    status.textContent = `Loaded ${file.name} (${Array.isArray(parsed) ? parsed.length + ' scenarios' : '1 scenario'})`;
+                    status.className = 'text-[11px] font-mono text-emerald-400';
+                }
+                this.showToast(`File "${file.name}" loaded! Click Save to publish. 📥`, 'success');
+            } catch (err) {
+                this.showToast('Invalid JSON file format: ' + err.message, 'error');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async saveNewScenario() {
+        let payload = null;
+
+        if (this.scenarioModalActiveTab === 'upload') {
+            const raw = document.getElementById('textarea-scenario-json')?.value.trim();
+            if (!raw) {
+                this.showToast('Please provide scenario JSON content', 'error');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    payload = { action: 'import', scenarios: parsed };
+                } else {
+                    payload = { action: 'create', scenario: parsed };
+                }
+            } catch (err) {
+                this.showToast('Invalid JSON format: ' + err.message, 'error');
+                return;
+            }
+        } else {
+            // Read visual builder form
+            const title = document.getElementById('input-sc-title')?.value.trim();
+            if (!title) {
+                this.showToast('Scenario title is required (請輸入情景名稱)', 'error');
+                document.getElementById('input-sc-title')?.focus();
+                return;
+            }
+
+            const titleEn = document.getElementById('input-sc-title-en')?.value.trim() || title;
+            const category = document.getElementById('input-sc-category')?.value || 'Daily';
+            const difficulty = document.getElementById('input-sc-difficulty')?.value || 'Beginner';
+            const emoji = document.getElementById('input-sc-emoji')?.value.trim() || '💬';
+            const description = document.getElementById('input-sc-desc')?.value.trim() || `User contributed scenario for ${title}`;
+
+            const speakerAName = document.getElementById('input-sc-speaker-a-name')?.value.trim() || 'Customer 顧客';
+            const speakerAAvatar = document.getElementById('input-sc-speaker-a-avatar')?.value.trim() || '👤';
+            const speakerBName = document.getElementById('input-sc-speaker-b-name')?.value.trim() || 'Shopkeeper 店員';
+            const speakerBAvatar = document.getElementById('input-sc-speaker-b-avatar')?.value.trim() || '🏪';
+
+            // Dialogue turns
+            const turnRows = document.querySelectorAll('.sc-turn-row');
+            const dialogue = [];
+            turnRows.forEach(row => {
+                const speaker = row.querySelector('.sc-turn-speaker')?.value || 'A';
+                const text = row.querySelector('.sc-turn-text')?.value.trim() || '';
+                const jyutping = row.querySelector('.sc-turn-jyutping')?.value.trim() || '';
+                const translation = row.querySelector('.sc-turn-trans')?.value.trim() || '';
+                if (text) {
+                    dialogue.push({ speaker, text, jyutping, translation });
+                }
+            });
+
+            if (dialogue.length < 2) {
+                this.showToast('Please add at least 2 dialogue turns with Cantonese text (至少需要兩句對話)', 'error');
+                return;
+            }
+
+            // Keywords
+            const kwRows = document.querySelectorAll('.sc-keyword-row');
+            const keywords = [];
+            kwRows.forEach(row => {
+                const word = row.querySelector('.sc-kw-word')?.value.trim() || '';
+                const jyutping = row.querySelector('.sc-kw-jyutping')?.value.trim() || '';
+                const meaning = row.querySelector('.sc-kw-meaning')?.value.trim() || '';
+                if (word) {
+                    keywords.push({ word, jyutping, meaning, meaning_zh: word });
+                }
+            });
+
+            const authorName = this.authManager && this.authManager.currentUser 
+                ? (this.authManager.currentUser.displayName || this.authManager.currentUser.email)
+                : 'Community Learner';
+
+            const scenarioObj = {
+                id: `sc-user-${Date.now()}`,
+                title,
+                titleEn,
+                category,
+                difficulty,
+                emoji,
+                description,
+                author: authorName,
+                createdAt: new Date().toISOString(),
+                speakers: {
+                    A: { name: speakerAName, avatar: speakerAAvatar },
+                    B: { name: speakerBName, avatar: speakerBAvatar }
+                },
+                keywords,
+                dialogue
+            };
+
+            payload = { action: 'create', scenario: scenarioObj };
+        }
+
+        try {
+            this.showToast('Saving and publishing scenario... 正在發布', 'info');
+            const res = await fetch('/api/scenarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                if (data.scenarios && Array.isArray(data.scenarios)) {
+                    this.scenariosList = data.scenarios;
+                } else if (payload.scenario) {
+                    this.scenariosList = this.scenariosList || this.getBuiltInScenariosData();
+                    this.scenariosList.unshift(payload.scenario);
+                }
+                try {
+                    localStorage.setItem('cantonese_scenarios_cache', JSON.stringify(this.scenariosList));
+                } catch (e) {}
+
+                this.closeCreateScenarioModal();
+                this.renderScenariosGrid();
+
+                const targetId = data.scenario?.id || payload.scenario?.id;
+                this.showToast('Scenario published successfully! 🚀 已成功建立情景', 'success');
+
+                if (targetId) {
+                    setTimeout(() => {
+                        this.openScenarioRoom(targetId);
+                    }, 400);
+                }
+            } else {
+                throw new Error(data.error || 'Server rejected scenario creation');
+            }
+        } catch (err) {
+            console.error('Failed to save scenario:', err);
+            // Fallback to local storage if offline
+            if (payload.scenario) {
+                this.scenariosList = this.scenariosList || this.getBuiltInScenariosData();
+                this.scenariosList.unshift(payload.scenario);
+                try {
+                    localStorage.setItem('cantonese_scenarios_cache', JSON.stringify(this.scenariosList));
+                } catch (e) {}
+                this.closeCreateScenarioModal();
+                this.renderScenariosGrid();
+                this.showToast('Saved to local browser cache! (Offline mode) 💾', 'info');
+                this.openScenarioRoom(payload.scenario.id);
+            } else {
+                this.showToast('Error saving scenario: ' + err.message, 'error');
+            }
+        }
+    }
+
+    exportActiveScenarioJSON() {
+        if (!this.activeScenario) return;
+        const jsonStr = JSON.stringify(this.activeScenario, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const filename = `${this.activeScenario.id || 'cantonese-scenario'}.json`;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        this.showToast(`Exported "${filename}" successfully! 💾`, 'success');
+    }
+
+    async deleteActiveScenario() {
+        if (!this.activeScenario) return;
+        const scId = this.activeScenario.id;
+        const scTitle = this.activeScenario.title;
+
+        if (!confirm(`Are you sure you want to delete this custom topic?\n\n"${scTitle}"`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/scenarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete', scenarioId: scId })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                if (data.scenarios) this.scenariosList = data.scenarios;
+                else this.scenariosList = (this.scenariosList || []).filter(s => s.id !== scId);
+                try {
+                    localStorage.setItem('cantonese_scenarios_cache', JSON.stringify(this.scenariosList));
+                } catch (e) {}
+                this.exitScenarioRoom();
+                this.renderScenariosGrid();
+                this.showToast('Topic deleted successfully 🗑️', 'info');
+            } else {
+                throw new Error(data.error || 'Failed to delete scenario');
+            }
+        } catch (err) {
+            this.showToast('Failed to delete topic: ' + err.message, 'error');
         }
     }
 
