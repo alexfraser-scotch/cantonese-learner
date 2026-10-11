@@ -1872,7 +1872,8 @@ class SpeechEngine {
         this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
         this.cantoneseVoice = null;
         this.isVoiceAvailable = true; // Always true because backend /api/tts Cloud Audio Stream is active
-        this.speechRate = 0.9;
+        const savedRate = typeof localStorage !== 'undefined' ? parseFloat(localStorage.getItem('cantonese_audio_speed')) : 0.9;
+        this.speechRate = !isNaN(savedRate) && savedRate > 0 ? savedRate : 0.9;
         this.currentAudio = null;
         this.init();
     }
@@ -1958,6 +1959,7 @@ class SpeechEngine {
 
         const audio = new Audio();
         audio.referrerPolicy = 'no-referrer';
+        audio.playbackRate = this.speechRate || 0.9;
         this.currentAudio = audio;
 
         let hasFiredStart = false;
@@ -2027,6 +2029,20 @@ class SpeechEngine {
             this.currentAudio = null;
         }
     }
+
+    setSpeechRate(rate) {
+        const num = parseFloat(rate);
+        if (!isNaN(num) && num > 0) {
+            this.speechRate = num;
+            try {
+                localStorage.setItem('cantonese_audio_speed', num.toString());
+            } catch (e) {}
+        }
+    }
+
+    getSpeechRate() {
+        return this.speechRate || 0.9;
+    }
 }
 
 // Global AudioController wrapper ensuring seamless audio playback across all modules
@@ -2040,6 +2056,21 @@ window.AudioController = {
             window.globalSpeechEngine = new SpeechEngine();
             window.globalSpeechEngine.speak(text, onStart, onEnd);
         }
+    },
+
+    setRate(rate) {
+        if (window.UIManager && window.UIManager.speechEngine) {
+            window.UIManager.speechEngine.setSpeechRate(rate);
+        } else if (window.globalSpeechEngine) {
+            window.globalSpeechEngine.setSpeechRate(rate);
+        }
+    },
+
+    getRate() {
+        if (window.UIManager && window.UIManager.speechEngine) {
+            return window.UIManager.speechEngine.getSpeechRate();
+        }
+        return 0.9;
     },
     stop() {
         if (window.UIManager && window.UIManager.speechEngine) {
@@ -2556,6 +2587,12 @@ class UIManager {
                 this.showToast('Community decks synced!', 'success');
             });
         }
+
+        // Initialize Audio Speed Badge
+        this.updateAudioSpeedUI();
+
+        // Initialize PWA and Network Listeners
+        this.initPWAAndNetworkListeners();
         // Admin Portal Search & Filter Bindings
         const adminSearchUsers = document.getElementById('admin-search-users');
         if (adminSearchUsers) {
@@ -2854,6 +2891,110 @@ class UIManager {
                 if (e.key === 'Escape') this.exitDictationMode();
             }
         });
+    }
+
+    // ==========================================
+    // PWA & Network Connectivity Handlers
+    // ==========================================
+    initPWAAndNetworkListeners() {
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        console.log('Cantonese Learner Service Worker registered, scope:', reg.scope);
+                    })
+                    .catch(err => {
+                        console.warn('Service Worker registration failed:', err);
+                    });
+            });
+        }
+
+        // Catch PWA Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.deferredPwaPrompt = e;
+            const btnInstall = document.getElementById('btn-install-pwa');
+            if (btnInstall) {
+                btnInstall.classList.remove('hidden');
+                btnInstall.classList.add('flex');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            this.deferredPwaPrompt = null;
+            const btnInstall = document.getElementById('btn-install-pwa');
+            if (btnInstall) btnInstall.classList.add('hidden');
+            this.showToast('Cantonese Learner installed successfully! 📱🇭🇰', 'success');
+        });
+
+        // Network Status Event Listeners
+        const updateNetworkBanner = () => {
+            const banner = document.getElementById('banner-offline-status');
+            if (!banner) return;
+            if (navigator.onLine) {
+                banner.classList.add('hidden');
+            } else {
+                banner.classList.remove('hidden');
+            }
+        };
+
+        window.addEventListener('online', () => {
+            updateNetworkBanner();
+            this.showToast('You are back online! 🟢', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            updateNetworkBanner();
+            this.showToast('Working offline. Cached flashcards are available! 📡', 'warning');
+        });
+
+        // Initial offline check
+        updateNetworkBanner();
+    }
+
+    async promptPwaInstall() {
+        if (!this.deferredPwaPrompt) {
+            this.showToast('App is already installed or install prompt unavailable in this browser.', 'info');
+            return;
+        }
+        this.deferredPwaPrompt.prompt();
+        const { outcome } = await this.deferredPwaPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted PWA install prompt');
+        } else {
+            console.log('User dismissed PWA install prompt');
+        }
+        this.deferredPwaPrompt = null;
+        const btnInstall = document.getElementById('btn-install-pwa');
+        if (btnInstall) btnInstall.classList.add('hidden');
+    }
+
+    // ==========================================
+    // Universal Audio Speed Controller
+    // ==========================================
+    cycleAudioSpeed() {
+        const speeds = [0.75, 0.9, 1.1];
+        const currentRate = this.speechEngine ? this.speechEngine.getSpeechRate() : 0.9;
+        let nextIndex = speeds.findIndex(s => Math.abs(s - currentRate) < 0.05) + 1;
+        if (nextIndex >= speeds.length || nextIndex < 0) nextIndex = 0;
+        const newSpeed = speeds[nextIndex];
+
+        if (this.speechEngine) {
+            this.speechEngine.setSpeechRate(newSpeed);
+        }
+        this.updateAudioSpeedUI();
+
+        const labelMap = { 0.75: 'Slow (0.75x) - Ideal for tones', 0.9: 'Normal (0.9x)', 1.1: 'Fast (1.1x) - Conversational' };
+        this.showToast(`Audio speed set to ${labelMap[newSpeed] || newSpeed + 'x'}`, 'info');
+    }
+
+    updateAudioSpeedUI() {
+        const rate = this.speechEngine ? this.speechEngine.getSpeechRate() : 0.9;
+        const labelEl = document.getElementById('label-audio-speed');
+        if (labelEl) {
+            labelEl.textContent = `${rate}x`;
+        }
     }
 
     switchView(targetView, params = {}) {
@@ -6404,12 +6545,24 @@ class UIManager {
         const grid = document.getElementById('scenarios-cards-grid');
         if (!grid) return;
 
+        this.scenarioSortOrder = this.scenarioSortOrder || 'default';
         const scenarios = this.getScenariosData();
-        const filtered = this.scenarioFilter === 'all' 
-            ? scenarios 
+        let filtered = this.scenarioFilter === 'all' 
+            ? [...scenarios] 
             : (this.scenarioFilter === 'Community'
                 ? scenarios.filter(s => s.id.startsWith('sc-user-') || s.id.startsWith('sc-custom-') || s.category === 'Community' || (s.author && s.author !== 'Cantonese Community'))
                 : scenarios.filter(s => s.category === this.scenarioFilter));
+
+        // Apply sorting
+        if (this.scenarioSortOrder === 'likes') {
+            filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        } else if (this.scenarioSortOrder === 'difficulty_asc') {
+            const diffMap = { 'Beginner (初級)': 1, 'Intermediate (中級)': 2, 'Advanced (高級)': 3 };
+            filtered.sort((a, b) => (diffMap[a.difficulty] || 2) - (diffMap[b.difficulty] || 2));
+        } else if (this.scenarioSortOrder === 'difficulty_desc') {
+            const diffMap = { 'Beginner (初級)': 1, 'Intermediate (中級)': 2, 'Advanced (高級)': 3 };
+            filtered.sort((a, b) => (diffMap[b.difficulty] || 2) - (diffMap[a.difficulty] || 2));
+        }
 
         if (filtered.length === 0) {
             grid.innerHTML = `
@@ -6428,8 +6581,13 @@ class UIManager {
             return;
         }
 
+        const likedScenarios = new Set(JSON.parse(localStorage.getItem('cantonese_liked_scenarios') || '[]'));
+
         grid.innerHTML = filtered.map(s => {
             const isCustom = s.id.startsWith('sc-user-') || s.id.startsWith('sc-custom-') || (s.author && s.author !== 'Cantonese Community');
+            const isLiked = likedScenarios.has(s.id);
+            const likesCount = s.likes || 0;
+
             return `
             <div onclick="window.UIManager.openScenarioRoom('${s.id}')" class="glass-card rounded-3xl p-6 border ${isCustom ? 'border-emerald-500/40 bg-emerald-950/10' : 'border-slate-800'} hover:border-emerald-500/50 cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between group shadow-xl">
                 <div class="space-y-4">
@@ -6459,8 +6617,13 @@ class UIManager {
                     </div>
                 </div>
                 <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
-                    <div class="flex items-center gap-1.5 text-xs text-slate-300 font-medium">
+                    <div class="flex items-center gap-2 text-xs text-slate-300 font-medium">
                         <span>${s.speakers?.A?.avatar || '👤'} vs ${s.speakers?.B?.avatar || '👥'}</span>
+                        <!-- Upvote / Like Button -->
+                        <button onclick="event.stopPropagation(); window.UIManager.likeScenario('${s.id}')" title="Like / Upvote scenario" class="px-2 py-1 rounded-lg text-[11px] font-mono flex items-center gap-1 border transition-all ${isLiked ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-rose-300 hover:border-rose-500/30'}">
+                            <span>❤️</span>
+                            <span id="scenario-likes-${s.id}">${likesCount}</span>
+                        </button>
                     </div>
                     <span class="text-xs font-bold text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         Start Dialogue →
@@ -6469,6 +6632,52 @@ class UIManager {
             </div>
             `;
         }).join('');
+    }
+
+    handleScenarioSortChange(newSort) {
+        this.scenarioSortOrder = newSort;
+        this.renderScenariosGrid();
+    }
+
+    async likeScenario(scenarioId) {
+        const likedScenarios = new Set(JSON.parse(localStorage.getItem('cantonese_liked_scenarios') || '[]'));
+        if (likedScenarios.has(scenarioId)) {
+            this.showToast('You already liked this topic! ❤️', 'info');
+            return;
+        }
+
+        // Optimistically update badge in UI & local state
+        likedScenarios.add(scenarioId);
+        try {
+            localStorage.setItem('cantonese_liked_scenarios', JSON.stringify([...likedScenarios]));
+        } catch (e) {}
+
+        const scenarios = this.getScenariosData();
+        const sc = scenarios.find(s => s.id === scenarioId);
+        if (sc) {
+            sc.likes = (sc.likes || 0) + 1;
+            const badge = document.getElementById(`scenario-likes-${scenarioId}`);
+            if (badge) badge.textContent = sc.likes;
+        }
+
+        try {
+            const res = await fetch('/api/scenarios/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scenarioId })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (sc && data.likes) sc.likes = data.likes;
+                this.showToast('Liked topic! ❤️ +1', 'success');
+                this.renderScenariosGrid();
+            } else {
+                this.showToast('Upvoted locally! ❤️', 'success');
+            }
+        } catch (err) {
+            console.warn('Network like failed, saved locally:', err.message);
+            this.showToast('Upvoted locally! ❤️', 'success');
+        }
     }
 
     openScenarioRoom(scenarioId) {

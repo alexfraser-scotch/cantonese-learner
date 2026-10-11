@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
 const fs = require('node:fs');
+const http = require('node:http');
 const { server, ensureDataFile, readProfiles, writeProfiles, DEFAULT_PROFILES } = require('../server.js');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -1037,6 +1038,111 @@ test('Scenario Creation, Persistence, and Validation Engine', async (t) => {
         });
         req.on('error', reject);
         req.write(JSON.stringify({ action: 'delete', scenarioId: testScenarioId }));
+        req.end();
+    });
+});
+
+test('PWA Manifest & Service Worker Static Headers and Cache Policy', async (t) => {
+    const port = (server.address() && server.address().port) || 8080;
+    // 1. Verify manifest.json is served with application/manifest+json
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/manifest.json`, (res) => {
+            assert.strictEqual(res.statusCode, 200, 'manifest.json should return 200');
+            assert.ok(
+                res.headers['content-type'].includes('application/manifest+json') || res.headers['content-type'].includes('application/json'),
+                'Content-type should be manifest or json'
+            );
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const manifest = JSON.parse(body);
+                assert.strictEqual(manifest.name, '粵語通 Cantonese Learner');
+                assert.strictEqual(manifest.display, 'standalone');
+                assert.strictEqual(manifest.theme_color, '#0f172a');
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    // 2. Verify sw.js is served with Service-Worker-Allowed: /
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/sw.js`, (res) => {
+            assert.strictEqual(res.statusCode, 200, 'sw.js should return 200');
+            assert.strictEqual(res.headers['service-worker-allowed'], '/', 'Service worker allowed header must be /');
+            assert.ok(res.headers['cache-control'].includes('no-store') && res.headers['cache-control'].includes('no-cache'), 'sw.js should not be cached');
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                assert.ok(body.includes('CACHE_NAME'), 'sw.js should define CACHE_NAME');
+                resolve();
+            });
+        }).on('error', reject);
+    });
+});
+
+test('Scenario Upvote & Likes API (/api/scenarios/like)', async (t) => {
+    const port = (server.address() && server.address().port) || 8080;
+    // 1. Missing scenarioId returns 400
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 400, 'Missing scenarioId should return 400');
+            resolve();
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({}));
+        req.end();
+    });
+
+    // 2. Non-existent scenarioId returns 404
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 404, 'Non-existent scenario should return 404');
+            resolve();
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ scenarioId: 'non-existent-scenario-999' }));
+        req.end();
+    });
+
+    // 3. Valid upvote increments likes
+    let initialLikes = 0;
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/scenarios`, (res) => {
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const scenarios = JSON.parse(body);
+                const chaChaanTeng = scenarios.find(s => s.id === 'sc-cha-chaan-teng');
+                initialLikes = chaChaanTeng ? (chaChaanTeng.likes || 0) : 0;
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/scenarios/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 200, 'Upvoting valid scenario should return 200');
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const data = JSON.parse(body);
+                assert.strictEqual(data.success, true);
+                assert.strictEqual(data.scenarioId, 'sc-cha-chaan-teng');
+                assert.strictEqual(data.likes, initialLikes + 1, 'Likes should increment by 1');
+                resolve();
+            });
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ scenarioId: 'sc-cha-chaan-teng' }));
         req.end();
     });
 });

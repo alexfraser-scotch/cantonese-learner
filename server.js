@@ -1126,6 +1126,39 @@ const server = http.createServer((req, res) => {
     }
 
     // ==========================================
+    // API ENDPOINT: LIKE CANTONESE SCENARIO
+    // ==========================================
+    if (pathName === '/api/scenarios/like' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                if (!data || !data.scenarioId) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'scenarioId is required' }));
+                    return;
+                }
+                const currentScenarios = readScenarios();
+                const scenario = currentScenarios.find(s => s.id === data.scenarioId);
+                if (scenario) {
+                    scenario.likes = (scenario.likes || 0) + 1;
+                    writeScenarios(currentScenarios);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, likes: scenario.likes, scenarioId: scenario.id }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Scenario not found' }));
+                }
+            } catch (err) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+            }
+        });
+        return;
+    }
+
+    // ==========================================
     // API ENDPOINTS FOR SHARED PUBLIC PROFILES
     // ==========================================
     if (pathName === '/api/profiles') {
@@ -1374,7 +1407,13 @@ const server = http.createServer((req, res) => {
             }
         } else {
             const headers = { 'Content-Type': contentType };
-            if (ext === '.js' || ext === '.html' || ext === '.css') {
+            if (pathName === '/sw.js') {
+                headers['Service-Worker-Allowed'] = '/';
+                headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+            } else if (pathName === '/manifest.json') {
+                headers['Content-Type'] = 'application/manifest+json; charset=utf-8';
+                headers['Cache-Control'] = 'public, max-age=86400';
+            } else if (ext === '.js' || ext === '.html' || ext === '.css') {
                 headers['Cache-Control'] = 'no-cache, must-revalidate, max-age=0';
                 headers['Pragma'] = 'no-cache';
             }

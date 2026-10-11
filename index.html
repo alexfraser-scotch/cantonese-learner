@@ -6,6 +6,14 @@
     <title>粵語通 Cantonese Vocabulary Learner SPA</title>
     <meta name="description" content="Modern profile-based Cantonese vocabulary flashcard learning application with Web Speech API audio pronunciation, CSV/JSON parser, and 3D study cards.">
     
+    <!-- PWA Web App Manifest & Mobile App Meta -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -122,11 +130,28 @@
                     </div>
                 </div>
 
+                <!-- Audio Playback Speed Toggle -->
+                <button id="btn-audio-speed-toggle" onclick="window.UIManager.cycleAudioSpeed()" title="Adjust Cantonese speech playback speed" class="px-2.5 py-1.5 text-xs font-mono font-bold text-sky-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/40 rounded-xl transition-all flex items-center gap-1 shadow-sm">
+                    <span class="text-sky-400">⚡</span>
+                    <span id="label-audio-speed">0.9x</span>
+                </button>
+
+                <!-- PWA Install Button (Hidden by default until prompt available) -->
+                <button id="btn-install-pwa" onclick="window.UIManager.promptPwaInstall()" class="hidden px-3 py-1.5 text-xs font-bold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-xl transition-all items-center gap-1.5 shadow-sm shadow-emerald-500/10">
+                    <span>📲</span> Install App
+                </button>
+
                 <button id="nav-sync-btn" title="Sync latest community profiles" class="px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     Sync Decks
                 </button>
             </div>
+        </div>
+
+        <!-- Offline Status Banner -->
+        <div id="banner-offline-status" class="hidden bg-gradient-to-r from-amber-900/90 via-amber-800/90 to-amber-900/90 border-b border-amber-600/40 text-amber-100 px-4 py-2 text-center text-xs font-medium flex items-center justify-center gap-2 shadow-md">
+            <span>📡</span>
+            <span>You are currently browsing offline. Cached flashcards, scenarios, and tone drills remain fully functional.</span>
         </div>
     </header>
 
@@ -1041,16 +1066,29 @@
                     </div>
                 </div>
 
-                <!-- Scenario Category Filter Chips -->
-                <div id="scenario-category-filters" class="flex items-center gap-2 flex-wrap">
-                    <button data-cat="all" onclick="window.UIManager.filterScenarioCategory('all', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all">All Scenarios (全部情景)</button>
-                    <button data-cat="Dining" onclick="window.UIManager.filterScenarioCategory('Dining', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🥟 Dining & Food (餐飲美食)</button>
-                    <button data-cat="Transport" onclick="window.UIManager.filterScenarioCategory('Transport', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🚕 Transport & Transit (交通問路)</button>
-                    <button data-cat="Shopping" onclick="window.UIManager.filterScenarioCategory('Shopping', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🛍️ Shopping & Bargaining (購物講價)</button>
-                    <button data-cat="Medical" onclick="window.UIManager.filterScenarioCategory('Medical', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏥 Clinic & Health (睇醫生求診)</button>
-                    <button data-cat="Workplace" onclick="window.UIManager.filterScenarioCategory('Workplace', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">💼 Workplace & Office (求職職場)</button>
-                    <button data-cat="Daily" onclick="window.UIManager.filterScenarioCategory('Daily', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏠 Daily Life & Housing (租屋生活)</button>
-                    <button data-cat="Community" onclick="window.UIManager.filterScenarioCategory('Community', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🌟 Community / Custom (用戶自訂)</button>
+                <!-- Scenario Category Filter Chips & Sort Controls -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div id="scenario-category-filters" class="flex items-center gap-2 flex-wrap">
+                        <button data-cat="all" onclick="window.UIManager.filterScenarioCategory('all', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all">All Scenarios (全部情景)</button>
+                        <button data-cat="Dining" onclick="window.UIManager.filterScenarioCategory('Dining', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🥟 Dining & Food (餐飲美食)</button>
+                        <button data-cat="Transport" onclick="window.UIManager.filterScenarioCategory('Transport', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🚕 Transport & Transit (交通問路)</button>
+                        <button data-cat="Shopping" onclick="window.UIManager.filterScenarioCategory('Shopping', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🛍️ Shopping & Bargaining (購物講價)</button>
+                        <button data-cat="Medical" onclick="window.UIManager.filterScenarioCategory('Medical', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏥 Clinic & Health (睇醫生求診)</button>
+                        <button data-cat="Workplace" onclick="window.UIManager.filterScenarioCategory('Workplace', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">💼 Workplace & Office (求職職場)</button>
+                        <button data-cat="Daily" onclick="window.UIManager.filterScenarioCategory('Daily', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🏠 Daily Life & Housing (租屋生活)</button>
+                        <button data-cat="Community" onclick="window.UIManager.filterScenarioCategory('Community', this)" class="scenario-cat-btn px-3.5 py-1.5 text-xs font-semibold rounded-xl text-slate-400 hover:text-slate-200 transition-all">🌟 Community / Custom (用戶自訂)</button>
+                    </div>
+
+                    <!-- Scenario Sort Dropdown -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <label for="scenario-sort-select" class="text-xs font-medium text-slate-400">Sort by:</label>
+                        <select id="scenario-sort-select" onchange="window.UIManager.handleScenarioSortChange(this.value)" class="bg-slate-900 border border-slate-800 text-slate-300 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-emerald-500">
+                            <option value="default">Default Order</option>
+                            <option value="likes">🔥 Most Popular (Likes)</option>
+                            <option value="difficulty_asc">Beginner → Advanced</option>
+                            <option value="difficulty_desc">Advanced → Beginner</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Scenarios Grid -->
@@ -2251,6 +2289,6 @@
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- App JavaScript File -->
-    <script src="app.js?v=45_custom_scenarios"></script>
+    <script src="app.js?v=46_pwa_audio_speed"></script>
 </body>
 </html>

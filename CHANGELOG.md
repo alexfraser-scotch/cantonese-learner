@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.8.0] - 2026-10-10 - PWA Offline Mode, Universal Audio Speed & Community Upvoting
+
+### 🌟 Added
+- **📲 Progressive Web App (PWA) & Offline Capability (離線 PWA 漸進式應用):**
+  - Installable application manifest (`manifest.json`) configured with standalone display, dark theme `#0f172a`, and quick shortcuts (`#scenarios`, `#dictation`, `#sentence-builder`).
+  - High-resolution SVG vector application icon (`icons/icon.svg`) featuring the traditional character `粵` with modern audio-wave aesthetics.
+  - Service Worker (`sw.js`) implementing stale-while-revalidate and cache-first caching strategy for instant offline loads of learning materials.
+  - Smart PWA install button in header (`#btn-install-pwa`) with `beforeinstallprompt` interception.
+  - Real-time offline connection banner (`#banner-offline-status`) that informs learners when disconnected while keeping flashcard drills and dialogues operable.
+
+- **⚡ Universal Audio Playback Speed Controller (語音播放速度調節器):**
+  - Instant tempo toggle button in navbar (`#btn-audio-speed-toggle`) cycling through **0.75x (Slow - Tone Practice)**, **0.9x (Standard)**, and **1.1x (Fast - Conversational)**.
+  - Synchronized control across both native OS Web Speech Synthesis (`SpeechSynthesisUtterance.rate`) and high-fidelity Cloud Audio Streams (`audio.playbackRate`).
+  - Persistent speed preference remembered via `localStorage`.
+
+- **❤️ Scenario Community Upvoting & Sorting Engine (情景點讚推介與熱度排序):**
+  - Added scenario like endpoint `POST /api/scenarios/like` with persistent counts saved in `data/scenarios.json`.
+  - Interactive upvote heart badges (`❤️`) with optimistic UI feedback and local duplicate-vote prevention.
+  - New sorting dropdown (`#scenario-sort-select`): Default, Most Popular (`🔥 Most Popular (Likes)`), Beginner → Advanced, and Advanced → Beginner.
+
+- **🧪 Comprehensive Automated Unit Test Coverage:**
+  - Added new integration test suites for manifest serving, service worker cache headers (`Service-Worker-Allowed: /`, `no-store`), and scenario upvoting. All 25 unit tests passing cleanly.
+
+---
+
 ## [v1.7.0] - 2026-10-10 - Custom Scenario Creation & JSON Uploader Release
 
 ### 🌟 Added

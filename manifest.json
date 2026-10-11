@@ -1,0 +1,42 @@
+{
+  "name": "粵語通 Cantonese Learner",
+  "short_name": "粵語通",
+  "description": "Interactive Cantonese Vocabulary, Scenarios & Audio Learning App with 3D Flashcards, Leitner SRS & Real-World Dialogues",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "lang": "zh-HK",
+  "categories": [
+    "education",
+    "language",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "情景對話 Scenarios",
+      "url": "/#scenarios",
+      "description": "Practice authentic Hong Kong dialogues"
+    },
+    {
+      "name": "默書模式 Dictation",
+      "url": "/#dictation",
+      "description": "Hands-free voice dictation practice"
+    },
+    {
+      "name": "組句練習 Sentence Builder",
+      "url": "/#sentence-builder",
+      "description": "Master Cantonese aspect markers and grammar"
+    }
+  ]
+}
