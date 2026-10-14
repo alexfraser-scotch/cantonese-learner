@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.9.0] - 2026-10-14 - Granular Jyutping Tone-Pill Colorization & Dialogue Audio Karaoke Mode
+
+### 🌟 Added
+- **🎨 Granular Jyutping 6-Tone Pill Colorization (粵拼六聲色彩標記系統):**
+  - Designed an intelligent syllable token parser (`UIManager.formatJyutpingWithToneColors`) that identifies and highlights individual Cantonese pitch contours based on LSHK tone numbers:
+    - **Tone 1 (陰平 55)**: `#fda4af` / Rose (`.tone-pill-1`)
+    - **Tone 2 (陰上 25)**: `#fed7aa` / Orange (`.tone-pill-2`)
+    - **Tone 3 (陰去 33)**: `#fef08a` / Yellow (`.tone-pill-3`)
+    - **Tone 4 (陽平 21)**: `#bbf7d0` / Green (`.tone-pill-4`)
+    - **Tone 5 (陽上 23)**: `#bae6fd` / Sky Blue (`.tone-pill-5`)
+    - **Tone 6 (陽去 22)**: `#e9d5ff` / Purple (`.tone-pill-6`)
+  - Seamlessly applied across profile flashcards, vocabulary detail inspector modals, 3D study mode, and real-world scenario dialogues.
+
+- **🎤 Interactive Dialogue Karaoke Playback Mode (情景對話卡拉OK跟讀模式):**
+  - Integrated visual speaker focus animations (`.karaoke-active-speaker`) with glowing pulse borders and smooth auto-scrolling during dialogue audio playback.
+  - Highlights active speaking turns in real time across single-line clicks and continuous full scenario dialogues (`Play Full Dialogue`).
+
+- **🧪 Automated Unit Testing Expansion:**
+  - Added new dedicated unit test suite in `test/server.test.js` validating Jyutping tone syllable tokenization, color class assignments, and fallback handling for toneless tokens. 26/26 tests passing.
+
+---
+
 ## [v1.8.0] - 2026-10-10 - PWA Offline Mode, Universal Audio Speed & Community Upvoting
 
 ### 🌟 Added

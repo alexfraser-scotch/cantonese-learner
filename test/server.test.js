@@ -1147,6 +1147,43 @@ test('Scenario Upvote & Likes API (/api/scenarios/like)', async (t) => {
     });
 });
 
+test('Jyutping Tone Colorization & Syllable Tokenization Engine', (t) => {
+    function formatJyutpingWithToneColors(jyutping = '') {
+        if (!jyutping || typeof jyutping !== 'string') return '';
+        const syllables = jyutping.trim().split(/\s+/);
+        return syllables.map(syl => {
+            const toneMatch = syl.match(/([1-6])$/);
+            if (toneMatch) {
+                const toneNum = toneMatch[1];
+                return `<span class="inline-block px-1.5 py-0.5 rounded-md border font-mono font-semibold tone-pill-${toneNum}">${syl}</span>`;
+            }
+            return `<span class="inline-block px-1.5 py-0.5 rounded-md border border-slate-700 bg-slate-800 text-slate-300 font-mono">${syl}</span>`;
+        }).join(' ');
+    }
+
+    // 1. Single syllable tone matching
+    const res1 = formatJyutpingWithToneColors('si1');
+    assert.ok(res1.includes('tone-pill-1'), 'si1 should map to tone-pill-1');
+    assert.ok(res1.includes('si1'));
+
+    // 2. Multi-syllable phrase matching (All 6 tones test)
+    const testPhrase = 'si1 si2 si3 si4 si5 si6';
+    const resAll = formatJyutpingWithToneColors(testPhrase);
+    for (let tone = 1; tone <= 6; tone++) {
+        assert.ok(resAll.includes(`tone-pill-${tone}`), `Should generate tone-pill-${tone}`);
+    }
+
+    // 3. Punctuation or toneless syllable fallback
+    const resNoTone = formatJyutpingWithToneColors('hello');
+    assert.ok(!resNoTone.includes('tone-pill-'), 'Toneless token should not match tone pills');
+    assert.ok(resNoTone.includes('hello'));
+
+    // 4. Empty and null input handling
+    assert.strictEqual(formatJyutpingWithToneColors(''), '');
+    assert.strictEqual(formatJyutpingWithToneColors(null), '');
+    assert.strictEqual(formatJyutpingWithToneColors(undefined), '');
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

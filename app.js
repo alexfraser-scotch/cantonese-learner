@@ -2534,6 +2534,28 @@ class UIManager {
         this.checkEmailConfirmationRedirect();
     }
 
+    /**
+     * Splits Jyutping string into color-coded tone pills or syllables.
+     * Maps tone digits 1-6 to distinctive visual tone pill styling.
+     * e.g., "nei5 hou2" -> spans with .tone-pill-5 and .tone-pill-2
+     */
+    static formatJyutpingWithToneColors(jyutping = '') {
+        if (!jyutping || typeof jyutping !== 'string') return '';
+        const syllables = jyutping.trim().split(/\s+/);
+        return syllables.map(syl => {
+            const toneMatch = syl.match(/([1-6])$/);
+            if (toneMatch) {
+                const toneNum = toneMatch[1];
+                return `<span class="inline-block px-1.5 py-0.5 rounded-md border font-mono font-semibold tone-pill-${toneNum}">${syl}</span>`;
+            }
+            return `<span class="inline-block px-1.5 py-0.5 rounded-md border border-slate-700 bg-slate-800 text-slate-300 font-mono">${syl}</span>`;
+        }).join(' ');
+    }
+
+    formatJyutping(jyutping = '') {
+        return UIManager.formatJyutpingWithToneColors(jyutping);
+    }
+
     initDOM() {
         this.viewDashboard = document.getElementById('view-dashboard');
         this.viewProfileDetail = document.getElementById('view-profile-detail');
@@ -3381,7 +3403,7 @@ class UIManager {
                     </div>
 
                     <div class="mb-3">
-                        <span class="jyutping-badge inline-block px-3 py-1 rounded-lg text-xs font-mono font-semibold">${this.escapeHTML(item.jyutping)}</span>
+                        <span class="inline-flex flex-wrap items-center gap-1.5 text-xs font-mono font-semibold">${this.formatJyutping(item.jyutping)}</span>
                     </div>
 
                     <div class="space-y-1 mb-3">
@@ -3410,7 +3432,10 @@ class UIManager {
         const item = this.activeProfile.items[index];
 
         document.getElementById('modal-word').textContent = item.word;
-        document.getElementById('modal-jyutping').textContent = item.jyutping;
+        const modalJyutpingEl = document.getElementById('modal-jyutping');
+        if (modalJyutpingEl) {
+            modalJyutpingEl.innerHTML = this.formatJyutping(item.jyutping);
+        }
 
         const masteredSet = new Set(StorageManager.userProgress.masteredItemIds || []);
         const favSet = new Set(StorageManager.userProgress.favoriteItemIds || []);
@@ -3901,7 +3926,10 @@ class UIManager {
         const isFavorite = favSet.has(item.id);
 
         document.getElementById('study-front-word').textContent = item.word;
-        document.getElementById('study-front-jyutping').textContent = item.jyutping;
+        const studyFrontJyutping = document.getElementById('study-front-jyutping');
+        if (studyFrontJyutping) {
+            studyFrontJyutping.innerHTML = this.formatJyutping(item.jyutping);
+        }
 
         const studyImgContainer = document.getElementById('study-front-image-container');
         const studyImgElem = document.getElementById('study-front-image');
@@ -6801,7 +6829,7 @@ class UIManager {
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
                                         </button>
                                     </div>
-                                    <p class="text-xs font-mono text-emerald-400/90 mt-1">${this.escapeHTML(line.jyutping)}</p>
+                                    <div class="mt-1 flex flex-wrap items-center gap-1 text-xs font-mono">${this.formatJyutping(line.jyutping)}</div>
                                 </div>
 
                                 <div class="pt-2 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed">
@@ -6830,7 +6858,7 @@ class UIManager {
             btn.classList.add('scale-110', 'text-emerald-400', 'bg-emerald-500/20', 'ring-2', 'ring-emerald-400/50');
         }
         if (bubble) {
-            bubble.classList.add('ring-2', 'ring-emerald-400', 'shadow-lg', 'shadow-emerald-500/10');
+            bubble.classList.add('ring-2', 'ring-emerald-400', 'karaoke-active-speaker');
         }
 
         const cleanup = () => {
@@ -6838,7 +6866,7 @@ class UIManager {
                 btn.classList.remove('scale-110', 'text-emerald-400', 'bg-emerald-500/20', 'ring-2', 'ring-emerald-400/50');
             }
             if (bubble) {
-                bubble.classList.remove('ring-2', 'ring-emerald-400', 'shadow-lg', 'shadow-emerald-500/10');
+                bubble.classList.remove('ring-2', 'ring-emerald-400', 'karaoke-active-speaker');
             }
         };
 
@@ -6885,7 +6913,7 @@ class UIManager {
 
                 if (bubble) {
                     bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    bubble.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-950/80');
+                    bubble.classList.add('ring-2', 'ring-emerald-400', 'karaoke-active-speaker');
                 }
                 if (lineBtn) {
                     lineBtn.classList.add('scale-110', 'text-emerald-400', 'bg-emerald-500/20');
@@ -6918,7 +6946,7 @@ class UIManager {
                 });
 
                 if (bubble) {
-                    bubble.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/80');
+                    bubble.classList.remove('ring-2', 'ring-emerald-400', 'karaoke-active-speaker');
                 }
                 if (lineBtn) {
                     lineBtn.classList.remove('scale-110', 'text-emerald-400', 'bg-emerald-500/20');
@@ -6936,7 +6964,7 @@ class UIManager {
             }
             for (let i = 0; i < dialogue.length; i++) {
                 const bubble = document.getElementById(`scenario-bubble-${i}`);
-                if (bubble) bubble.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/80');
+                if (bubble) bubble.classList.remove('ring-2', 'ring-emerald-400', 'karaoke-active-speaker');
                 const lineBtn = document.getElementById(`btn-scenario-audio-${i}`);
                 if (lineBtn) lineBtn.classList.remove('scale-110', 'text-emerald-400', 'bg-emerald-500/20');
             }
