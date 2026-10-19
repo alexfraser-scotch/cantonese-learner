@@ -1298,6 +1298,7 @@ class StorageManager {
     static SETTINGS_KEY = 'cantonese_learner_settings_v1';
     static USER_PROGRESS_KEY = 'cantonese_user_progress_v1';
     static DICTATION_HISTORY_KEY = 'cantonese_dictation_history_v1';
+    static DICTATION_IN_PROGRESS_KEY = 'cantonese_dictation_in_progress_v1';
     static API_URL = '/api/profiles';
     static PROGRESS_API_URL = '/api/user/progress';
     static cachedProfiles = null;
@@ -1600,6 +1601,75 @@ class StorageManager {
         } catch (e) {
             console.warn('Failed to read dictation session from storage:', e);
             return null;
+        }
+    }
+
+    static saveInProgressDictation(session) {
+        if (!session || !Array.isArray(session.items) || session.items.length === 0) return;
+        try {
+            const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.DICTATION_IN_PROGRESS_KEY) : null;
+            let records = {};
+            if (raw) {
+                try { records = JSON.parse(raw); } catch (e) {}
+            }
+            if (!records || typeof records !== 'object') records = {};
+
+            const profileKey = session.profileId || 'global';
+            records[profileKey] = {
+                ...session,
+                savedAt: new Date().toISOString()
+            };
+            records['_last_active'] = profileKey;
+
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(this.DICTATION_IN_PROGRESS_KEY, JSON.stringify(records));
+            }
+        } catch (e) {
+            console.warn('Failed to save in-progress dictation to storage:', e);
+        }
+    }
+
+    static getInProgressDictation(profileId = null) {
+        try {
+            const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.DICTATION_IN_PROGRESS_KEY) : null;
+            if (!raw) return null;
+            const records = JSON.parse(raw);
+            if (!records || typeof records !== 'object') return null;
+
+            if (profileId && records[profileId]) {
+                return records[profileId];
+            }
+            if (!profileId && records['_last_active'] && records[records['_last_active']]) {
+                return records[records['_last_active']];
+            }
+            return records['global'] || null;
+        } catch (e) {
+            console.warn('Failed to read in-progress dictation from storage:', e);
+            return null;
+        }
+    }
+
+    static clearInProgressDictation(profileId = null) {
+        try {
+            const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.DICTATION_IN_PROGRESS_KEY) : null;
+            if (!raw) return;
+            let records = JSON.parse(raw);
+            if (!records || typeof records !== 'object') return;
+
+            if (profileId) {
+                delete records[profileId];
+                if (records['_last_active'] === profileId) {
+                    delete records['_last_active'];
+                }
+            } else {
+                records = {};
+            }
+
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(this.DICTATION_IN_PROGRESS_KEY, JSON.stringify(records));
+            }
+        } catch (e) {
+            console.warn('Failed to clear in-progress dictation from storage:', e);
         }
     }
 
@@ -3089,6 +3159,8 @@ class UIManager {
             if (params.viewResult && this.dictationState && this.dictationState.isFinished) {
                 this.renderDictationCard();
                 if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
+            } else if (params.isResume) {
+                if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
             } else if (this.activeProfile && this.activeProfile.items.length > 0) {
                 this.initDictationMode(params.scope || this.dictationState.filterScope || 'all');
                 if (this.viewDictationMode) this.viewDictationMode.classList.remove('hidden');
@@ -4486,12 +4558,96 @@ class UIManager {
         this.showToast(`Restored last dictation result (${session.items.length} words)! 📜`, 'success');
     }
 
+    resumeInProgressDictation(profileId = null) {
+        const targetProfileId = profileId || (this.activeProfile ? this.activeProfile.id : null);
+        const saved = StorageManager.getInProgressDictation(targetProfileId);
+
+        if (!saved || !Array.isArray(saved.items) || saved.items.length === 0) {
+            this.showToast('No saved dictation progress found.', 'warning');
+            return;
+        }
+
+        this.closeDictationSetupModal();
+
+        if (saved.profileId && (!this.activeProfile || this.activeProfile.id !== saved.profileId)) {
+            const foundProfile = StorageManager.getProfileById(saved.profileId);
+            if (foundProfile) {
+                this.activeProfile = foundProfile;
+            }
+        }
+
+        this.stopDictationAutoPlay();
+        this.stopDictationStopwatch();
+        this.stopDictationHandsFree();
+
+        this.dictationState.items = saved.items;
+        this.dictationState.currentIndex = Math.max(0, Math.min(saved.currentIndex || 0, saved.items.length - 1));
+        this.dictationState.elapsedSeconds = saved.elapsedSeconds || 0;
+        this.dictationState.filterScope = saved.filterScope || 'all';
+        this.dictationState.isFinished = false;
+        this.dictationState.isRevealed = false;
+        this.dictationState.remainingSeconds = this.dictationState.autoPlaySeconds;
+
+        let scopeLabel = 'All Words';
+        if (saved.filterScope === 'learning') scopeLabel = 'Learning 學習中';
+        else if (saved.filterScope === 'mastered') scopeLabel = 'Mastered 已掌握';
+        else if (saved.filterScope === 'favorites') scopeLabel = 'Favorites 我的最愛';
+
+        const scopeNameElem = document.getElementById('dictation-scope-name');
+        if (scopeNameElem) scopeNameElem.textContent = `${scopeLabel} (${saved.items.length})`;
+
+        this.switchView('dictation-mode', { profileId: this.activeProfile ? this.activeProfile.id : null, isResume: true });
+        this.startDictationStopwatch(saved.elapsedSeconds || 0);
+        this.renderDictationCard();
+        setTimeout(() => this.playDictationCurrentWord(), 300);
+
+        this.showToast(`Resumed dictation at Word ${this.dictationState.currentIndex + 1} of ${saved.items.length}! ▶️`, 'success');
+    }
+
+    discardInProgressDictation(profileId = null) {
+        const targetProfileId = profileId || (this.activeProfile ? this.activeProfile.id : null);
+        StorageManager.clearInProgressDictation(targetProfileId);
+        this.updateDictationButtonsVisibility();
+        this.showToast('Cleared in-progress dictation session.', 'info');
+    }
+
+    saveAndExitDictation() {
+        if (!this.dictationState || !this.dictationState.items || this.dictationState.items.length === 0 || this.dictationState.isFinished) {
+            this.exitDictationMode();
+            return;
+        }
+
+        const sessionPayload = {
+            profileId: this.activeProfile ? this.activeProfile.id : null,
+            profileName: this.activeProfile ? this.activeProfile.name : 'Deck',
+            items: this.dictationState.items,
+            currentIndex: this.dictationState.currentIndex,
+            elapsedSeconds: this.dictationState.elapsedSeconds,
+            filterScope: this.dictationState.filterScope || 'all',
+            savedAt: new Date().toISOString()
+        };
+
+        StorageManager.saveInProgressDictation(sessionPayload);
+        this.stopDictationAutoPlay();
+        this.stopDictationStopwatch();
+        this.stopDictationHandsFree();
+
+        const currentWordNum = this.dictationState.currentIndex + 1;
+        const totalWords = this.dictationState.items.length;
+        this.switchView('profile-detail', { profileId: this.activeProfile ? this.activeProfile.id : null });
+        this.updateDictationButtonsVisibility();
+        this.showToast(`Dictation progress saved at Word ${currentWordNum} of ${totalWords}! You can resume anytime. 💾`, 'success');
+    }
+
     updateDictationButtonsVisibility() {
         const profileId = this.activeProfile ? this.activeProfile.id : null;
         const lastSession = StorageManager.getLastDictationSession(profileId);
         const hasSession = !!(lastSession && Array.isArray(lastSession.items) && lastSession.items.length > 0);
 
-        // 1. Profile Detail View button
+        const inProgress = StorageManager.getInProgressDictation(profileId);
+        const hasInProgress = !!(inProgress && Array.isArray(inProgress.items) && inProgress.items.length > 0);
+
+        // 1. Profile Detail View button: Last Result
         const btnProfileLast = document.getElementById('btn-profile-last-dictation');
         if (btnProfileLast) {
             if (hasSession) {
@@ -4502,7 +4658,37 @@ class UIManager {
             }
         }
 
-        // 2. Dictation Setup Modal banner
+        // 2. Profile Detail View button: Resume In-Progress
+        const btnProfileResume = document.getElementById('btn-profile-resume-dictation');
+        const profileResumeCount = document.getElementById('profile-resume-count');
+        if (btnProfileResume) {
+            if (hasInProgress) {
+                btnProfileResume.classList.remove('hidden');
+                if (profileResumeCount) {
+                    profileResumeCount.textContent = `Word ${(inProgress.currentIndex || 0) + 1} of ${inProgress.items.length}`;
+                }
+                btnProfileResume.onclick = () => this.resumeInProgressDictation(profileId);
+            } else {
+                btnProfileResume.classList.add('hidden');
+            }
+        }
+
+        // 3. Dictation Setup Modal: In-Progress Resume banner
+        const setupResumeBox = document.getElementById('dictation-setup-resume-box');
+        const setupResumeDesc = document.getElementById('dictation-setup-resume-desc');
+        if (setupResumeBox) {
+            if (hasInProgress) {
+                setupResumeBox.classList.remove('hidden');
+                if (setupResumeDesc) {
+                    const elapsed = this.formatStopwatchTime(inProgress.elapsedSeconds || 0);
+                    setupResumeDesc.textContent = `Paused at Word ${(inProgress.currentIndex || 0) + 1} of ${inProgress.items.length} • Time spent: ${elapsed}`;
+                }
+            } else {
+                setupResumeBox.classList.add('hidden');
+            }
+        }
+
+        // 4. Dictation Setup Modal: Completed session banner
         const setupBox = document.getElementById('dictation-setup-last-result-box');
         const setupDesc = document.getElementById('dictation-setup-last-result-desc');
         if (setupBox) {
@@ -4517,7 +4703,7 @@ class UIManager {
             }
         }
 
-        // 3. Dictation View Header button
+        // 5. Dictation View Header button: View Result
         const btnDictationResult = document.getElementById('btn-dictation-view-result');
         if (btnDictationResult) {
             if (hasSession) {
@@ -4525,6 +4711,16 @@ class UIManager {
                 btnDictationResult.onclick = () => this.viewLastDictationResult(profileId);
             } else {
                 btnDictationResult.classList.add('hidden');
+            }
+        }
+
+        // 6. Dictation View Header button: Save & Exit
+        const btnSaveExit = document.getElementById('btn-dictation-save-exit');
+        if (btnSaveExit) {
+            if (this.dictationState && this.dictationState.isFinished) {
+                btnSaveExit.classList.add('hidden');
+            } else {
+                btnSaveExit.classList.remove('hidden');
             }
         }
     }
@@ -4547,6 +4743,9 @@ class UIManager {
         if (!this.activeProfile || !this.activeProfile.items || this.activeProfile.items.length === 0) return;
         this.stopDictationAutoPlay();
         this.stopDictationStopwatch();
+
+        // Clear any previous in-progress dictation session for this deck
+        StorageManager.clearInProgressDictation(this.activeProfile ? this.activeProfile.id : null);
 
         this.dictationState.filterScope = scope;
 
@@ -4588,17 +4787,17 @@ class UIManager {
         if (scopeNameElem) scopeNameElem.textContent = `${scopeLabel} (${randomized.length})`;
 
         // Start Stopwatch
-        this.startDictationStopwatch();
+        this.startDictationStopwatch(0);
 
         this.renderDictationCard();
         // Play word audio on initial entry
         setTimeout(() => this.playDictationCurrentWord(), 300);
     }
 
-    startDictationStopwatch() {
+    startDictationStopwatch(initialSeconds = 0) {
         this.stopDictationStopwatch();
         this.dictationState.startTime = Date.now();
-        this.dictationState.elapsedSeconds = 0;
+        this.dictationState.elapsedSeconds = initialSeconds || 0;
         this.updateStopwatchDisplay();
 
         this.dictationState.stopwatchTimer = setInterval(() => {
@@ -4654,7 +4853,7 @@ class UIManager {
                 summaryTime.textContent = this.formatStopwatchTime(this.dictationState.elapsedSeconds);
             }
 
-            // Auto-persist completed session to storage
+            // Auto-persist completed session to storage & clear in-progress session
             const sessionPayload = {
                 profileId: this.activeProfile ? this.activeProfile.id : null,
                 profileName: this.activeProfile ? this.activeProfile.name : 'Deck',
@@ -4665,6 +4864,7 @@ class UIManager {
             };
             this.dictationState.completedAt = sessionPayload.completedAt;
             StorageManager.saveLastDictationSession(sessionPayload);
+            StorageManager.clearInProgressDictation(this.activeProfile ? this.activeProfile.id : null);
             this.updateDictationButtonsVisibility();
 
             // Display completion date badge if available
@@ -5178,6 +5378,21 @@ class UIManager {
     }
 
     exitDictationMode() {
+        if (this.dictationState && !this.dictationState.isFinished && Array.isArray(this.dictationState.items) && this.dictationState.items.length > 0) {
+            if (this.dictationState.currentIndex > 0 || this.dictationState.elapsedSeconds >= 3) {
+                const sessionPayload = {
+                    profileId: this.activeProfile ? this.activeProfile.id : null,
+                    profileName: this.activeProfile ? this.activeProfile.name : 'Deck',
+                    items: this.dictationState.items,
+                    currentIndex: this.dictationState.currentIndex,
+                    elapsedSeconds: this.dictationState.elapsedSeconds,
+                    filterScope: this.dictationState.filterScope || 'all',
+                    savedAt: new Date().toISOString()
+                };
+                StorageManager.saveInProgressDictation(sessionPayload);
+                this.showToast(`Dictation progress auto-saved at Word ${this.dictationState.currentIndex + 1}. 💾`, 'info');
+            }
+        }
         this.stopDictationAutoPlay();
         this.stopDictationStopwatch();
         this.stopDictationHandsFree();

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.10.0] - 2026-10-19 - In-Progress Dictation Progress Auto-Save & Seamless Resumption
+
+### 🌟 Added
+- **💾 In-Progress Dictation Auto-Save & Manual "Save & Exit" (默書中途暫存與繼續進度):**
+  - Added dedicated `StorageManager.saveInProgressDictation()`, `getInProgressDictation()`, and `clearInProgressDictation()` methods using localized storage keys.
+  - Dictation header now features a dedicated **"💾 暫存進度 Save & Exit"** button (`#btn-dictation-save-exit`), preserving the exact word index (`currentIndex`), elapsed session timer, item sequence, and chosen filter scope.
+  - Safe exit protection: exiting dictation midway automatically preserves progress when learners have completed at least one word or spent >3 seconds in the session.
+- **▶️ Multi-Point Resumption UX (多端一鍵恢復默書進度):**
+  - **Profile Detail View:** Displays an amber **"▶️ 繼續默書 Resume (Word X of Y)"** button (`#btn-profile-resume-dictation`) right in the deck header action bar.
+  - **Dictation Setup Modal:** Renders an interactive In-Progress Alert Banner (`#dictation-setup-resume-box`) with paused position and elapsed time breakdown, providing 1-click **"繼續默書 Resume →"** or quick discard.
+  - Resuming restores the stopwatch from the exact saved elapsed time, loads the current word card, and triggers native pronunciation audio.
+- **🧹 Automatic Lifecycle Cleanup:**
+  - In-progress dictation state is automatically purged upon completing all words in the session or when starting fresh with a new scope, preventing stale session prompts.
+- **🧪 Unit Test Expansion:**
+  - Added test suite in `test/server.test.js` validating state retention, multiple deck isolation, and lifecycle cleanup. All 27 tests passing.
+
+---
+
 ## [v1.9.0] - 2026-10-14 - Granular Jyutping Tone-Pill Colorization & Dialogue Audio Karaoke Mode
 
 ### 🌟 Added

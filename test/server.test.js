@@ -848,6 +848,125 @@ test('Dictation Session Result Persistence and Retrieval Engine', (t) => {
     assert.strictEqual(getSession().profileId, 'deck-2', 'Global last points to most recent deck-2');
 });
 
+test('Dictation In-Progress Saving and Resumption Engine', (t) => {
+    const mockStorage = new Map();
+    const fakeLocalStorage = {
+        getItem: (k) => mockStorage.get(k) || null,
+        setItem: (k, v) => mockStorage.set(k, String(v)),
+        removeItem: (k) => mockStorage.delete(k)
+    };
+
+    const DICTATION_IN_PROGRESS_KEY = 'cantonese_dictation_in_progress_v1';
+    const DICTATION_HISTORY_KEY = 'cantonese_dictation_history_v1';
+
+    function saveInProgressDictation(session) {
+        if (!session || !Array.isArray(session.items) || session.items.length === 0) return;
+        const raw = fakeLocalStorage.getItem(DICTATION_IN_PROGRESS_KEY);
+        let records = {};
+        if (raw) {
+            try { records = JSON.parse(raw); } catch (e) {}
+        }
+        const profileKey = session.profileId || 'global';
+        records[profileKey] = {
+            ...session,
+            savedAt: new Date().toISOString()
+        };
+        records['_last_active'] = profileKey;
+        fakeLocalStorage.setItem(DICTATION_IN_PROGRESS_KEY, JSON.stringify(records));
+    }
+
+    function getInProgressDictation(profileId = null) {
+        const raw = fakeLocalStorage.getItem(DICTATION_IN_PROGRESS_KEY);
+        if (!raw) return null;
+        const records = JSON.parse(raw);
+        if (profileId && records[profileId]) {
+            return records[profileId];
+        }
+        if (!profileId && records['_last_active'] && records[records['_last_active']]) {
+            return records[records['_last_active']];
+        }
+        return records['global'] || null;
+    }
+
+    function clearInProgressDictation(profileId = null) {
+        const raw = fakeLocalStorage.getItem(DICTATION_IN_PROGRESS_KEY);
+        if (!raw) return;
+        let records = JSON.parse(raw);
+        if (profileId) {
+            delete records[profileId];
+            if (records['_last_active'] === profileId) {
+                delete records['_last_active'];
+            }
+        } else {
+            records = {};
+        }
+        fakeLocalStorage.setItem(DICTATION_IN_PROGRESS_KEY, JSON.stringify(records));
+    }
+
+    // 1. Initial State: No in-progress sessions
+    assert.strictEqual(getInProgressDictation('deck-hsk1'), null, 'Initial lookup returns null');
+
+    // 2. User starts dictation of 5 words, pauses halfway at word 3 (index 2)
+    const mockInProgress1 = {
+        profileId: 'deck-hsk1',
+        profileName: 'HSK 1 Cantonese',
+        items: [
+            { id: 'h1', word: '你好', jyutping: 'nei5 hou2' },
+            { id: 'h2', word: '多謝', jyutping: 'do1 ze6' },
+            { id: 'h3', word: '唔該', jyutping: 'm4 goi1' },
+            { id: 'h4', word: '早晨', jyutping: 'zou2 san4' },
+            { id: 'h5', word: '再見', jyutping: 'zoi3 gin3' }
+        ],
+        currentIndex: 2, // paused at word 3 of 5
+        elapsedSeconds: 45,
+        filterScope: 'learning'
+    };
+
+    saveInProgressDictation(mockInProgress1);
+
+    // 3. Retrieve and verify preserved halfway progress
+    const restored = getInProgressDictation('deck-hsk1');
+    assert.ok(restored, 'Should retrieve in-progress dictation');
+    assert.strictEqual(restored.currentIndex, 2, 'Should preserve exact word index (Word 3)');
+    assert.strictEqual(restored.elapsedSeconds, 45, 'Should preserve elapsed timer seconds');
+    assert.strictEqual(restored.filterScope, 'learning', 'Should preserve filter scope');
+    assert.strictEqual(restored.items.length, 5, 'Should preserve item list order');
+    assert.ok(restored.savedAt, 'Should record savedAt timestamp');
+
+    // 4. Default lookup without profileId returns last active session
+    const lastActive = getInProgressDictation();
+    assert.ok(lastActive);
+    assert.strictEqual(lastActive.profileId, 'deck-hsk1');
+
+    // 5. Another deck starts and saves progress (deck-food)
+    const mockInProgress2 = {
+        profileId: 'deck-food',
+        profileName: 'Hong Kong Food',
+        items: [
+            { id: 'f1', word: '叉燒包', jyutping: 'caa1 siu1 baau1' },
+            { id: 'f2', word: '燒賣', jyutping: 'siu1 maai2' }
+        ],
+        currentIndex: 1,
+        elapsedSeconds: 15,
+        filterScope: 'all'
+    };
+    saveInProgressDictation(mockInProgress2);
+
+    // Both decks maintain distinct in-progress states
+    assert.strictEqual(getInProgressDictation('deck-hsk1').currentIndex, 2);
+    assert.strictEqual(getInProgressDictation('deck-food').currentIndex, 1);
+    assert.strictEqual(getInProgressDictation().profileId, 'deck-food', 'Last active shifts to deck-food');
+
+    // 6. User resumes and finishes deck-hsk1: clear in-progress dictation
+    clearInProgressDictation('deck-hsk1');
+    assert.strictEqual(getInProgressDictation('deck-hsk1'), null, 'deck-hsk1 in-progress progress cleared upon completion');
+    assert.ok(getInProgressDictation('deck-food'), 'deck-food progress remains unaffected');
+
+    // 7. Clear all in-progress dictation
+    clearInProgressDictation();
+    assert.strictEqual(getInProgressDictation('deck-food'), null);
+});
+
 test('Dictation Hands-Free Voice Command Matching Engine', (t) => {
     function parseCommand(text) {
         if (!text || typeof text !== 'string') return null;

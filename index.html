@@ -375,6 +375,9 @@
                     <button id="btn-profile-dictation" onclick="window.UIManager.startDictationMode()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-purple-500/20 transition-all flex items-center gap-1.5">
                         <span>✍️</span> 默書 Dictation
                     </button>
+                    <button id="btn-profile-resume-dictation" onclick="window.UIManager.resumeInProgressDictation()" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5 hidden" title="Resume in-progress dictation session">
+                        <span>▶️</span> 繼續默書 Resume (<span id="profile-resume-count">Word 1</span>)
+                    </button>
                     <button id="btn-profile-last-dictation" onclick="window.UIManager.viewLastDictationResult()" class="px-3.5 py-2 bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 font-semibold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 hidden" title="View the results and words from your last dictation session">
                         <span>📜</span> 查看上次成績 View Last Result
                     </button>
@@ -603,7 +606,10 @@
                 <div class="flex items-center gap-2">
                     <button onclick="window.UIManager.exitDictationMode()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl border border-slate-800 text-xs font-medium transition-all flex items-center gap-1.5">
                         <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        Exit Dictation / 退出默書
+                        Exit / 退出
+                    </button>
+                    <button id="btn-dictation-save-exit" onclick="window.UIManager.saveAndExitDictation()" class="px-3.5 py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all" title="Save In-Progress Dictation & Exit / 暫存進度並退出">
+                        <span>💾</span> 暫存進度 Save & Exit
                     </button>
                     <button id="btn-dictation-view-result" onclick="window.UIManager.viewLastDictationResult()" class="px-3.5 py-2 bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all hidden" title="Review Last Completed Session">
                         <span>📜</span> 查看成績 View Result
@@ -2044,6 +2050,24 @@
                 <div>
                     <h3 class="text-xl font-extrabold text-slate-100 font-cantonese">默書範圍 Dictation Word List</h3>
                     <p class="text-xs text-slate-400">Choose which word list to practice for this dictation session:</p>
+                </div>
+            </div>
+
+            <!-- In-Progress Dictation Session Resume Banner -->
+            <div id="dictation-setup-resume-box" class="p-3.5 bg-gradient-to-r from-amber-950/60 to-orange-950/50 border border-amber-500/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hidden">
+                <div class="text-left space-y-0.5">
+                    <div class="flex items-center gap-1.5 text-amber-300 text-xs font-bold">
+                        <span>⏸️</span> 發現未完成默書進度 In-Progress Session
+                    </div>
+                    <p id="dictation-setup-resume-desc" class="text-[11px] text-slate-300">Paused at Word 3 of 10 • Elapsed: 01:15</p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="window.UIManager.resumeInProgressDictation()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5">
+                        <span>▶️</span> 繼續默書 Resume →
+                    </button>
+                    <button onclick="window.UIManager.discardInProgressDictation()" title="Discard in-progress session / 放棄此進度" class="px-2.5 py-1.5 bg-slate-900/80 hover:bg-rose-950/50 text-slate-400 hover:text-rose-300 rounded-xl border border-slate-800 hover:border-rose-500/30 text-xs font-bold transition-all">
+                        ✕
+                    </button>
                 </div>
             </div>
 
