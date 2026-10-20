@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.11.0] - 2026-10-20 - Community Sentence Contributor & Hong Kong Slang/Xiehouyu Deck
+
+### 🌟 Added
+- **💬 Community Example Sentences & Colloquial Notes (社區地道例句與文化註釋眾包系統):**
+  - Public learners and native speakers can now submit their own authentic Hong Kong Cantonese example sentences and cultural usage context for any vocabulary item directly inside the word detail inspector modal (`#modal-detail`).
+  - Interactive collapsible submission form with input validation, Cantonese character parsing, author attribution, and XSS sanitization.
+  - Community sentences render with full Jyutping 6-tone colorization pills, cultural context badges, native audio playback (`SpeechEngine`), and upvote thumbs-up counters (`👍`).
+- **🌐 RESTful Community Sentences API Endpoints:**
+  - `GET /api/community/sentences`: Search and retrieve community notes by `word` or `wordId` sorted by community upvotes.
+  - `POST /api/community/sentences`: Validated submission endpoint with localized file persistence (`data/community_sentences.json`) and offline LocalStorage fallback.
+  - `POST /api/community/sentences/like`: Real-time sentence upvoting and popularity incrementing.
+- **🔥 New Official Community Deck - Hong Kong Slang & Xiehouyu (香港地道潮語與歇後語):**
+  - Added new featured deck `prof-slang-04` with 8 essential colloquial slang terms and witty two-part allegorical sayings (歇後語):
+    1. **食死貓** (Being scapegoated / wrongfully blamed)
+    2. **炒魷魚** (Getting fired / dismissed from a job)
+    3. **賣大包** (Offering huge discounts / extreme generosity)
+    4. **執生** (Improvise / adapt on the fly)
+    5. **放飛機** (Stand someone up / flake on an appointment)
+    6. **搞掂** (All settled / done and dusted)
+    7. **泥菩薩過江** (Clay idol crossing river — barely able to save oneself: 自身難保)
+    8. **單眼佬睇榜** (One-eyed man looking at exam board — obvious at a glance: 一目了然)
+- **🧪 Comprehensive Unit Testing Expansion:**
+  - Added test suites in `test/server.test.js` covering community sentence validation, filtering, creation, upvoting, and slang deck tone integrity (29/29 tests passing).
+
+---
+
 ## [v1.10.0] - 2026-10-19 - In-Progress Dictation Progress Auto-Save & Seamless Resumption
 
 ### 🌟 Added

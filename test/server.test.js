@@ -1303,6 +1303,132 @@ test('Jyutping Tone Colorization & Syllable Tokenization Engine', (t) => {
     assert.strictEqual(formatJyutpingWithToneColors(undefined), '');
 });
 
+test('Community Example Sentences API & Persistence Lifecycle', async (t) => {
+    const port = (server.address() && server.address().port) || 8080;
+
+    // 1. GET /api/community/sentences returns array
+    let initialCount = 0;
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/community/sentences`, (res) => {
+            assert.strictEqual(res.statusCode, 200);
+            assert.ok(res.headers['content-type'].includes('application/json'));
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const list = JSON.parse(body);
+                assert.ok(Array.isArray(list), 'Response must be an array');
+                assert.ok(list.length > 0, 'Should have initial curated sentences');
+                initialCount = list.length;
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    // 2. Query filtering by word (?word=你好)
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/community/sentences?word=${encodeURIComponent('你好')}`, (res) => {
+            assert.strictEqual(res.statusCode, 200);
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const list = JSON.parse(body);
+                assert.ok(list.every(s => s.word === '你好' || s.wordId === 'w-1'), 'All results should match target word');
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    // 3. POST validation: Reject empty sentence
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/community/sentences`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 400, 'Empty sentence should return 400');
+            resolve();
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ sentence: '', word: '你好' }));
+        req.end();
+    });
+
+    // 4. POST valid community sentence
+    let createdSentenceId = null;
+    await new Promise((resolve, reject) => {
+        const payload = {
+            wordId: 'w-slang-01',
+            word: '食死貓',
+            sentence: '同事做錯嘢推畀我，搞到我要食死貓！',
+            jyutping: 'tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!',
+            meaning_zh: '同事做錯事推給我，害我要背黑鍋！',
+            meaning_en: 'My colleague messed up and pushed it onto me, leaving me to take the fall!',
+            cultural_note: 'A very common workplace slang expression in Hong Kong.',
+            author: 'WorkplaceSurvivor'
+        };
+
+        const req = http.request(`http://127.0.0.1:${port}/api/community/sentences`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 201, 'Valid sentence submission should return 201');
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const data = JSON.parse(body);
+                assert.strictEqual(data.success, true);
+                assert.ok(data.sentence.id, 'Should generate unique sentence ID');
+                assert.strictEqual(data.sentence.word, '食死貓');
+                assert.strictEqual(data.sentence.author, 'WorkplaceSurvivor');
+                assert.strictEqual(data.sentence.likes, 1);
+                createdSentenceId = data.sentence.id;
+                resolve();
+            });
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify(payload));
+        req.end();
+    });
+
+    // 5. Upvote community sentence via POST /api/community/sentences/like
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://127.0.0.1:${port}/api/community/sentences/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }, (res) => {
+            assert.strictEqual(res.statusCode, 200, 'Upvoting valid sentence should return 200');
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const data = JSON.parse(body);
+                assert.strictEqual(data.success, true);
+                assert.strictEqual(data.sentenceId, createdSentenceId);
+                assert.strictEqual(data.likes, 2, 'Likes should increment from 1 to 2');
+                resolve();
+            });
+        });
+        req.on('error', reject);
+        req.write(JSON.stringify({ sentenceId: createdSentenceId }));
+        req.end();
+    });
+});
+
+test('Hong Kong Slang & Xiehouyu Deck Integrity & Tone Verification', (t) => {
+    const profiles = readProfiles();
+    const slangDeck = profiles.find(p => p.id === 'prof-slang-04');
+
+    assert.ok(slangDeck, 'prof-slang-04 should exist in profiles');
+    assert.strictEqual(slangDeck.category, 'Culture');
+    assert.ok(Array.isArray(slangDeck.items) && slangDeck.items.length >= 8, 'Slang deck should contain at least 8 items');
+
+    slangDeck.items.forEach(item => {
+        assert.ok(item.word && item.word.length > 0, 'Item must have a word');
+        assert.ok(item.jyutping && item.jyutping.length > 0, `Item ${item.word} must have jyutping`);
+        assert.ok(/[1-6]/.test(item.jyutping), `Jyutping for ${item.word} must include LSHK tone numbers 1-6`);
+        assert.ok(item.meaning && item.meaning.length > 0, `Item ${item.word} must have English meaning`);
+        assert.ok(item.example && item.example.length > 0, `Item ${item.word} must have example sentence`);
+    });
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

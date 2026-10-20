@@ -418,6 +418,98 @@ const DEFAULT_PROFILES = [
                 favorite: false
             }
         ]
+    },
+    {
+        author: 'Hong Kong Cultural Heritage',
+        difficulty: 'Intermediate',
+        likes: 88,
+        id: 'prof-slang-04',
+        name: 'Hong Kong Slang & Xiehouyu (香港地道潮語與歇後語)',
+        category: 'Culture',
+        description: 'Essential colloquial Hong Kong slang, 4-character idioms, and classic allegorical sayings (歇後語).',
+        createdAt: new Date().toISOString(),
+        items: [
+            {
+                id: 'w-slang-01',
+                word: '食死貓',
+                jyutping: 'sik6 sei2 maau1',
+                meaning: 'Being scapegoated / Wrongfully blamed',
+                example: '件事明明唔關佢事，佢今次真係食死貓喇。',
+                example_meaning: 'The matter clearly had nothing to do with him; he really took the blame unfairly this time.',
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-slang-02',
+                word: '炒魷魚',
+                jyutping: 'caau2 jau4 jyu4',
+                meaning: 'Getting fired / Dismissed from a job',
+                example: '老細話公司要減開支，今日炒咗幾個人魷魚。',
+                example_meaning: 'The boss said the company needs to cut costs and fired a few people today.',
+                mastered: false,
+                favorite: false
+            },
+            {
+                id: 'w-slang-03',
+                word: '賣大包',
+                jyutping: 'maai6 daai6 baau1',
+                meaning: 'Offering huge bargains / Extremely generous discounts',
+                example: '呢間鋪頭清貨大減價，真係賣大包！',
+                example_meaning: 'This shop is having a clearance sale, they\'re really offering huge bargains!',
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-slang-04',
+                word: '執生',
+                jyutping: 'zap1 saang1',
+                meaning: 'Improvise / Adapt flexibly to the situation',
+                example: '陣間個客如果發脾氣，你要識得執生呀！',
+                example_meaning: 'If the client loses their temper in a moment, you need to know how to adapt and improvise!',
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-slang-05',
+                word: '放飛機',
+                jyutping: 'fong3 fei1 gei1',
+                meaning: 'Stand someone up / Fail to show up for an appointment',
+                example: '約好咗七點喺地鐵站見，佢竟然放我飛機！',
+                example_meaning: 'We agreed to meet at 7pm at the MTR station, but he actually stood me up!',
+                mastered: false,
+                favorite: false
+            },
+            {
+                id: 'w-slang-06',
+                word: '搞掂',
+                jyutping: 'gaau2 dim2',
+                meaning: 'All settled / Solved / Done and dusted',
+                example: '呢份報表我已經搞掂喇，隨時可以交。',
+                example_meaning: 'I\'ve already completed this report, it\'s ready to submit anytime.',
+                mastered: true,
+                favorite: false
+            },
+            {
+                id: 'w-slang-07',
+                word: '泥菩薩過江',
+                jyutping: 'nai4 pou4 saat3 gwo3 gong1',
+                meaning: 'Clay idol crossing a river — barely able to save oneself (自身難保)',
+                example: '我而家都泥菩薩過江，點幫到你借錢呀？',
+                example_meaning: 'I can barely keep my own head above water right now, how can I lend you money?',
+                mastered: false,
+                favorite: true
+            },
+            {
+                id: 'w-slang-08',
+                word: '單眼佬睇榜',
+                jyutping: 'daan1 ngaan5 lou2 tai2 bong2',
+                meaning: 'One-eyed man looking at exam board — obvious at a glance (一目了然)',
+                example: '邊個做錯事？單眼佬睇榜，一目了然啦！',
+                example_meaning: 'Who made the mistake? It\'s as plain as day, obvious at a single glance!',
+                mastered: false,
+                favorite: false
+            }
+        ]
     }
 ];
 
@@ -507,7 +599,10 @@ function readProfiles() {
         }
 
         if (raw) {
-            const parsed = JSON.parse(raw);
+            let parsed = JSON.parse(raw);
+            DEFAULT_PROFILES.forEach(dp => {
+                if (!parsed.some(p => p.id === dp.id)) parsed.push(dp);
+            });
             inMemoryProfilesStore = parsed.map((p, idx) => ({
                 author: p.author || 'Cantonese Community',
                 difficulty: p.difficulty || (idx % 2 === 0 ? 'Beginner' : 'Intermediate'),
@@ -585,6 +680,42 @@ function writeScenarios(scenarios) {
 }
 
 const USER_PROGRESS_FILE = path.join(DATA_DIR, 'user_progress.json');
+const COMMUNITY_SENTENCES_FILE = path.join(DATA_DIR, 'community_sentences.json');
+let inMemorySentencesStore = null;
+
+function readCommunitySentences() {
+    ensureDataFile();
+    if (inMemorySentencesStore && inMemorySentencesStore.length > 0) {
+        return inMemorySentencesStore;
+    }
+    try {
+        if (fs.existsSync(COMMUNITY_SENTENCES_FILE)) {
+            const raw = fs.readFileSync(COMMUNITY_SENTENCES_FILE, 'utf-8');
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                inMemorySentencesStore = parsed;
+                return inMemorySentencesStore;
+            }
+        }
+    } catch (e) {
+        console.error('Error reading community sentences file:', e);
+    }
+    inMemorySentencesStore = [];
+    return inMemorySentencesStore;
+}
+
+function writeCommunitySentences(sentences) {
+    ensureDataFile();
+    inMemorySentencesStore = sentences;
+    try {
+        fs.writeFileSync(COMMUNITY_SENTENCES_FILE, JSON.stringify(sentences, null, 2), 'utf-8');
+        return true;
+    } catch (e) {
+        console.error('Error writing community sentences file:', e);
+        return true;
+    }
+}
+
 
 function readUserProgressMap() {
     ensureDataFile();
@@ -1158,6 +1289,138 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+
+    // ==========================================
+    // API ENDPOINT: COMMUNITY EXAMPLE SENTENCES
+    // ==========================================
+    if (pathName === '/api/community/sentences') {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        if (req.method === 'GET') {
+            const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+            const queryWordId = parsedUrl.searchParams.get('wordId');
+            const queryWord = parsedUrl.searchParams.get('word');
+
+            let sentences = readCommunitySentences();
+
+            if (queryWordId || queryWord) {
+                const targetWord = (queryWord || '').trim().toLowerCase();
+                const targetId = (queryWordId || '').trim();
+                sentences = sentences.filter(s => {
+                    const matchId = targetId && s.wordId === targetId;
+                    const matchWord = targetWord && s.word && s.word.toLowerCase() === targetWord;
+                    return matchId || matchWord;
+                });
+            }
+
+            // Sort by likes descending
+            sentences.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify(sentences));
+            return;
+        }
+
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body);
+                    if (!data || typeof data !== 'object') {
+                        res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+                        return;
+                    }
+
+                    const sentence = (data.sentence || '').trim();
+                    const word = (data.word || '').trim();
+                    const wordId = (data.wordId || '').trim() || null;
+
+                    if (!sentence || sentence.length < 2 || sentence.length > 300) {
+                        res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Sentence must be between 2 and 300 characters.' }));
+                        return;
+                    }
+
+                    if (!word && !wordId) {
+                        res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                        res.end(JSON.stringify({ success: false, error: 'Target word or wordId is required.' }));
+                        return;
+                    }
+
+                    const cleanAuthor = (data.author || 'Anonymous Contributor').trim().substring(0, 50).replace(/[<>]/g, '');
+                    const cleanMeaningZh = (data.meaning_zh || '').trim().substring(0, 300).replace(/[<>]/g, '');
+                    const cleanMeaningEn = (data.meaning_en || '').trim().substring(0, 300).replace(/[<>]/g, '');
+                    const cleanNote = (data.cultural_note || '').trim().substring(0, 500).replace(/[<>]/g, '');
+                    const cleanJyutping = (data.jyutping || '').trim().substring(0, 300).replace(/[<>]/g, '');
+
+                    const newSentence = {
+                        id: `cs-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+                        wordId: wordId,
+                        word: word,
+                        sentence: sentence.replace(/[<>]/g, ''),
+                        jyutping: cleanJyutping,
+                        meaning_zh: cleanMeaningZh,
+                        meaning_en: cleanMeaningEn,
+                        cultural_note: cleanNote,
+                        author: cleanAuthor,
+                        author_id: data.author_id || null,
+                        likes: 1,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    const allSentences = readCommunitySentences();
+                    allSentences.unshift(newSentence);
+                    writeCommunitySentences(allSentences);
+
+                    res.writeHead(201, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, sentence: newSentence }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Malformed JSON payload' }));
+                }
+            });
+            return;
+        }
+
+        res.writeHead(405, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Method not allowed' }));
+        return;
+    }
+
+    // ==========================================
+    // API ENDPOINT: LIKE COMMUNITY SENTENCE
+    // ==========================================
+    if (pathName === '/api/community/sentences/like' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                if (!data || !data.sentenceId) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'sentenceId is required' }));
+                    return;
+                }
+                const allSentences = readCommunitySentences();
+                const target = allSentences.find(s => s.id === data.sentenceId);
+                if (target) {
+                    target.likes = (target.likes || 0) + 1;
+                    writeCommunitySentences(allSentences);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: true, sentenceId: target.id, likes: target.likes }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ success: false, error: 'Community sentence not found' }));
+                }
+            } catch (err) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ success: false, error: 'Invalid payload' }));
+            }
+        });
+        return;
+    }
+
     // ==========================================
     // API ENDPOINTS FOR SHARED PUBLIC PROFILES
     // ==========================================
@@ -1445,6 +1708,9 @@ module.exports = {
     readScenarios,
     writeScenarios,
     ROOT_ADMIN_EMAILS,
-    isAuthorizedAdmin
+    isAuthorizedAdmin,
+    COMMUNITY_SENTENCES_FILE,
+    readCommunitySentences,
+    writeCommunitySentences
 };
 

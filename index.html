@@ -1638,6 +1638,67 @@
                         <p id="modal-example-meaning" class="text-xs text-slate-400">Example sentence translation</p>
                     </div>
 
+                    <!-- Community Colloquial Sentences & Notes Section -->
+                    <div id="community-sentences-section" class="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-amber-400 text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                                <span>💬</span> Community Examples & Slang Notes (社區例句與地道用法)
+                            </span>
+                            <button id="btn-toggle-add-community-sentence" onclick="window.UIManager.toggleAddCommunitySentenceForm()" class="px-2.5 py-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1">
+                                <span>➕</span> 貢獻例句 Add Note
+                            </button>
+                        </div>
+
+                        <!-- Add Community Sentence Collapsible Form -->
+                        <div id="form-add-community-sentence" class="hidden p-3.5 bg-slate-950/80 rounded-xl border border-amber-500/30 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-amber-300">Contribute Colloquial Sentence / Usage Note</span>
+                                <button type="button" onclick="window.UIManager.toggleAddCommunitySentenceForm(false)" class="text-slate-400 hover:text-slate-200 text-xs">✕</button>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-400 mb-1">Cantonese Sentence (廣東話漢字例句) *</label>
+                                <input type="text" id="input-cs-sentence" placeholder="e.g. 呢間茶餐廳嘅凍檸茶真係好正！" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 font-cantonese focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Jyutping (粵拼)</label>
+                                    <input type="text" id="input-cs-jyutping" placeholder="Optional or auto-generated" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Contributor Name (發表暱稱)</label>
+                                    <input type="text" id="input-cs-author" placeholder="Your name or handle" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Chinese Meaning (中文解釋)</label>
+                                    <input type="text" id="input-cs-meaning-zh" placeholder="中文釋義" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-medium text-slate-400 mb-1">English Meaning (英文釋義)</label>
+                                    <input type="text" id="input-cs-meaning-en" placeholder="English translation" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-400 mb-1">Cultural Tip / Slang Context (文化或用法備註)</label>
+                                <input type="text" id="input-cs-note" placeholder="e.g. Commonly used by locals when dining out." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div class="flex justify-end gap-2 pt-1">
+                                <button type="button" onclick="window.UIManager.toggleAddCommunitySentenceForm(false)" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs rounded-lg transition-all">Cancel</button>
+                                <button type="button" onclick="window.UIManager.submitCommunitySentence()" class="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5">
+                                    <span>🚀</span> Submit Example 發表
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Community Sentences Dynamic List -->
+                        <div id="community-sentences-list" class="space-y-2.5">
+                            <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-center text-xs text-slate-500">
+                                Loading community examples...
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Voice Recorder & Audio Comparison Widget -->
                     <div class="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-3">
                         <div class="flex items-center justify-between">

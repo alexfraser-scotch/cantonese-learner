@@ -2,7 +2,7 @@
   {
     "author": "Cantonese Community",
     "difficulty": "Beginner",
-    "likes": 90,
+    "likes": 96,
     "id": "prof-greetings-01",
     "name": "Essential Greetings & Basics (廣東話日常對話)",
     "category": "Basics",
@@ -248,6 +248,222 @@
         "favorite": false,
         "meaning_zh": "充電器 / 行動電源",
         "image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80"
+      }
+    ]
+  },
+  {
+    "author": "Cantonese Community",
+    "difficulty": "Intermediate",
+    "likes": 27,
+    "id": "prof-emotions-04",
+    "name": "Feelings & Emotions (廣東話心情與感受)",
+    "category": "Emotions",
+    "description": "Express feelings, psychological states, and moods in natural spoken Cantonese.",
+    "createdAt": "2026-10-20T03:52:46.859Z",
+    "items": [
+      {
+        "id": "w-19",
+        "word": "生氣",
+        "jyutping": "saang1 hei3",
+        "meaning": "Angry / Mad",
+        "example": "你唔好咁生氣啦，坐低飲杯水先。",
+        "example_meaning": "Don't be so angry, sit down and have a glass of water first.",
+        "mastered": false,
+        "favorite": true,
+        "meaning_zh": "生氣 / 憤怒 / 發火",
+        "image": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-20",
+        "word": "害怕",
+        "jyutping": "hoi2 paa3",
+        "meaning": "Scared / Afraid",
+        "example": "佢好害怕睇恐怖片。",
+        "example_meaning": "He is very scared of watching horror movies.",
+        "mastered": false,
+        "favorite": false,
+        "meaning_zh": "害怕 / 恐懼 / 驚慌",
+        "image": "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-21",
+        "word": "緊張",
+        "jyutping": "gan2 zoeng1",
+        "meaning": "Nervous / Tense",
+        "example": "聽日要演講，我好緊張。",
+        "example_meaning": "I have a speech tomorrow, I feel very nervous.",
+        "mastered": false,
+        "favorite": true,
+        "meaning_zh": "緊張 / 忐忑不安",
+        "image": "https://images.unsplash.com/photo-1541199249251-f713e6145474?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-22",
+        "word": "擔心",
+        "jyutping": "daam1 sam1",
+        "meaning": "Worried / Anxious",
+        "example": "唔使擔心，事情一定會順利的。",
+        "example_meaning": "Don't worry, things will definitely go smoothly.",
+        "mastered": true,
+        "favorite": false,
+        "meaning_zh": "擔心 / 憂慮 / 牽掛",
+        "image": "https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-23",
+        "word": "害羞",
+        "jyutping": "hoi6 sau1",
+        "meaning": "Shy / Blushing",
+        "example": "個小朋友見到陌生人就有啲害羞。",
+        "example_meaning": "The child gets a little shy when meeting strangers.",
+        "mastered": false,
+        "favorite": false,
+        "meaning_zh": "害羞 / 怕醜 / 靦腆",
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-24",
+        "word": "勇敢",
+        "jyutping": "jung5 gam2",
+        "meaning": "Brave / Courageous",
+        "example": "消防員非常勇敢，救咗好多人。",
+        "example_meaning": "Firefighters are very brave and have saved many people.",
+        "mastered": true,
+        "favorite": true,
+        "meaning_zh": "勇敢 / 膽大 / 英勇",
+        "image": "https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-25",
+        "word": "開心",
+        "jyutping": "hoi1 sam1",
+        "meaning": "Happy / Joyful",
+        "example": "今日同朋友聚會好開心！",
+        "example_meaning": "Today hanging out with friends was so happy!",
+        "mastered": true,
+        "favorite": true,
+        "meaning_zh": "開心 / 快樂 / 歡喜",
+        "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-26",
+        "word": "傷心",
+        "jyutping": "soeng1 sam1",
+        "meaning": "Sad / Heartbroken",
+        "example": "聽到呢個壞消息，大家都很傷心。",
+        "example_meaning": "Hearing this bad news, everyone was very sad.",
+        "mastered": false,
+        "favorite": false,
+        "meaning_zh": "傷心 / 難過 / 悲傷",
+        "image": "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80"
+      }
+    ]
+  },
+  {
+    "author": "Hong Kong Cultural Heritage",
+    "difficulty": "Intermediate",
+    "likes": 88,
+    "id": "prof-slang-04",
+    "name": "Hong Kong Slang & Xiehouyu (香港地道潮語與歇後語)",
+    "category": "Culture",
+    "description": "Essential colloquial Hong Kong slang, 4-character idioms, and classic allegorical sayings (歇後語).",
+    "createdAt": "2026-10-20T03:52:46.859Z",
+    "items": [
+      {
+        "id": "w-slang-01",
+        "word": "食死貓",
+        "jyutping": "sik6 sei2 maau1",
+        "meaning": "Being scapegoated / Wrongfully blamed",
+        "example": "件事明明唔關佢事，佢今次真係食死貓喇。",
+        "example_meaning": "The matter clearly had nothing to do with him; he really took the blame unfairly this time.",
+        "mastered": false,
+        "favorite": true,
+        "meaning_zh": "食死貓 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-02",
+        "word": "炒魷魚",
+        "jyutping": "caau2 jau4 jyu4",
+        "meaning": "Getting fired / Dismissed from a job",
+        "example": "老細話公司要減開支，今日炒咗幾個人魷魚。",
+        "example_meaning": "The boss said the company needs to cut costs and fired a few people today.",
+        "mastered": false,
+        "favorite": false,
+        "meaning_zh": "炒魷魚 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-03",
+        "word": "賣大包",
+        "jyutping": "maai6 daai6 baau1",
+        "meaning": "Offering huge bargains / Extremely generous discounts",
+        "example": "呢間鋪頭清貨大減價，真係賣大包！",
+        "example_meaning": "This shop is having a clearance sale, they're really offering huge bargains!",
+        "mastered": false,
+        "favorite": true,
+        "meaning_zh": "賣大包 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-04",
+        "word": "執生",
+        "jyutping": "zap1 saang1",
+        "meaning": "Improvise / Adapt flexibly to the situation",
+        "example": "陣間個客如果發脾氣，你要識得執生呀！",
+        "example_meaning": "If the client loses their temper in a moment, you need to know how to adapt and improvise!",
+        "mastered": false,
+        "favorite": true,
+        "meaning_zh": "執生 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-05",
+        "word": "放飛機",
+        "jyutping": "fong3 fei1 gei1",
+        "meaning": "Stand someone up / Fail to show up for an appointment",
+        "example": "約好咗七點喺地鐵站見，佢竟然放我飛機！",
+        "example_meaning": "We agreed to meet at 7pm at the MTR station, but he actually stood me up!",
+        "mastered": false,
+        "favorite": false,
+        "meaning_zh": "放飛機 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-06",
+        "word": "搞掂",
+        "jyutping": "gaau2 dim2",
+        "meaning": "All settled / Solved / Done and dusted",
+        "example": "呢份報表我已經搞掂喇，隨時可以交。",
+        "example_meaning": "I've already completed this report, it's ready to submit anytime.",
+        "mastered": true,
+        "favorite": false,
+        "meaning_zh": "搞掂 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-07",
+        "word": "泥菩薩過江",
+        "jyutping": "nai4 pou4 saat3 gwo3 gong1",
+        "meaning": "Clay idol crossing a river — barely able to save oneself (自身難保)",
+        "example": "我而家都泥菩薩過江，點幫到你借錢呀？",
+        "example_meaning": "I can barely keep my own head above water right now, how can I lend you money?",
+        "mastered": false,
+        "favorite": true,
+        "meaning_zh": "泥菩薩過江 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        "id": "w-slang-08",
+        "word": "單眼佬睇榜",
+        "jyutping": "daan1 ngaan5 lou2 tai2 bong2",
+        "meaning": "One-eyed man looking at exam board — obvious at a glance (一目了然)",
+        "example": "邊個做錯事？單眼佬睇榜，一目了然啦！",
+        "example_meaning": "Who made the mistake? It's as plain as day, obvious at a single glance!",
+        "mastered": false,
+        "favorite": false,
+        "meaning_zh": "單眼佬睇榜 (廣東話詞彙)",
+        "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80"
       }
     ]
   }

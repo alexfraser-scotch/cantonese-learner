@@ -1673,7 +1673,94 @@ class StorageManager {
         }
     }
 
-    static formatForSupabase(p) {
+static async getCommunitySentences(wordId = null, word = null) {
+        try {
+            let url = '/api/community/sentences';
+            const params = [];
+            if (wordId) params.push('wordId=' + encodeURIComponent(wordId));
+            if (word) params.push('word=' + encodeURIComponent(word));
+            if (params.length > 0) url += '?' + params.join('&');
+
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data)) return data;
+            }
+        } catch (e) {
+            console.warn('Failed to fetch community sentences from API:', e);
+        }
+
+        // Local storage fallback
+        try {
+            const raw = localStorage.getItem('cantonese_community_sentences_v1');
+            if (raw) {
+                const localList = JSON.parse(raw);
+                if (Array.isArray(localList)) {
+                    if (wordId || word) {
+                        return localList.filter(s => (wordId && s.wordId === wordId) || (word && s.word && s.word.toLowerCase() === word.toLowerCase()));
+                    }
+                    return localList;
+                }
+            }
+        } catch (e) {}
+
+        return [];
+    }
+
+    static async addCommunitySentence(payload) {
+        let savedItem = null;
+        try {
+            const res = await fetch('/api/community/sentences', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const json = await res.json();
+                if (json && json.sentence) savedItem = json.sentence;
+            }
+        } catch (e) {
+            console.warn('Failed to submit community sentence to API:', e);
+        }
+
+        if (!savedItem) {
+            savedItem = {
+                id: 'cs-local-' + Date.now(),
+                ...payload,
+                likes: 1,
+                createdAt: new Date().toISOString()
+            };
+        }
+
+        try {
+            let localList = [];
+            const raw = localStorage.getItem('cantonese_community_sentences_v1');
+            if (raw) localList = JSON.parse(raw) || [];
+            localList.unshift(savedItem);
+            localStorage.setItem('cantonese_community_sentences_v1', JSON.stringify(localList));
+        } catch (e) {}
+
+        return savedItem;
+    }
+
+    static async likeCommunitySentence(sentenceId) {
+        try {
+            const res = await fetch('/api/community/sentences/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sentenceId })
+            });
+            if (res.ok) {
+                const json = await res.json();
+                return json.likes;
+            }
+        } catch (e) {
+            console.warn('Failed to like community sentence:', e);
+        }
+        return null;
+    }
+
+        static formatForSupabase(p) {
         return {
             id: p.id,
             name: p.name || 'Untitled Profile',
@@ -3590,6 +3677,7 @@ class UIManager {
         document.getElementById('modal-word-counter').textContent = `${index + 1} of ${this.activeProfile.items.length}`;
 
         this.closeModalEditMode();
+        this.renderCommunitySentences(item.id, item.word);
         this.modalDetail.classList.remove('hidden');
     }
 
@@ -3893,6 +3981,173 @@ class UIManager {
         } else {
             this.showToast('All card pictures in this deck already have high-precision matches! 👍', 'info');
         }
+    }
+
+    toggleAddCommunitySentenceForm(show = null) {
+        const form = document.getElementById('form-add-community-sentence');
+        if (!form) return;
+        const isHidden = form.classList.contains('hidden');
+        const shouldShow = show !== null ? show : isHidden;
+
+        if (shouldShow) {
+            form.classList.remove('hidden');
+            const authorInput = document.getElementById('input-cs-author');
+            if (authorInput && !authorInput.value.trim() && AuthManager.currentUser) {
+                authorInput.value = AuthManager.currentUser.displayName || AuthManager.currentUser.email.split('@')[0];
+            }
+            const item = this.activeProfile && this.activeProfile.items ? this.activeProfile.items[this.activeWordIndex] : null;
+            const jyutpingInput = document.getElementById('input-cs-jyutping');
+            if (jyutpingInput && !jyutpingInput.value.trim() && item) {
+                jyutpingInput.placeholder = `e.g. ${item.jyutping} ...`;
+            }
+            const sentenceInput = document.getElementById('input-cs-sentence');
+            if (sentenceInput) sentenceInput.focus();
+        } else {
+            form.classList.add('hidden');
+        }
+    }
+
+    async renderCommunitySentences(wordId, word) {
+        const container = document.getElementById('community-sentences-list');
+        if (!container) return;
+
+        container.innerHTML = '<div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-center text-xs text-slate-500">Loading community notes...</div>';
+
+        const sentences = await StorageManager.getCommunitySentences(wordId, word);
+
+        if (!sentences || sentences.length === 0) {
+            container.innerHTML = `
+                <div class="p-4 bg-slate-950/60 rounded-xl border border-dashed border-slate-800 text-center space-y-2">
+                    <p class="text-xs text-slate-400">No community notes or colloquial sentences yet for "${this.escapeHTML(word || 'this word')}".</p>
+                    <button onclick="window.UIManager.toggleAddCommunitySentenceForm(true)" class="px-3 py-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1">
+                        <span>✍️</span> Be the first to contribute a colloquial sentence
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = '';
+        sentences.forEach(cs => {
+            const row = document.createElement('div');
+            row.className = 'p-3.5 bg-slate-950/80 rounded-xl border border-slate-800/90 hover:border-amber-500/30 transition-all space-y-2';
+            row.id = `cs-row-${cs.id}`;
+
+            const cleanSentence = this.escapeHTML(cs.sentence);
+            const coloredJyutping = cs.jyutping ? this.formatJyutpingWithToneColors(cs.jyutping) : '';
+            const safeAuthor = this.escapeHTML(cs.author || 'Anonymous');
+            const safeMeaningZh = this.escapeHTML(cs.meaning_zh || '');
+            const safeMeaningEn = this.escapeHTML(cs.meaning_en || '');
+            const safeNote = this.escapeHTML(cs.cultural_note || '');
+
+            row.innerHTML = `
+                <div class="flex items-start justify-between gap-3">
+                    <div class="space-y-1 flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-base font-extrabold text-slate-100 font-cantonese tracking-wide">${cleanSentence}</span>
+                            <button onclick="window.UIManager.playAudioText('${this.escapeQuotes(cs.sentence)}')" class="p-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-lg border border-sky-500/20 transition-all text-xs inline-flex items-center gap-1" title="Listen Audio">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                            </button>
+                        </div>
+                        ${coloredJyutping ? `<div class="text-xs pt-0.5">${coloredJyutping}</div>` : ''}
+                        <div class="text-xs text-slate-300">
+                            ${safeMeaningZh ? `<span>${safeMeaningZh}</span>` : ''}
+                            ${safeMeaningEn ? `<span class="text-slate-400 text-[11px] ml-1">(${safeMeaningEn})</span>` : ''}
+                        </div>
+                        ${safeNote ? `
+                            <div class="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/20 rounded-md px-2 py-0.5 inline-block mt-1">
+                                💡 Context: ${safeNote}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                        <button onclick="window.UIManager.likeCommunitySentence('${this.escapeQuotes(cs.id)}', this)" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 hover:border-amber-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
+                            <span>👍</span> <span class="cs-like-count">${cs.likes || 1}</span>
+                        </button>
+                        <span class="text-[10px] text-slate-500">by ${safeAuthor}</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    async submitCommunitySentence() {
+        const sentenceInput = document.getElementById('input-cs-sentence');
+        const jyutpingInput = document.getElementById('input-cs-jyutping');
+        const authorInput = document.getElementById('input-cs-author');
+        const zhInput = document.getElementById('input-cs-meaning-zh');
+        const enInput = document.getElementById('input-cs-meaning-en');
+        const noteInput = document.getElementById('input-cs-note');
+
+        const sentence = (sentenceInput ? sentenceInput.value : '').trim();
+        if (!sentence || sentence.length < 2) {
+            this.showToast('Please enter a Cantonese sentence of at least 2 characters.', 'warning');
+            if (sentenceInput) sentenceInput.focus();
+            return;
+        }
+
+        const item = this.activeProfile && this.activeProfile.items ? this.activeProfile.items[this.activeWordIndex] : null;
+        if (!item) {
+            this.showToast('No active vocabulary item selected.', 'error');
+            return;
+        }
+
+        let jyutping = (jyutpingInput ? jyutpingInput.value : '').trim();
+        if (!jyutping) {
+            try {
+                if (typeof ParserEngine !== 'undefined' && ParserEngine.generateJyutping) {
+                    jyutping = ParserEngine.generateJyutping(sentence) || '';
+                }
+            } catch (e) {}
+        }
+
+        const author = (authorInput && authorInput.value.trim()) || 
+                       (AuthManager.currentUser ? AuthManager.currentUser.displayName : 'Cantonese Explorer');
+
+        const payload = {
+            wordId: item.id,
+            word: item.word,
+            sentence: sentence,
+            jyutping: jyutping,
+            meaning_zh: (zhInput ? zhInput.value : '').trim(),
+            meaning_en: (enInput ? enInput.value : '').trim(),
+            cultural_note: (noteInput ? noteInput.value : '').trim(),
+            author: author,
+            author_id: AuthManager.currentUser ? AuthManager.currentUser.id : null
+        };
+
+        const result = await StorageManager.addCommunitySentence(payload);
+        if (result) {
+            this.showToast('Community sentence submitted successfully! 🎉', 'success');
+            if (sentenceInput) sentenceInput.value = '';
+            if (jyutpingInput) jyutpingInput.value = '';
+            if (zhInput) zhInput.value = '';
+            if (enInput) enInput.value = '';
+            if (noteInput) noteInput.value = '';
+            this.toggleAddCommunitySentenceForm(false);
+            this.renderCommunitySentences(item.id, item.word);
+        } else {
+            this.showToast('Failed to save sentence. Please try again.', 'error');
+        }
+    }
+
+    async likeCommunitySentence(sentenceId, btnElem) {
+        if (!sentenceId) return;
+        const newLikes = await StorageManager.likeCommunitySentence(sentenceId);
+        if (btnElem) {
+            const countElem = btnElem.querySelector('.cs-like-count');
+            if (countElem) {
+                const current = parseInt(countElem.textContent, 10) || 0;
+                countElem.textContent = newLikes !== null ? newLikes : current + 1;
+            }
+            btnElem.classList.add('scale-105', 'bg-amber-500/20');
+            setTimeout(() => {
+                btnElem.classList.remove('scale-105', 'bg-amber-500/20');
+            }, 300);
+        }
+        this.showToast('Thank you for your vote! 👍', 'info');
     }
 
     closeDetailModal() {

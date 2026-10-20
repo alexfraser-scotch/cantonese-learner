@@ -15,6 +15,8 @@ An interactive, open-source Cantonese Vocabulary Learning platform featuring **3
 
 ## ✨ Features
 
+- 💬 **Community Example Sentences & Colloquial Notes Contributor (社區例句與文化註釋眾包):** Public learners and native speakers can contribute colloquial sentences, real-life conversation tips, and cultural usage notes for any vocabulary item in the word detail inspector. Features full LSHK 6-tone colorization, native TTS audio playback, and peer upvoting (👍).
+- 🔥 **Hong Kong Slang, Idioms & Xiehouyu Deck (香港地道潮語與歇後語):** Curated culture deck packed with vibrant local Cantonese slang (食死貓, 炒魷魚, 賣大包, 執生, 放飛機, 搞掂) and classic two-part allegorical sayings (泥菩薩過江 — 自身難保, 單眼佬睇榜 — 一目了然) complete with Jyutping tone numbers and contextual definitions.
 - 🎨 **Granular Jyutping 6-Tone Colorization (粵拼六聲色彩標記):** Syllable-level token parser that color-codes each Cantonese word by pitch contour numbers 1–6 (陰平 High Level, 陰上 High Rising, 陰去 Mid Level, 陽平 Low Falling, 陽上 Low Rising, 陽去 Low Level) across all flashcards, modal inspectors, and dialogue turns.
 - 🎤 **Interactive Dialogue Audio Karaoke Mode (情景對話跟讀高亮):** Real-time visual speaker focus animation with smooth auto-scroll and glow effects during turn-by-turn dialogue listening.
 - 📱 **Progressive Web App (PWA) & Offline Mode (離線 PWA 支援):** Installable web application with dark-theme manifest, native app icon, Service Worker caching (`sw.js`), "📲 Install App" prompt, and real-time offline status indicator allowing uninterrupted study even without internet connection.
