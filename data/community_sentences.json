@@ -1,6 +1,6 @@
 [
   {
-    "id": "cs-1792468421806-qlzyaf",
+    "id": "cs-1794775389487-eylp5m",
     "wordId": "w-slang-01",
     "word": "食死貓",
     "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
@@ -11,7 +11,7 @@
     "author": "WorkplaceSurvivor",
     "author_id": null,
     "likes": 2,
-    "createdAt": "2026-10-20T03:53:41.806Z"
+    "createdAt": "2026-11-15T20:43:09.487Z"
   },
   {
     "id": "cs-init-05",
@@ -77,6 +77,90 @@
     "author": "AhMing_HK",
     "likes": 15,
     "createdAt": "2026-10-15T08:00:00.000Z"
+  },
+  {
+    "id": "cs-1794775337066-vbtmjb",
+    "wordId": "w-slang-01",
+    "word": "食死貓",
+    "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
+    "jyutping": "tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!",
+    "meaning_zh": "同事做錯事推給我，害我要背黑鍋！",
+    "meaning_en": "My colleague messed up and pushed it onto me, leaving me to take the fall!",
+    "cultural_note": "A very common workplace slang expression in Hong Kong.",
+    "author": "WorkplaceSurvivor",
+    "author_id": null,
+    "likes": 2,
+    "createdAt": "2026-11-15T20:42:17.066Z"
+  },
+  {
+    "id": "cs-1794775325750-o9drt3",
+    "wordId": "w-slang-01",
+    "word": "食死貓",
+    "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
+    "jyutping": "tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!",
+    "meaning_zh": "同事做錯事推給我，害我要背黑鍋！",
+    "meaning_en": "My colleague messed up and pushed it onto me, leaving me to take the fall!",
+    "cultural_note": "A very common workplace slang expression in Hong Kong.",
+    "author": "WorkplaceSurvivor",
+    "author_id": null,
+    "likes": 2,
+    "createdAt": "2026-11-15T20:42:05.750Z"
+  },
+  {
+    "id": "cs-1794775279587-qf664r",
+    "wordId": "w-slang-01",
+    "word": "食死貓",
+    "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
+    "jyutping": "tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!",
+    "meaning_zh": "同事做錯事推給我，害我要背黑鍋！",
+    "meaning_en": "My colleague messed up and pushed it onto me, leaving me to take the fall!",
+    "cultural_note": "A very common workplace slang expression in Hong Kong.",
+    "author": "WorkplaceSurvivor",
+    "author_id": null,
+    "likes": 2,
+    "createdAt": "2026-11-15T20:41:19.587Z"
+  },
+  {
+    "id": "cs-1794774990227-2a4rdl",
+    "wordId": "w-slang-01",
+    "word": "食死貓",
+    "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
+    "jyutping": "tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!",
+    "meaning_zh": "同事做錯事推給我，害我要背黑鍋！",
+    "meaning_en": "My colleague messed up and pushed it onto me, leaving me to take the fall!",
+    "cultural_note": "A very common workplace slang expression in Hong Kong.",
+    "author": "WorkplaceSurvivor",
+    "author_id": null,
+    "likes": 2,
+    "createdAt": "2026-11-15T20:36:30.227Z"
+  },
+  {
+    "id": "cs-1794774740545-i2q3qh",
+    "wordId": "w-slang-01",
+    "word": "食死貓",
+    "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
+    "jyutping": "tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!",
+    "meaning_zh": "同事做錯事推給我，害我要背黑鍋！",
+    "meaning_en": "My colleague messed up and pushed it onto me, leaving me to take the fall!",
+    "cultural_note": "A very common workplace slang expression in Hong Kong.",
+    "author": "WorkplaceSurvivor",
+    "author_id": null,
+    "likes": 2,
+    "createdAt": "2026-11-15T20:32:20.545Z"
+  },
+  {
+    "id": "cs-1792468421806-qlzyaf",
+    "wordId": "w-slang-01",
+    "word": "食死貓",
+    "sentence": "同事做錯嘢推畀我，搞到我要食死貓！",
+    "jyutping": "tung4 si6 zou6 co3 je5 teoi1 bei2 ngo5, gaau2 dou3 ngo5 jiu3 sik6 sei2 maau1!",
+    "meaning_zh": "同事做錯事推給我，害我要背黑鍋！",
+    "meaning_en": "My colleague messed up and pushed it onto me, leaving me to take the fall!",
+    "cultural_note": "A very common workplace slang expression in Hong Kong.",
+    "author": "WorkplaceSurvivor",
+    "author_id": null,
+    "likes": 2,
+    "createdAt": "2026-10-20T03:53:41.806Z"
   },
   {
     "id": "cs-1792468367127-uew8yd",

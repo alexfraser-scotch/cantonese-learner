@@ -1429,6 +1429,109 @@ test('Hong Kong Slang & Xiehouyu Deck Integrity & Tone Verification', (t) => {
     });
 });
 
+test('Grade 1 Reading Chapters API and Chapter Integrity', async (t) => {
+    const http = require('http');
+    const port = (server.address() && server.address().port) || 8080;
+
+    // 1. GET /api/reading/chapters returns 12 Grade 1 chapters
+    let chapters = [];
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/reading/chapters`, (res) => {
+            assert.strictEqual(res.statusCode, 200);
+            assert.ok(res.headers['content-type'].includes('application/json'));
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                chapters = JSON.parse(body);
+                assert.ok(Array.isArray(chapters), 'Chapters must be an array');
+                assert.strictEqual(chapters.length, 12, 'Must contain exactly 12 Grade 1 Chinese chapters');
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    // 2. Validate chapter numbering (Chapters 1-6, 8-13)
+    const expectedChapterNumbers = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13];
+    const actualChapterNumbers = chapters.map(c => c.chapterNumber);
+    assert.deepStrictEqual(actualChapterNumbers, expectedChapterNumbers, 'Chapter numbering must match 1-6, 8-13 sequence');
+
+    // 3. Validate chapter structure and token alignment (character, pinyin, jyutping)
+    chapters.forEach(ch => {
+        assert.ok(ch.id && ch.id.startsWith('ch-'), `Chapter id must start with ch- (${ch.id})`);
+        assert.ok(ch.title && ch.title.length > 0, `Chapter ${ch.id} must have a title`);
+        assert.ok(ch.author && ch.author.length > 0, `Chapter ${ch.id} must have an author`);
+        assert.ok(Array.isArray(ch.lines) && ch.lines.length > 0, `Chapter ${ch.id} must have lines`);
+        assert.ok(ch.fullText && ch.fullText.length > 0, `Chapter ${ch.id} must have fullText`);
+
+        ch.lines.forEach((line, lIdx) => {
+            assert.strictEqual(line.index, lIdx, `Line index must match array index in chapter ${ch.id}`);
+            assert.ok(line.text && line.text.length > 0, `Line ${lIdx} in chapter ${ch.id} must have text`);
+            assert.ok(Array.isArray(line.tokens) && line.tokens.length > 0, `Line ${lIdx} must have tokens`);
+
+            line.tokens.forEach(tok => {
+                assert.ok(tok.char && tok.char.length > 0, 'Token must have a character');
+                assert.ok(typeof tok.pinyin === 'string', 'Token must have a pinyin property');
+                assert.ok(typeof tok.jyutping === 'string', 'Token must have a jyutping property');
+            });
+        });
+    });
+
+    // 4. GET /api/reading/chapters/:id returns single chapter
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/reading/chapters/ch-1`, (res) => {
+            assert.strictEqual(res.statusCode, 200);
+            let body = '';
+            res.on('data', chunk => { body += chunk; });
+            res.on('end', () => {
+                const ch1 = JSON.parse(body);
+                assert.strictEqual(ch1.id, 'ch-1');
+                assert.strictEqual(ch1.chapterNumber, 1);
+                assert.strictEqual(ch1.title, '我要上學了');
+                assert.strictEqual(ch1.author, '羅小羽');
+                assert.strictEqual(ch1.lines.length, 5);
+                resolve();
+            });
+        }).on('error', reject);
+    });
+
+    // 5. GET /api/reading/chapters/:id returns 404 for invalid id
+    await new Promise((resolve, reject) => {
+        http.get(`http://127.0.0.1:${port}/api/reading/chapters/ch-non-existent`, (res) => {
+            assert.strictEqual(res.statusCode, 404);
+            resolve();
+        }).on('error', reject);
+    });
+});
+
+test('Dual-Language Cantonese and Mandarin TTS Proxy Verification', async (t) => {
+    const http = require('http');
+    const port = (server.address() && server.address().port) || 8080;
+
+    // Test Mandarin TTS (tl=zh-CN)
+    await new Promise((resolve, reject) => {
+        const text = encodeURIComponent('我要上學了');
+        http.get(`http://127.0.0.1:${port}/api/tts?tl=zh-CN&text=${text}`, (res) => {
+            assert.ok([200, 502].includes(res.statusCode), 'Mandarin TTS should return 200 or 502 in isolated sandbox');
+            if (res.statusCode === 200) {
+                assert.strictEqual(res.headers['content-type'], 'audio/mpeg');
+            }
+            resolve();
+        }).on('error', reject);
+    });
+
+    // Test Cantonese TTS (tl=zh-HK)
+    await new Promise((resolve, reject) => {
+        const text = encodeURIComponent('我要上學了');
+        http.get(`http://127.0.0.1:${port}/api/tts?tl=zh-HK&text=${text}`, (res) => {
+            assert.ok([200, 502].includes(res.statusCode), 'Cantonese TTS should return 200 or 502 in isolated sandbox');
+            if (res.statusCode === 200) {
+                assert.strictEqual(res.headers['content-type'], 'audio/mpeg');
+            }
+            resolve();
+        }).on('error', reject);
+    });
+});
+
 test('Teardown test runner server handle', (t) => {
     if (server && typeof server.close === 'function') {
         server.close();

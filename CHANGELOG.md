@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.12.0] - 2026-11-15 - Grade 1 Chinese Reading Chapters, Dual-Language (Cantonese & Mandarin) Audio & Ruby Pinyin Annotation
+
+### 🌟 Added
+- **📖 Grade 1 Chinese Reading Category (小學一年級課文朗讀與拼音專區):**
+  - Added 12 complete Grade 1 Chinese textbook chapters (Chapters 1 to 6, and 8 to 13) preserving curriculum numbering:
+    1. 第1課〈我要上學了〉（羅小羽）
+    2. 第2課〈我的學校〉（馬翠蘿）
+    3. 第3課〈我幫爺爺穿鞋子〉（陳珉）
+    4. 第4課〈門鈴響了〉（申一言）
+    5. 第5課〈十個小朋友〉（宇文）
+    6. 第6課〈照鏡子〉（羅小羽）
+    8. 第8課〈搖籃〉（劉饒民）
+    9. 第9課〈小小的船〉（葉聖陶）
+    10. 第10課〈洗澡〉（羅小羽）
+    11. 第11課〈掉牙〉（黃慶雲）
+    12. 第12課〈吃月餅〉（周蜜蜜）
+    13. 第13課〈中秋〉（黃慶雲）
+- **🗣️ Dual-Language Audio Playback (粵語 / 普通話雙音頻朗讀):**
+  - Seamless toggle between authentic **Cantonese (`zh-HK`)** and standard **Mandarin (`zh-CN`)** read-alouds.
+  - Supports both sequential full-chapter karaoke playback and click-to-read single sentence listening with real-time active row highlighting and auto-scrolling.
+  - Upgraded `/api/tts` proxy endpoint to handle target language parameters (`tl=zh-CN` and `tl=zh-HK`) with localized cache partitions.
+- **✨ Dynamic Ruby Character Annotations & Typography Controls:**
+  - Interactive switcher between **Mandarin Pinyin with tone marks (`<ruby rt>` in sky blue)**, **Cantonese Jyutping (`<ruby rt>` in purple)**, and **Plain Characters (純漢字)**.
+  - 4-level responsive text scaler (`A-` / `A+`: 小 / 中 / 大 / 特大) for comfortable young learner and adult reading.
+  - Horizontal scrollable chapter pills bar and previous/next chapter navigation buttons.
+- **🌐 RESTful Reading Endpoints & Offline Precaching:**
+  - `GET /api/reading/chapters`: Returns all Grade 1 chapters with verified line and character token arrays.
+  - `GET /api/reading/chapters/:id`: Fetches chapter-specific details.
+  - Precached in Service Worker (`sw.js`) and embedded in offline fallback client dataset.
+- **🧪 Test Suite Expansion:**
+  - Added comprehensive automated unit tests in `test/server.test.js` validating chapter count (12 chapters), numbering integrity, line tokens, Pinyin/Jyutping alignments, single chapter endpoint, and dual-language TTS proxy audio responses (31/31 tests passing).
+
+---
+
 ## [v1.11.0] - 2026-10-20 - Community Sentence Contributor & Hong Kong Slang/Xiehouyu Deck
 
 ### 🌟 Added

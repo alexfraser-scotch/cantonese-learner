@@ -15,6 +15,10 @@ An interactive, open-source Cantonese Vocabulary Learning platform featuring **3
 
 ## ✨ Features
 
+- 📖 **Grade 1 Chinese Reading Category with Dual-Language (Cantonese & Mandarin) Audio (小學一年級課文朗讀與普通話拼音):** Dedicated reading section featuring 12 classic Grade 1 textbook chapters (Chapters 1–6, 8–13) with full-chapter continuous read-aloud and click-to-read single sentence listening. Includes:
+  - **🔊 Dual-Language Audio:** Toggle effortlessly between authentic **Cantonese (zh-HK)** and standard **Mandarin (zh-CN)** speech.
+  - **✨ Dynamic Ruby Character Annotations:** Live switcher between **Mandarin Pinyin with tone marks (<ruby rt> in sky blue)**, **Cantonese Jyutping (<ruby rt> in purple)**, and **Plain Characters (純漢字)**.
+  - **📏 Typography Scaler & Carousel:** 4-level text sizing (A- / A+: 小 / 中 / 大 / 特大) for optimal reading comfort, along with quick-switching chapter selector pills and previous/next chapter navigation.
 - 💬 **Community Example Sentences & Colloquial Notes Contributor (社區例句與文化註釋眾包):** Public learners and native speakers can contribute colloquial sentences, real-life conversation tips, and cultural usage notes for any vocabulary item in the word detail inspector. Features full LSHK 6-tone colorization, native TTS audio playback, and peer upvoting (👍).
 - 🔥 **Hong Kong Slang, Idioms & Xiehouyu Deck (香港地道潮語與歇後語):** Curated culture deck packed with vibrant local Cantonese slang (食死貓, 炒魷魚, 賣大包, 執生, 放飛機, 搞掂) and classic two-part allegorical sayings (泥菩薩過江 — 自身難保, 單眼佬睇榜 — 一目了然) complete with Jyutping tone numbers and contextual definitions.
 - 🎨 **Granular Jyutping 6-Tone Colorization (粵拼六聲色彩標記):** Syllable-level token parser that color-codes each Cantonese word by pitch contour numbers 1–6 (陰平 High Level, 陰上 High Rising, 陰去 Mid Level, 陽平 Low Falling, 陽上 Low Rising, 陽去 Low Level) across all flashcards, modal inspectors, and dialogue turns.

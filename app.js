@@ -1042,6 +1042,3177 @@ const DEFAULT_PROFILES = [
 // ==========================================
 // 1. Supabase Auth Manager
 // ==========================================
+const DEFAULT_READING_CHAPTERS = [
+    {
+        "id": "ch-1",
+        "chapterNumber": 1,
+        "title": "我要上學了",
+        "author": "羅小羽",
+        "lines": [
+            {
+                "index": 0,
+                "text": "爸爸笑，",
+                "pinyin": "bà ba xiào ，",
+                "jyutping": "baa4 baa1 siu3 ，",
+                "tokens": [
+                    {
+                        "char": "爸",
+                        "pinyin": "bà",
+                        "jyutping": "baa4"
+                    },
+                    {
+                        "char": "爸",
+                        "pinyin": "ba",
+                        "jyutping": "baa1"
+                    },
+                    {
+                        "char": "笑",
+                        "pinyin": "xiào",
+                        "jyutping": "siu3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "媽媽笑，",
+                "pinyin": "mā ma xiào ，",
+                "jyutping": "maa1 maa1 siu3 ，",
+                "tokens": [
+                    {
+                        "char": "媽",
+                        "pinyin": "mā",
+                        "jyutping": "maa1"
+                    },
+                    {
+                        "char": "媽",
+                        "pinyin": "ma",
+                        "jyutping": "maa1"
+                    },
+                    {
+                        "char": "笑",
+                        "pinyin": "xiào",
+                        "jyutping": "siu3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "小貓也說妙。",
+                "pinyin": "xiǎo māo yě shuō miào 。",
+                "jyutping": "siu2 maau1 jaa5 syut3 miu6 。",
+                "tokens": [
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "貓",
+                        "pinyin": "māo",
+                        "jyutping": "maau1"
+                    },
+                    {
+                        "char": "也",
+                        "pinyin": "yě",
+                        "jyutping": "jaa5"
+                    },
+                    {
+                        "char": "說",
+                        "pinyin": "shuō",
+                        "jyutping": "syut3"
+                    },
+                    {
+                        "char": "妙",
+                        "pinyin": "miào",
+                        "jyutping": "miu6"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "真開心，",
+                "pinyin": "zhēn kāi xīn ，",
+                "jyutping": "zan1 hoi1 sam1 ，",
+                "tokens": [
+                    {
+                        "char": "真",
+                        "pinyin": "zhēn",
+                        "jyutping": "zan1"
+                    },
+                    {
+                        "char": "開",
+                        "pinyin": "kāi",
+                        "jyutping": "hoi1"
+                    },
+                    {
+                        "char": "心",
+                        "pinyin": "xīn",
+                        "jyutping": "sam1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "我要上學了。",
+                "pinyin": "wǒ yào shàng xué le 。",
+                "jyutping": "ngo5 jiu3 soeng5 hok6 liu5 。",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "要",
+                        "pinyin": "yào",
+                        "jyutping": "jiu3"
+                    },
+                    {
+                        "char": "上",
+                        "pinyin": "shàng",
+                        "jyutping": "soeng5"
+                    },
+                    {
+                        "char": "學",
+                        "pinyin": "xué",
+                        "jyutping": "hok6"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "爸爸笑， 媽媽笑， 小貓也說妙。 真開心， 我要上學了。"
+    },
+    {
+        "id": "ch-2",
+        "chapterNumber": 2,
+        "title": "我的學校",
+        "author": "馬翠蘿",
+        "lines": [
+            {
+                "index": 0,
+                "text": "老師，您好！",
+                "pinyin": "lǎo shī ， nín hǎo ！",
+                "jyutping": "lou5 si1 ， nei5 hou2 ！",
+                "tokens": [
+                    {
+                        "char": "老",
+                        "pinyin": "lǎo",
+                        "jyutping": "lou5"
+                    },
+                    {
+                        "char": "師",
+                        "pinyin": "shī",
+                        "jyutping": "si1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "您",
+                        "pinyin": "nín",
+                        "jyutping": "nei5"
+                    },
+                    {
+                        "char": "好",
+                        "pinyin": "hǎo",
+                        "jyutping": "hou2"
+                    },
+                    {
+                        "char": "！",
+                        "pinyin": "！",
+                        "jyutping": "！"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "同學，你早！",
+                "pinyin": "tóng xué ， nǐ zǎo ！",
+                "jyutping": "tung4 hok6 ， nei5 zou2 ！",
+                "tokens": [
+                    {
+                        "char": "同",
+                        "pinyin": "tóng",
+                        "jyutping": "tung4"
+                    },
+                    {
+                        "char": "學",
+                        "pinyin": "xué",
+                        "jyutping": "hok6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "你",
+                        "pinyin": "nǐ",
+                        "jyutping": "nei5"
+                    },
+                    {
+                        "char": "早",
+                        "pinyin": "zǎo",
+                        "jyutping": "zou2"
+                    },
+                    {
+                        "char": "！",
+                        "pinyin": "！",
+                        "jyutping": "！"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "大哥哥，你真高！",
+                "pinyin": "dà gē ge ， nǐ zhēn gāo ！",
+                "jyutping": "daai6 go1 go1 ， nei5 zan1 gou1 ！",
+                "tokens": [
+                    {
+                        "char": "大",
+                        "pinyin": "dà",
+                        "jyutping": "daai6"
+                    },
+                    {
+                        "char": "哥",
+                        "pinyin": "gē",
+                        "jyutping": "go1"
+                    },
+                    {
+                        "char": "哥",
+                        "pinyin": "ge",
+                        "jyutping": "go1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "你",
+                        "pinyin": "nǐ",
+                        "jyutping": "nei5"
+                    },
+                    {
+                        "char": "真",
+                        "pinyin": "zhēn",
+                        "jyutping": "zan1"
+                    },
+                    {
+                        "char": "高",
+                        "pinyin": "gāo",
+                        "jyutping": "gou1"
+                    },
+                    {
+                        "char": "！",
+                        "pinyin": "！",
+                        "jyutping": "！"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "逛逛大操場，",
+                "pinyin": "guàng guang dà cāo chǎng ，",
+                "jyutping": "gwaang6 gwaang6 daai6 cou1 coeng4 ，",
+                "tokens": [
+                    {
+                        "char": "逛",
+                        "pinyin": "guàng",
+                        "jyutping": "gwaang6"
+                    },
+                    {
+                        "char": "逛",
+                        "pinyin": "guang",
+                        "jyutping": "gwaang6"
+                    },
+                    {
+                        "char": "大",
+                        "pinyin": "dà",
+                        "jyutping": "daai6"
+                    },
+                    {
+                        "char": "操",
+                        "pinyin": "cāo",
+                        "jyutping": "cou1"
+                    },
+                    {
+                        "char": "場",
+                        "pinyin": "chǎng",
+                        "jyutping": "coeng4"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "看看小賣部，",
+                "pinyin": "kàn kan xiǎo mài bù ，",
+                "jyutping": "hon3 hon3 siu2 maai6 bou6 ，",
+                "tokens": [
+                    {
+                        "char": "看",
+                        "pinyin": "kàn",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "看",
+                        "pinyin": "kan",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "賣",
+                        "pinyin": "mài",
+                        "jyutping": "maai6"
+                    },
+                    {
+                        "char": "部",
+                        "pinyin": "bù",
+                        "jyutping": "bou6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "我的學校，真好！",
+                "pinyin": "wǒ de xué xiào ， zhēn hǎo ！",
+                "jyutping": "ngo5 dik1 hok6 haau6 ， zan1 hou2 ！",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "學",
+                        "pinyin": "xué",
+                        "jyutping": "hok6"
+                    },
+                    {
+                        "char": "校",
+                        "pinyin": "xiào",
+                        "jyutping": "haau6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "真",
+                        "pinyin": "zhēn",
+                        "jyutping": "zan1"
+                    },
+                    {
+                        "char": "好",
+                        "pinyin": "hǎo",
+                        "jyutping": "hou2"
+                    },
+                    {
+                        "char": "！",
+                        "pinyin": "！",
+                        "jyutping": "！"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "老師，您好！ 同學，你早！ 大哥哥，你真高！ 逛逛大操場， 看看小賣部， 我的學校，真好！"
+    },
+    {
+        "id": "ch-3",
+        "chapterNumber": 3,
+        "title": "我幫爺爺穿鞋子",
+        "author": "陳珉",
+        "lines": [
+            {
+                "index": 0,
+                "text": "爺爺穿鞋子，",
+                "pinyin": "yé ye chuān xié zi ，",
+                "jyutping": "je4 je4 cyun1 haai4 zi2 ，",
+                "tokens": [
+                    {
+                        "char": "爺",
+                        "pinyin": "yé",
+                        "jyutping": "je4"
+                    },
+                    {
+                        "char": "爺",
+                        "pinyin": "ye",
+                        "jyutping": "je4"
+                    },
+                    {
+                        "char": "穿",
+                        "pinyin": "chuān",
+                        "jyutping": "cyun1"
+                    },
+                    {
+                        "char": "鞋",
+                        "pinyin": "xié",
+                        "jyutping": "haai4"
+                    },
+                    {
+                        "char": "子",
+                        "pinyin": "zi",
+                        "jyutping": "zi2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "彎不下身子，",
+                "pinyin": "wān bu xià shēn zi ，",
+                "jyutping": "waan1 bat1 haa6 san1 zi2 ，",
+                "tokens": [
+                    {
+                        "char": "彎",
+                        "pinyin": "wān",
+                        "jyutping": "waan1"
+                    },
+                    {
+                        "char": "不",
+                        "pinyin": "bu",
+                        "jyutping": "bat1"
+                    },
+                    {
+                        "char": "下",
+                        "pinyin": "xià",
+                        "jyutping": "haa6"
+                    },
+                    {
+                        "char": "身",
+                        "pinyin": "shēn",
+                        "jyutping": "san1"
+                    },
+                    {
+                        "char": "子",
+                        "pinyin": "zi",
+                        "jyutping": "zi2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "我幫爺爺穿鞋子，",
+                "pinyin": "wǒ bāng yé ye chuān xié zi ，",
+                "jyutping": "ngo5 bong1 je4 je4 cyun1 haai4 zi2 ，",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "幫",
+                        "pinyin": "bāng",
+                        "jyutping": "bong1"
+                    },
+                    {
+                        "char": "爺",
+                        "pinyin": "yé",
+                        "jyutping": "je4"
+                    },
+                    {
+                        "char": "爺",
+                        "pinyin": "ye",
+                        "jyutping": "je4"
+                    },
+                    {
+                        "char": "穿",
+                        "pinyin": "chuān",
+                        "jyutping": "cyun1"
+                    },
+                    {
+                        "char": "鞋",
+                        "pinyin": "xié",
+                        "jyutping": "haai4"
+                    },
+                    {
+                        "char": "子",
+                        "pinyin": "zi",
+                        "jyutping": "zi2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "哈，爺爺成了小孩子。",
+                "pinyin": "hā ， yé ye chéng le xiǎo hái zi 。",
+                "jyutping": "haa1 ， je4 je4 sing4 liu5 siu2 haai4 zi2 。",
+                "tokens": [
+                    {
+                        "char": "哈",
+                        "pinyin": "hā",
+                        "jyutping": "haa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "爺",
+                        "pinyin": "yé",
+                        "jyutping": "je4"
+                    },
+                    {
+                        "char": "爺",
+                        "pinyin": "ye",
+                        "jyutping": "je4"
+                    },
+                    {
+                        "char": "成",
+                        "pinyin": "chéng",
+                        "jyutping": "sing4"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "孩",
+                        "pinyin": "hái",
+                        "jyutping": "haai4"
+                    },
+                    {
+                        "char": "子",
+                        "pinyin": "zi",
+                        "jyutping": "zi2"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "爺爺穿鞋子， 彎不下身子， 我幫爺爺穿鞋子， 哈，爺爺成了小孩子。"
+    },
+    {
+        "id": "ch-4",
+        "chapterNumber": 4,
+        "title": "門鈴響了",
+        "author": "申一言",
+        "lines": [
+            {
+                "index": 0,
+                "text": "門鈴響了，哥哥和姐姐手拉手回家了。",
+                "pinyin": "mén líng xiǎng le ， gē ge hé jiě jie shǒu lā shǒu huí jiā le 。",
+                "jyutping": "mun4 ling4 hoeng2 liu5 ， go1 go1 wo4 ze2 ze2 sau2 laai1 sau2 wui4 gaa1 liu5 。",
+                "tokens": [
+                    {
+                        "char": "門",
+                        "pinyin": "mén",
+                        "jyutping": "mun4"
+                    },
+                    {
+                        "char": "鈴",
+                        "pinyin": "líng",
+                        "jyutping": "ling4"
+                    },
+                    {
+                        "char": "響",
+                        "pinyin": "xiǎng",
+                        "jyutping": "hoeng2"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "哥",
+                        "pinyin": "gē",
+                        "jyutping": "go1"
+                    },
+                    {
+                        "char": "哥",
+                        "pinyin": "ge",
+                        "jyutping": "go1"
+                    },
+                    {
+                        "char": "和",
+                        "pinyin": "hé",
+                        "jyutping": "wo4"
+                    },
+                    {
+                        "char": "姐",
+                        "pinyin": "jiě",
+                        "jyutping": "ze2"
+                    },
+                    {
+                        "char": "姐",
+                        "pinyin": "jie",
+                        "jyutping": "ze2"
+                    },
+                    {
+                        "char": "手",
+                        "pinyin": "shǒu",
+                        "jyutping": "sau2"
+                    },
+                    {
+                        "char": "拉",
+                        "pinyin": "lā",
+                        "jyutping": "laai1"
+                    },
+                    {
+                        "char": "手",
+                        "pinyin": "shǒu",
+                        "jyutping": "sau2"
+                    },
+                    {
+                        "char": "回",
+                        "pinyin": "huí",
+                        "jyutping": "wui4"
+                    },
+                    {
+                        "char": "家",
+                        "pinyin": "jiā",
+                        "jyutping": "gaa1"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "門鈴響了，爸爸和媽媽肩並肩回家了。",
+                "pinyin": "mén líng xiǎng le ， bà ba hé mā ma jiān bìng jiān huí jiā le 。",
+                "jyutping": "mun4 ling4 hoeng2 liu5 ， baa4 baa1 wo4 maa1 maa1 gin1 bing3 gin1 wui4 gaa1 liu5 。",
+                "tokens": [
+                    {
+                        "char": "門",
+                        "pinyin": "mén",
+                        "jyutping": "mun4"
+                    },
+                    {
+                        "char": "鈴",
+                        "pinyin": "líng",
+                        "jyutping": "ling4"
+                    },
+                    {
+                        "char": "響",
+                        "pinyin": "xiǎng",
+                        "jyutping": "hoeng2"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "爸",
+                        "pinyin": "bà",
+                        "jyutping": "baa4"
+                    },
+                    {
+                        "char": "爸",
+                        "pinyin": "ba",
+                        "jyutping": "baa1"
+                    },
+                    {
+                        "char": "和",
+                        "pinyin": "hé",
+                        "jyutping": "wo4"
+                    },
+                    {
+                        "char": "媽",
+                        "pinyin": "mā",
+                        "jyutping": "maa1"
+                    },
+                    {
+                        "char": "媽",
+                        "pinyin": "ma",
+                        "jyutping": "maa1"
+                    },
+                    {
+                        "char": "肩",
+                        "pinyin": "jiān",
+                        "jyutping": "gin1"
+                    },
+                    {
+                        "char": "並",
+                        "pinyin": "bìng",
+                        "jyutping": "bing3"
+                    },
+                    {
+                        "char": "肩",
+                        "pinyin": "jiān",
+                        "jyutping": "gin1"
+                    },
+                    {
+                        "char": "回",
+                        "pinyin": "huí",
+                        "jyutping": "wui4"
+                    },
+                    {
+                        "char": "家",
+                        "pinyin": "jiā",
+                        "jyutping": "gaa1"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "門鈴響了，歡笑和溫暖都回家了。",
+                "pinyin": "mén líng xiǎng le ， huān xiào hé wēn nuǎn dōu huí jiā le 。",
+                "jyutping": "mun4 ling4 hoeng2 liu5 ， fun1 siu3 wo4 wan1 nyun5 dou1 wui4 gaa1 liu5 。",
+                "tokens": [
+                    {
+                        "char": "門",
+                        "pinyin": "mén",
+                        "jyutping": "mun4"
+                    },
+                    {
+                        "char": "鈴",
+                        "pinyin": "líng",
+                        "jyutping": "ling4"
+                    },
+                    {
+                        "char": "響",
+                        "pinyin": "xiǎng",
+                        "jyutping": "hoeng2"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "歡",
+                        "pinyin": "huān",
+                        "jyutping": "fun1"
+                    },
+                    {
+                        "char": "笑",
+                        "pinyin": "xiào",
+                        "jyutping": "siu3"
+                    },
+                    {
+                        "char": "和",
+                        "pinyin": "hé",
+                        "jyutping": "wo4"
+                    },
+                    {
+                        "char": "溫",
+                        "pinyin": "wēn",
+                        "jyutping": "wan1"
+                    },
+                    {
+                        "char": "暖",
+                        "pinyin": "nuǎn",
+                        "jyutping": "nyun5"
+                    },
+                    {
+                        "char": "都",
+                        "pinyin": "dōu",
+                        "jyutping": "dou1"
+                    },
+                    {
+                        "char": "回",
+                        "pinyin": "huí",
+                        "jyutping": "wui4"
+                    },
+                    {
+                        "char": "家",
+                        "pinyin": "jiā",
+                        "jyutping": "gaa1"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "門鈴響了，哥哥和姐姐手拉手回家了。 門鈴響了，爸爸和媽媽肩並肩回家了。 門鈴響了，歡笑和溫暖都回家了。"
+    },
+    {
+        "id": "ch-5",
+        "chapterNumber": 5,
+        "title": "十個小朋友",
+        "author": "宇文",
+        "lines": [
+            {
+                "index": 0,
+                "text": "十個小朋友，",
+                "pinyin": "shí gè xiǎo péng you ，",
+                "jyutping": "sap6 go3 siu2 pang4 jau5 ，",
+                "tokens": [
+                    {
+                        "char": "十",
+                        "pinyin": "shí",
+                        "jyutping": "sap6"
+                    },
+                    {
+                        "char": "個",
+                        "pinyin": "gè",
+                        "jyutping": "go3"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "朋",
+                        "pinyin": "péng",
+                        "jyutping": "pang4"
+                    },
+                    {
+                        "char": "友",
+                        "pinyin": "you",
+                        "jyutping": "jau5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "你有我有他也有。",
+                "pinyin": "nǐ yǒu wǒ yǒu tā yě yǒu 。",
+                "jyutping": "nei5 jau5 ngo5 jau5 taa1 jaa5 jau5 。",
+                "tokens": [
+                    {
+                        "char": "你",
+                        "pinyin": "nǐ",
+                        "jyutping": "nei5"
+                    },
+                    {
+                        "char": "有",
+                        "pinyin": "yǒu",
+                        "jyutping": "jau5"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "有",
+                        "pinyin": "yǒu",
+                        "jyutping": "jau5"
+                    },
+                    {
+                        "char": "他",
+                        "pinyin": "tā",
+                        "jyutping": "taa1"
+                    },
+                    {
+                        "char": "也",
+                        "pinyin": "yě",
+                        "jyutping": "jaa5"
+                    },
+                    {
+                        "char": "有",
+                        "pinyin": "yǒu",
+                        "jyutping": "jau5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "五個在左，",
+                "pinyin": "wǔ gè zài zuǒ ，",
+                "jyutping": "ng5 go3 zoi6 zo2 ，",
+                "tokens": [
+                    {
+                        "char": "五",
+                        "pinyin": "wǔ",
+                        "jyutping": "ng5"
+                    },
+                    {
+                        "char": "個",
+                        "pinyin": "gè",
+                        "jyutping": "go3"
+                    },
+                    {
+                        "char": "在",
+                        "pinyin": "zài",
+                        "jyutping": "zoi6"
+                    },
+                    {
+                        "char": "左",
+                        "pinyin": "zuǒ",
+                        "jyutping": "zo2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "五個在右，",
+                "pinyin": "wǔ gè zài yòu ，",
+                "jyutping": "ng5 go3 zoi6 jau6 ，",
+                "tokens": [
+                    {
+                        "char": "五",
+                        "pinyin": "wǔ",
+                        "jyutping": "ng5"
+                    },
+                    {
+                        "char": "個",
+                        "pinyin": "gè",
+                        "jyutping": "go3"
+                    },
+                    {
+                        "char": "在",
+                        "pinyin": "zài",
+                        "jyutping": "zoi6"
+                    },
+                    {
+                        "char": "右",
+                        "pinyin": "yòu",
+                        "jyutping": "jau6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "只會做事，",
+                "pinyin": "zhǐ huì zuò shì ，",
+                "jyutping": "zi2 wui5 zou6 si6 ，",
+                "tokens": [
+                    {
+                        "char": "只",
+                        "pinyin": "zhǐ",
+                        "jyutping": "zi2"
+                    },
+                    {
+                        "char": "會",
+                        "pinyin": "huì",
+                        "jyutping": "wui5"
+                    },
+                    {
+                        "char": "做",
+                        "pinyin": "zuò",
+                        "jyutping": "zou6"
+                    },
+                    {
+                        "char": "事",
+                        "pinyin": "shì",
+                        "jyutping": "si6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "不會開口。",
+                "pinyin": "bù huì kāi kǒu 。",
+                "jyutping": "bat1 wui5 hoi1 hau2 。",
+                "tokens": [
+                    {
+                        "char": "不",
+                        "pinyin": "bù",
+                        "jyutping": "bat1"
+                    },
+                    {
+                        "char": "會",
+                        "pinyin": "huì",
+                        "jyutping": "wui5"
+                    },
+                    {
+                        "char": "開",
+                        "pinyin": "kāi",
+                        "jyutping": "hoi1"
+                    },
+                    {
+                        "char": "口",
+                        "pinyin": "kǒu",
+                        "jyutping": "hau2"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "十個小朋友， 你有我有他也有。 五個在左， 五個在右， 只會做事， 不會開口。"
+    },
+    {
+        "id": "ch-6",
+        "chapterNumber": 6,
+        "title": "照鏡子",
+        "author": "羅小羽",
+        "lines": [
+            {
+                "index": 0,
+                "text": "我看他，他看我，",
+                "pinyin": "wǒ kàn tā ， tā kàn wǒ ，",
+                "jyutping": "ngo5 hon3 taa1 ， taa1 hon3 ngo5 ，",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "看",
+                        "pinyin": "kàn",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "他",
+                        "pinyin": "tā",
+                        "jyutping": "taa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "他",
+                        "pinyin": "tā",
+                        "jyutping": "taa1"
+                    },
+                    {
+                        "char": "看",
+                        "pinyin": "kàn",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "我親他，他親我。",
+                "pinyin": "wǒ qīn tā ， tā qīn wǒ 。",
+                "jyutping": "ngo5 can1 taa1 ， taa1 can1 ngo5 。",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "親",
+                        "pinyin": "qīn",
+                        "jyutping": "can1"
+                    },
+                    {
+                        "char": "他",
+                        "pinyin": "tā",
+                        "jyutping": "taa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "他",
+                        "pinyin": "tā",
+                        "jyutping": "taa1"
+                    },
+                    {
+                        "char": "親",
+                        "pinyin": "qīn",
+                        "jyutping": "can1"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "大眼睛，小耳朵，",
+                "pinyin": "dà yǎn jing ， xiǎo ěr duo ，",
+                "jyutping": "daai6 ngaan5 zing1 ， siu2 ji5 do2 ，",
+                "tokens": [
+                    {
+                        "char": "大",
+                        "pinyin": "dà",
+                        "jyutping": "daai6"
+                    },
+                    {
+                        "char": "眼",
+                        "pinyin": "yǎn",
+                        "jyutping": "ngaan5"
+                    },
+                    {
+                        "char": "睛",
+                        "pinyin": "jing",
+                        "jyutping": "zing1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "耳",
+                        "pinyin": "ěr",
+                        "jyutping": "ji5"
+                    },
+                    {
+                        "char": "朵",
+                        "pinyin": "duo",
+                        "jyutping": "do2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "臉兒好像紅蘋果。",
+                "pinyin": "liǎn r hǎo xiàng hóng píng guǒ 。",
+                "jyutping": "lim5 ji4 hou2 zoeng6 hung4 ping4 gwo2 。",
+                "tokens": [
+                    {
+                        "char": "臉",
+                        "pinyin": "liǎn",
+                        "jyutping": "lim5"
+                    },
+                    {
+                        "char": "兒",
+                        "pinyin": "r",
+                        "jyutping": "ji4"
+                    },
+                    {
+                        "char": "好",
+                        "pinyin": "hǎo",
+                        "jyutping": "hou2"
+                    },
+                    {
+                        "char": "像",
+                        "pinyin": "xiàng",
+                        "jyutping": "zoeng6"
+                    },
+                    {
+                        "char": "紅",
+                        "pinyin": "hóng",
+                        "jyutping": "hung4"
+                    },
+                    {
+                        "char": "蘋",
+                        "pinyin": "píng",
+                        "jyutping": "ping4"
+                    },
+                    {
+                        "char": "果",
+                        "pinyin": "guǒ",
+                        "jyutping": "gwo2"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "舌頭一伸要嚇我，",
+                "pinyin": "shé tou yī shēn yào xià wǒ ，",
+                "jyutping": "sit3 tau4 jat1 san1 jiu3 haak3 ngo5 ，",
+                "tokens": [
+                    {
+                        "char": "舌",
+                        "pinyin": "shé",
+                        "jyutping": "sit3"
+                    },
+                    {
+                        "char": "頭",
+                        "pinyin": "tou",
+                        "jyutping": "tau4"
+                    },
+                    {
+                        "char": "一",
+                        "pinyin": "yī",
+                        "jyutping": "jat1"
+                    },
+                    {
+                        "char": "伸",
+                        "pinyin": "shēn",
+                        "jyutping": "san1"
+                    },
+                    {
+                        "char": "要",
+                        "pinyin": "yào",
+                        "jyutping": "jiu3"
+                    },
+                    {
+                        "char": "嚇",
+                        "pinyin": "xià",
+                        "jyutping": "haak3"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "他是誰？就是我。",
+                "pinyin": "tā shì shuí ？ jiù shì wǒ 。",
+                "jyutping": "taa1 si6 seoi4 ？ zau6 si6 ngo5 。",
+                "tokens": [
+                    {
+                        "char": "他",
+                        "pinyin": "tā",
+                        "jyutping": "taa1"
+                    },
+                    {
+                        "char": "是",
+                        "pinyin": "shì",
+                        "jyutping": "si6"
+                    },
+                    {
+                        "char": "誰",
+                        "pinyin": "shuí",
+                        "jyutping": "seoi4"
+                    },
+                    {
+                        "char": "？",
+                        "pinyin": "？",
+                        "jyutping": "？"
+                    },
+                    {
+                        "char": "就",
+                        "pinyin": "jiù",
+                        "jyutping": "zau6"
+                    },
+                    {
+                        "char": "是",
+                        "pinyin": "shì",
+                        "jyutping": "si6"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "我看他，他看我， 我親他，他親我。 大眼睛，小耳朵， 臉兒好像紅蘋果。 舌頭一伸要嚇我， 他是誰？就是我。"
+    },
+    {
+        "id": "ch-8",
+        "chapterNumber": 8,
+        "title": "搖籃",
+        "author": "劉饒民",
+        "lines": [
+            {
+                "index": 0,
+                "text": "天藍藍，",
+                "pinyin": "tiān lán lán ，",
+                "jyutping": "tin1 laam4 laam4 ，",
+                "tokens": [
+                    {
+                        "char": "天",
+                        "pinyin": "tiān",
+                        "jyutping": "tin1"
+                    },
+                    {
+                        "char": "藍",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "藍",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "海藍藍，",
+                "pinyin": "hǎi lán lán ，",
+                "jyutping": "hoi2 laam4 laam4 ，",
+                "tokens": [
+                    {
+                        "char": "海",
+                        "pinyin": "hǎi",
+                        "jyutping": "hoi2"
+                    },
+                    {
+                        "char": "藍",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "藍",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "小小船兒當搖籃。",
+                "pinyin": "xiǎo xiǎo chuán r dāng yáo lán 。",
+                "jyutping": "siu2 siu2 syun4 ji4 dong1 jiu4 laam4 。",
+                "tokens": [
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "船",
+                        "pinyin": "chuán",
+                        "jyutping": "syun4"
+                    },
+                    {
+                        "char": "兒",
+                        "pinyin": "r",
+                        "jyutping": "ji4"
+                    },
+                    {
+                        "char": "當",
+                        "pinyin": "dāng",
+                        "jyutping": "dong1"
+                    },
+                    {
+                        "char": "搖",
+                        "pinyin": "yáo",
+                        "jyutping": "jiu4"
+                    },
+                    {
+                        "char": "籃",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "海是家，",
+                "pinyin": "hǎi shì jiā ，",
+                "jyutping": "hoi2 si6 gaa1 ，",
+                "tokens": [
+                    {
+                        "char": "海",
+                        "pinyin": "hǎi",
+                        "jyutping": "hoi2"
+                    },
+                    {
+                        "char": "是",
+                        "pinyin": "shì",
+                        "jyutping": "si6"
+                    },
+                    {
+                        "char": "家",
+                        "pinyin": "jiā",
+                        "jyutping": "gaa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "浪做伴，",
+                "pinyin": "làng zuò bàn ，",
+                "jyutping": "long6 zou6 bun6 ，",
+                "tokens": [
+                    {
+                        "char": "浪",
+                        "pinyin": "làng",
+                        "jyutping": "long6"
+                    },
+                    {
+                        "char": "做",
+                        "pinyin": "zuò",
+                        "jyutping": "zou6"
+                    },
+                    {
+                        "char": "伴",
+                        "pinyin": "bàn",
+                        "jyutping": "bun6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "白帆帶我到處玩。",
+                "pinyin": "bái fān dài wǒ dào chù wán 。",
+                "jyutping": "baak6 faan4 daai3 ngo5 dou3 cyu3 waan2 。",
+                "tokens": [
+                    {
+                        "char": "白",
+                        "pinyin": "bái",
+                        "jyutping": "baak6"
+                    },
+                    {
+                        "char": "帆",
+                        "pinyin": "fān",
+                        "jyutping": "faan4"
+                    },
+                    {
+                        "char": "帶",
+                        "pinyin": "dài",
+                        "jyutping": "daai3"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "到",
+                        "pinyin": "dào",
+                        "jyutping": "dou3"
+                    },
+                    {
+                        "char": "處",
+                        "pinyin": "chù",
+                        "jyutping": "cyu3"
+                    },
+                    {
+                        "char": "玩",
+                        "pinyin": "wán",
+                        "jyutping": "waan2"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "天藍藍， 海藍藍， 小小船兒當搖籃。 海是家， 浪做伴， 白帆帶我到處玩。"
+    },
+    {
+        "id": "ch-9",
+        "chapterNumber": 9,
+        "title": "小小的船",
+        "author": "葉聖陶",
+        "lines": [
+            {
+                "index": 0,
+                "text": "彎彎的月兒小小的船，",
+                "pinyin": "wān wān de yuè r xiǎo xiǎo de chuán ，",
+                "jyutping": "waan1 waan1 dik1 jyut6 ji4 siu2 siu2 dik1 syun4 ，",
+                "tokens": [
+                    {
+                        "char": "彎",
+                        "pinyin": "wān",
+                        "jyutping": "waan1"
+                    },
+                    {
+                        "char": "彎",
+                        "pinyin": "wān",
+                        "jyutping": "waan1"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "兒",
+                        "pinyin": "r",
+                        "jyutping": "ji4"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "船",
+                        "pinyin": "chuán",
+                        "jyutping": "syun4"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "小小的船兒兩頭尖。",
+                "pinyin": "xiǎo xiǎo de chuán r liǎng tóu jiān 。",
+                "jyutping": "siu2 siu2 dik1 syun4 ji4 loeng5 tau4 zim1 。",
+                "tokens": [
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "船",
+                        "pinyin": "chuán",
+                        "jyutping": "syun4"
+                    },
+                    {
+                        "char": "兒",
+                        "pinyin": "r",
+                        "jyutping": "ji4"
+                    },
+                    {
+                        "char": "兩",
+                        "pinyin": "liǎng",
+                        "jyutping": "loeng5"
+                    },
+                    {
+                        "char": "頭",
+                        "pinyin": "tóu",
+                        "jyutping": "tau4"
+                    },
+                    {
+                        "char": "尖",
+                        "pinyin": "jiān",
+                        "jyutping": "zim1"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "我在小小的船裏坐，",
+                "pinyin": "wǒ zài xiǎo xiǎo de chuán lǐ zuò ，",
+                "jyutping": "ngo5 zoi6 siu2 siu2 dik1 syun4 leoi5 co5 ，",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "在",
+                        "pinyin": "zài",
+                        "jyutping": "zoi6"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "船",
+                        "pinyin": "chuán",
+                        "jyutping": "syun4"
+                    },
+                    {
+                        "char": "裏",
+                        "pinyin": "lǐ",
+                        "jyutping": "leoi5"
+                    },
+                    {
+                        "char": "坐",
+                        "pinyin": "zuò",
+                        "jyutping": "co5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "只看見閃閃的星星藍藍的天。",
+                "pinyin": "zhǐ kàn jiàn shǎn shǎn de xīng xing lán lán de tiān 。",
+                "jyutping": "zi2 hon3 gin3 sim2 sim2 dik1 sing1 sing1 laam4 laam4 dik1 tin1 。",
+                "tokens": [
+                    {
+                        "char": "只",
+                        "pinyin": "zhǐ",
+                        "jyutping": "zi2"
+                    },
+                    {
+                        "char": "看",
+                        "pinyin": "kàn",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "見",
+                        "pinyin": "jiàn",
+                        "jyutping": "gin3"
+                    },
+                    {
+                        "char": "閃",
+                        "pinyin": "shǎn",
+                        "jyutping": "sim2"
+                    },
+                    {
+                        "char": "閃",
+                        "pinyin": "shǎn",
+                        "jyutping": "sim2"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "星",
+                        "pinyin": "xīng",
+                        "jyutping": "sing1"
+                    },
+                    {
+                        "char": "星",
+                        "pinyin": "xing",
+                        "jyutping": "sing1"
+                    },
+                    {
+                        "char": "藍",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "藍",
+                        "pinyin": "lán",
+                        "jyutping": "laam4"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "天",
+                        "pinyin": "tiān",
+                        "jyutping": "tin1"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "彎彎的月兒小小的船， 小小的船兒兩頭尖。 我在小小的船裏坐， 只看見閃閃的星星藍藍的天。"
+    },
+    {
+        "id": "ch-10",
+        "chapterNumber": 10,
+        "title": "洗澡",
+        "author": "羅小羽",
+        "lines": [
+            {
+                "index": 0,
+                "text": "小水花，",
+                "pinyin": "xiǎo shuǐ huā ，",
+                "jyutping": "siu2 seoi2 faa1 ，",
+                "tokens": [
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "水",
+                        "pinyin": "shuǐ",
+                        "jyutping": "seoi2"
+                    },
+                    {
+                        "char": "花",
+                        "pinyin": "huā",
+                        "jyutping": "faa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "沙沙沙。",
+                "pinyin": "shā shā shā 。",
+                "jyutping": "saa1 saa1 saa1 。",
+                "tokens": [
+                    {
+                        "char": "沙",
+                        "pinyin": "shā",
+                        "jyutping": "saa1"
+                    },
+                    {
+                        "char": "沙",
+                        "pinyin": "shā",
+                        "jyutping": "saa1"
+                    },
+                    {
+                        "char": "沙",
+                        "pinyin": "shā",
+                        "jyutping": "saa1"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "小弟弟，",
+                "pinyin": "xiǎo dì di ，",
+                "jyutping": "siu2 dai6 dai6 ，",
+                "tokens": [
+                    {
+                        "char": "小",
+                        "pinyin": "xiǎo",
+                        "jyutping": "siu2"
+                    },
+                    {
+                        "char": "弟",
+                        "pinyin": "dì",
+                        "jyutping": "dai6"
+                    },
+                    {
+                        "char": "弟",
+                        "pinyin": "di",
+                        "jyutping": "dai6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "洗澡啦！",
+                "pinyin": "xǐ zǎo la ！",
+                "jyutping": "sai2 cou5 laa1 ！",
+                "tokens": [
+                    {
+                        "char": "洗",
+                        "pinyin": "xǐ",
+                        "jyutping": "sai2"
+                    },
+                    {
+                        "char": "澡",
+                        "pinyin": "zǎo",
+                        "jyutping": "cou5"
+                    },
+                    {
+                        "char": "啦",
+                        "pinyin": "la",
+                        "jyutping": "laa1"
+                    },
+                    {
+                        "char": "！",
+                        "pinyin": "！",
+                        "jyutping": "！"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "洗呀洗，",
+                "pinyin": "xǐ ya xǐ ，",
+                "jyutping": "sai2 aa1 sai2 ，",
+                "tokens": [
+                    {
+                        "char": "洗",
+                        "pinyin": "xǐ",
+                        "jyutping": "sai2"
+                    },
+                    {
+                        "char": "呀",
+                        "pinyin": "ya",
+                        "jyutping": "aa1"
+                    },
+                    {
+                        "char": "洗",
+                        "pinyin": "xǐ",
+                        "jyutping": "sai2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "擦呀擦。",
+                "pinyin": "cā ya cā 。",
+                "jyutping": "caat3 aa1 caat3 。",
+                "tokens": [
+                    {
+                        "char": "擦",
+                        "pinyin": "cā",
+                        "jyutping": "caat3"
+                    },
+                    {
+                        "char": "呀",
+                        "pinyin": "ya",
+                        "jyutping": "aa1"
+                    },
+                    {
+                        "char": "擦",
+                        "pinyin": "cā",
+                        "jyutping": "caat3"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 6,
+                "text": "愛清潔，",
+                "pinyin": "ài qīng jié ，",
+                "jyutping": "ngoi3 cing1 git3 ，",
+                "tokens": [
+                    {
+                        "char": "愛",
+                        "pinyin": "ài",
+                        "jyutping": "ngoi3"
+                    },
+                    {
+                        "char": "清",
+                        "pinyin": "qīng",
+                        "jyutping": "cing1"
+                    },
+                    {
+                        "char": "潔",
+                        "pinyin": "jié",
+                        "jyutping": "git3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 7,
+                "text": "人人誇。",
+                "pinyin": "rén rén kuā 。",
+                "jyutping": "jan4 jan4 kwaa1 。",
+                "tokens": [
+                    {
+                        "char": "人",
+                        "pinyin": "rén",
+                        "jyutping": "jan4"
+                    },
+                    {
+                        "char": "人",
+                        "pinyin": "rén",
+                        "jyutping": "jan4"
+                    },
+                    {
+                        "char": "誇",
+                        "pinyin": "kuā",
+                        "jyutping": "kwaa1"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "小水花， 沙沙沙。 小弟弟， 洗澡啦！ 洗呀洗， 擦呀擦。 愛清潔， 人人誇。"
+    },
+    {
+        "id": "ch-11",
+        "chapterNumber": 11,
+        "title": "掉牙",
+        "author": "黃慶雲",
+        "lines": [
+            {
+                "index": 0,
+                "text": "哈，哈，哈，",
+                "pinyin": "hā ， hā ， hā ，",
+                "jyutping": "haa1 ， haa1 ， haa1 ，",
+                "tokens": [
+                    {
+                        "char": "哈",
+                        "pinyin": "hā",
+                        "jyutping": "haa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "哈",
+                        "pinyin": "hā",
+                        "jyutping": "haa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "哈",
+                        "pinyin": "hā",
+                        "jyutping": "haa1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "掉牙我不怕，",
+                "pinyin": "diào yá wǒ bù pà ，",
+                "jyutping": "diu6 ngaa4 ngo5 bat1 paa3 ，",
+                "tokens": [
+                    {
+                        "char": "掉",
+                        "pinyin": "diào",
+                        "jyutping": "diu6"
+                    },
+                    {
+                        "char": "牙",
+                        "pinyin": "yá",
+                        "jyutping": "ngaa4"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "不",
+                        "pinyin": "bù",
+                        "jyutping": "bat1"
+                    },
+                    {
+                        "char": "怕",
+                        "pinyin": "pà",
+                        "jyutping": "paa3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "舊的不換去，",
+                "pinyin": "jiù de bù huàn qù ，",
+                "jyutping": "gau6 dik1 bat1 wun6 heoi3 ，",
+                "tokens": [
+                    {
+                        "char": "舊",
+                        "pinyin": "jiù",
+                        "jyutping": "gau6"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "不",
+                        "pinyin": "bù",
+                        "jyutping": "bat1"
+                    },
+                    {
+                        "char": "換",
+                        "pinyin": "huàn",
+                        "jyutping": "wun6"
+                    },
+                    {
+                        "char": "去",
+                        "pinyin": "qù",
+                        "jyutping": "heoi3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "怎麼長新牙？",
+                "pinyin": "zěn me zhǎng xīn yá ？",
+                "jyutping": "zam2 mo1 zoeng2 san1 ngaa4 ？",
+                "tokens": [
+                    {
+                        "char": "怎",
+                        "pinyin": "zěn",
+                        "jyutping": "zam2"
+                    },
+                    {
+                        "char": "麼",
+                        "pinyin": "me",
+                        "jyutping": "mo1"
+                    },
+                    {
+                        "char": "長",
+                        "pinyin": "zhǎng",
+                        "jyutping": "zoeng2"
+                    },
+                    {
+                        "char": "新",
+                        "pinyin": "xīn",
+                        "jyutping": "san1"
+                    },
+                    {
+                        "char": "牙",
+                        "pinyin": "yá",
+                        "jyutping": "ngaa4"
+                    },
+                    {
+                        "char": "？",
+                        "pinyin": "？",
+                        "jyutping": "？"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "嘴裏開了洞，",
+                "pinyin": "zuǐ lǐ kāi le dòng ，",
+                "jyutping": "zeoi2 leoi5 hoi1 liu5 dung6 ，",
+                "tokens": [
+                    {
+                        "char": "嘴",
+                        "pinyin": "zuǐ",
+                        "jyutping": "zeoi2"
+                    },
+                    {
+                        "char": "裏",
+                        "pinyin": "lǐ",
+                        "jyutping": "leoi5"
+                    },
+                    {
+                        "char": "開",
+                        "pinyin": "kāi",
+                        "jyutping": "hoi1"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "洞",
+                        "pinyin": "dòng",
+                        "jyutping": "dung6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "照樣能說話。",
+                "pinyin": "zhào yàng néng shuō huà 。",
+                "jyutping": "ziu3 joeng6 nang4 syut3 waa6 。",
+                "tokens": [
+                    {
+                        "char": "照",
+                        "pinyin": "zhào",
+                        "jyutping": "ziu3"
+                    },
+                    {
+                        "char": "樣",
+                        "pinyin": "yàng",
+                        "jyutping": "joeng6"
+                    },
+                    {
+                        "char": "能",
+                        "pinyin": "néng",
+                        "jyutping": "nang4"
+                    },
+                    {
+                        "char": "說",
+                        "pinyin": "shuō",
+                        "jyutping": "syut3"
+                    },
+                    {
+                        "char": "話",
+                        "pinyin": "huà",
+                        "jyutping": "waa6"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 6,
+                "text": "告訴全世界，",
+                "pinyin": "gào su quán shì jiè ，",
+                "jyutping": "gou3 sou3 cyun4 sai3 gaai3 ，",
+                "tokens": [
+                    {
+                        "char": "告",
+                        "pinyin": "gào",
+                        "jyutping": "gou3"
+                    },
+                    {
+                        "char": "訴",
+                        "pinyin": "su",
+                        "jyutping": "sou3"
+                    },
+                    {
+                        "char": "全",
+                        "pinyin": "quán",
+                        "jyutping": "cyun4"
+                    },
+                    {
+                        "char": "世",
+                        "pinyin": "shì",
+                        "jyutping": "sai3"
+                    },
+                    {
+                        "char": "界",
+                        "pinyin": "jiè",
+                        "jyutping": "gaai3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 7,
+                "text": "我要長大啦！",
+                "pinyin": "wǒ yào zhǎng dà la ！",
+                "jyutping": "ngo5 jiu3 zoeng2 daai6 laa1 ！",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "要",
+                        "pinyin": "yào",
+                        "jyutping": "jiu3"
+                    },
+                    {
+                        "char": "長",
+                        "pinyin": "zhǎng",
+                        "jyutping": "zoeng2"
+                    },
+                    {
+                        "char": "大",
+                        "pinyin": "dà",
+                        "jyutping": "daai6"
+                    },
+                    {
+                        "char": "啦",
+                        "pinyin": "la",
+                        "jyutping": "laa1"
+                    },
+                    {
+                        "char": "！",
+                        "pinyin": "！",
+                        "jyutping": "！"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "哈，哈，哈， 掉牙我不怕， 舊的不換去， 怎麼長新牙？ 嘴裏開了洞， 照樣能說話。 告訴全世界， 我要長大啦！"
+    },
+    {
+        "id": "ch-12",
+        "chapterNumber": 12,
+        "title": "吃月餅",
+        "author": "周蜜蜜",
+        "lines": [
+            {
+                "index": 0,
+                "text": "中秋節，慶團圓。吃吃月餅，月餅甜甜。看看月亮，月亮圓圓。",
+                "pinyin": "zhōng qiū jié ， qìng tuán yuán 。 chī chi yuè bing ， yuè bing tián tián 。 kàn kan yuè liang ， yuè liang yuán yuán 。",
+                "jyutping": "zung1 cau1 zit3 ， hing3 tyun4 jyun4 。 hek3 hek3 jyut6 beng2 ， jyut6 beng2 tim4 tim4 。 hon3 hon3 jyut6 loeng6 ， jyut6 loeng6 jyun4 jyun4 。",
+                "tokens": [
+                    {
+                        "char": "中",
+                        "pinyin": "zhōng",
+                        "jyutping": "zung1"
+                    },
+                    {
+                        "char": "秋",
+                        "pinyin": "qiū",
+                        "jyutping": "cau1"
+                    },
+                    {
+                        "char": "節",
+                        "pinyin": "jié",
+                        "jyutping": "zit3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "慶",
+                        "pinyin": "qìng",
+                        "jyutping": "hing3"
+                    },
+                    {
+                        "char": "團",
+                        "pinyin": "tuán",
+                        "jyutping": "tyun4"
+                    },
+                    {
+                        "char": "圓",
+                        "pinyin": "yuán",
+                        "jyutping": "jyun4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    },
+                    {
+                        "char": "吃",
+                        "pinyin": "chī",
+                        "jyutping": "hek3"
+                    },
+                    {
+                        "char": "吃",
+                        "pinyin": "chi",
+                        "jyutping": "hek3"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "餅",
+                        "pinyin": "bing",
+                        "jyutping": "beng2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "餅",
+                        "pinyin": "bing",
+                        "jyutping": "beng2"
+                    },
+                    {
+                        "char": "甜",
+                        "pinyin": "tián",
+                        "jyutping": "tim4"
+                    },
+                    {
+                        "char": "甜",
+                        "pinyin": "tián",
+                        "jyutping": "tim4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    },
+                    {
+                        "char": "看",
+                        "pinyin": "kàn",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "看",
+                        "pinyin": "kan",
+                        "jyutping": "hon3"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "亮",
+                        "pinyin": "liang",
+                        "jyutping": "loeng6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "亮",
+                        "pinyin": "liang",
+                        "jyutping": "loeng6"
+                    },
+                    {
+                        "char": "圓",
+                        "pinyin": "yuán",
+                        "jyutping": "jyun4"
+                    },
+                    {
+                        "char": "圓",
+                        "pinyin": "yuán",
+                        "jyutping": "jyun4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "妹妹說：「月亮會不會和月餅一樣，又香又甜？」",
+                "pinyin": "mèi mei shuō ： 「 yuè liang huì bu huì hé yuè bing yī yàng ， yòu xiāng yòu tián ？ 」",
+                "jyutping": "mui6 mui6 syut3 ： 「 jyut6 loeng6 wui5 bat1 wui5 wo4 jyut6 beng2 jat1 joeng6 ， jau6 hoeng1 jau6 tim4 ？ 」",
+                "tokens": [
+                    {
+                        "char": "妹",
+                        "pinyin": "mèi",
+                        "jyutping": "mui6"
+                    },
+                    {
+                        "char": "妹",
+                        "pinyin": "mei",
+                        "jyutping": "mui6"
+                    },
+                    {
+                        "char": "說",
+                        "pinyin": "shuō",
+                        "jyutping": "syut3"
+                    },
+                    {
+                        "char": "：",
+                        "pinyin": "：",
+                        "jyutping": "："
+                    },
+                    {
+                        "char": "「",
+                        "pinyin": "「",
+                        "jyutping": "「"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "亮",
+                        "pinyin": "liang",
+                        "jyutping": "loeng6"
+                    },
+                    {
+                        "char": "會",
+                        "pinyin": "huì",
+                        "jyutping": "wui5"
+                    },
+                    {
+                        "char": "不",
+                        "pinyin": "bu",
+                        "jyutping": "bat1"
+                    },
+                    {
+                        "char": "會",
+                        "pinyin": "huì",
+                        "jyutping": "wui5"
+                    },
+                    {
+                        "char": "和",
+                        "pinyin": "hé",
+                        "jyutping": "wo4"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "餅",
+                        "pinyin": "bing",
+                        "jyutping": "beng2"
+                    },
+                    {
+                        "char": "一",
+                        "pinyin": "yī",
+                        "jyutping": "jat1"
+                    },
+                    {
+                        "char": "樣",
+                        "pinyin": "yàng",
+                        "jyutping": "joeng6"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "又",
+                        "pinyin": "yòu",
+                        "jyutping": "jau6"
+                    },
+                    {
+                        "char": "香",
+                        "pinyin": "xiāng",
+                        "jyutping": "hoeng1"
+                    },
+                    {
+                        "char": "又",
+                        "pinyin": "yòu",
+                        "jyutping": "jau6"
+                    },
+                    {
+                        "char": "甜",
+                        "pinyin": "tián",
+                        "jyutping": "tim4"
+                    },
+                    {
+                        "char": "？",
+                        "pinyin": "？",
+                        "jyutping": "？"
+                    },
+                    {
+                        "char": "」",
+                        "pinyin": "」",
+                        "jyutping": "」"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "姐姐說：「一想到中秋節，我就滿心香甜。」",
+                "pinyin": "jiě jie shuō ： 「 yī xiǎng dào zhōng qiū jié ， wǒ jiù mǎn xīn xiāng tián 。 」",
+                "jyutping": "ze2 ze2 syut3 ： 「 jat1 soeng2 dou3 zung1 cau1 zit3 ， ngo5 zau6 mun5 sam1 hoeng1 tim4 。 」",
+                "tokens": [
+                    {
+                        "char": "姐",
+                        "pinyin": "jiě",
+                        "jyutping": "ze2"
+                    },
+                    {
+                        "char": "姐",
+                        "pinyin": "jie",
+                        "jyutping": "ze2"
+                    },
+                    {
+                        "char": "說",
+                        "pinyin": "shuō",
+                        "jyutping": "syut3"
+                    },
+                    {
+                        "char": "：",
+                        "pinyin": "：",
+                        "jyutping": "："
+                    },
+                    {
+                        "char": "「",
+                        "pinyin": "「",
+                        "jyutping": "「"
+                    },
+                    {
+                        "char": "一",
+                        "pinyin": "yī",
+                        "jyutping": "jat1"
+                    },
+                    {
+                        "char": "想",
+                        "pinyin": "xiǎng",
+                        "jyutping": "soeng2"
+                    },
+                    {
+                        "char": "到",
+                        "pinyin": "dào",
+                        "jyutping": "dou3"
+                    },
+                    {
+                        "char": "中",
+                        "pinyin": "zhōng",
+                        "jyutping": "zung1"
+                    },
+                    {
+                        "char": "秋",
+                        "pinyin": "qiū",
+                        "jyutping": "cau1"
+                    },
+                    {
+                        "char": "節",
+                        "pinyin": "jié",
+                        "jyutping": "zit3"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    },
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "就",
+                        "pinyin": "jiù",
+                        "jyutping": "zau6"
+                    },
+                    {
+                        "char": "滿",
+                        "pinyin": "mǎn",
+                        "jyutping": "mun5"
+                    },
+                    {
+                        "char": "心",
+                        "pinyin": "xīn",
+                        "jyutping": "sam1"
+                    },
+                    {
+                        "char": "香",
+                        "pinyin": "xiāng",
+                        "jyutping": "hoeng1"
+                    },
+                    {
+                        "char": "甜",
+                        "pinyin": "tián",
+                        "jyutping": "tim4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    },
+                    {
+                        "char": "」",
+                        "pinyin": "」",
+                        "jyutping": "」"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "中秋節，慶團圓。吃吃月餅，月餅甜甜。看看月亮，月亮圓圓。 妹妹說：「月亮會不會和月餅一樣，又香又甜？」 姐姐說：「一想到中秋節，我就滿心香甜。」"
+    },
+    {
+        "id": "ch-13",
+        "chapterNumber": 13,
+        "title": "中秋",
+        "author": "黃慶雲",
+        "lines": [
+            {
+                "index": 0,
+                "text": "八月十五是中秋，",
+                "pinyin": "bā yuè shí wǔ shì zhōng qiū ，",
+                "jyutping": "baat3 jyut6 sap6 ng5 si6 zung1 cau1 ，",
+                "tokens": [
+                    {
+                        "char": "八",
+                        "pinyin": "bā",
+                        "jyutping": "baat3"
+                    },
+                    {
+                        "char": "月",
+                        "pinyin": "yuè",
+                        "jyutping": "jyut6"
+                    },
+                    {
+                        "char": "十",
+                        "pinyin": "shí",
+                        "jyutping": "sap6"
+                    },
+                    {
+                        "char": "五",
+                        "pinyin": "wǔ",
+                        "jyutping": "ng5"
+                    },
+                    {
+                        "char": "是",
+                        "pinyin": "shì",
+                        "jyutping": "si6"
+                    },
+                    {
+                        "char": "中",
+                        "pinyin": "zhōng",
+                        "jyutping": "zung1"
+                    },
+                    {
+                        "char": "秋",
+                        "pinyin": "qiū",
+                        "jyutping": "cau1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "text": "提着花燈街上遊。",
+                "pinyin": "tí zhe huā dēng jiē shang yóu 。",
+                "jyutping": "tai4 zoek6 faa1 dang1 gaai1 soeng6 jau4 。",
+                "tokens": [
+                    {
+                        "char": "提",
+                        "pinyin": "tí",
+                        "jyutping": "tai4"
+                    },
+                    {
+                        "char": "着",
+                        "pinyin": "zhe",
+                        "jyutping": "zoek6"
+                    },
+                    {
+                        "char": "花",
+                        "pinyin": "huā",
+                        "jyutping": "faa1"
+                    },
+                    {
+                        "char": "燈",
+                        "pinyin": "dēng",
+                        "jyutping": "dang1"
+                    },
+                    {
+                        "char": "街",
+                        "pinyin": "jiē",
+                        "jyutping": "gaai1"
+                    },
+                    {
+                        "char": "上",
+                        "pinyin": "shang",
+                        "jyutping": "soeng6"
+                    },
+                    {
+                        "char": "遊",
+                        "pinyin": "yóu",
+                        "jyutping": "jau4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "text": "我的黑貓雄赳赳，",
+                "pinyin": "wǒ de hēi māo xióng jiū jiū ，",
+                "jyutping": "ngo5 dik1 hak1 maau1 hung4 dau1 dau1 ，",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "黑",
+                        "pinyin": "hēi",
+                        "jyutping": "hak1"
+                    },
+                    {
+                        "char": "貓",
+                        "pinyin": "māo",
+                        "jyutping": "maau1"
+                    },
+                    {
+                        "char": "雄",
+                        "pinyin": "xióng",
+                        "jyutping": "hung4"
+                    },
+                    {
+                        "char": "赳",
+                        "pinyin": "jiū",
+                        "jyutping": "dau1"
+                    },
+                    {
+                        "char": "赳",
+                        "pinyin": "jiū",
+                        "jyutping": "dau1"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "text": "你的白鼠像雪球。",
+                "pinyin": "nǐ de bái shǔ xiàng xuě qiú 。",
+                "jyutping": "nei5 dik1 baak6 syu2 zoeng6 syut3 kau4 。",
+                "tokens": [
+                    {
+                        "char": "你",
+                        "pinyin": "nǐ",
+                        "jyutping": "nei5"
+                    },
+                    {
+                        "char": "的",
+                        "pinyin": "de",
+                        "jyutping": "dik1"
+                    },
+                    {
+                        "char": "白",
+                        "pinyin": "bái",
+                        "jyutping": "baak6"
+                    },
+                    {
+                        "char": "鼠",
+                        "pinyin": "shǔ",
+                        "jyutping": "syu2"
+                    },
+                    {
+                        "char": "像",
+                        "pinyin": "xiàng",
+                        "jyutping": "zoeng6"
+                    },
+                    {
+                        "char": "雪",
+                        "pinyin": "xuě",
+                        "jyutping": "syut3"
+                    },
+                    {
+                        "char": "球",
+                        "pinyin": "qiú",
+                        "jyutping": "kau4"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "text": "我和你，",
+                "pinyin": "wǒ hé nǐ ，",
+                "jyutping": "ngo5 wo4 nei5 ，",
+                "tokens": [
+                    {
+                        "char": "我",
+                        "pinyin": "wǒ",
+                        "jyutping": "ngo5"
+                    },
+                    {
+                        "char": "和",
+                        "pinyin": "hé",
+                        "jyutping": "wo4"
+                    },
+                    {
+                        "char": "你",
+                        "pinyin": "nǐ",
+                        "jyutping": "nei5"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "text": "手拉手。",
+                "pinyin": "shǒu lā shǒu 。",
+                "jyutping": "sau2 laai1 sau2 。",
+                "tokens": [
+                    {
+                        "char": "手",
+                        "pinyin": "shǒu",
+                        "jyutping": "sau2"
+                    },
+                    {
+                        "char": "拉",
+                        "pinyin": "lā",
+                        "jyutping": "laai1"
+                    },
+                    {
+                        "char": "手",
+                        "pinyin": "shǒu",
+                        "jyutping": "sau2"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            },
+            {
+                "index": 6,
+                "text": "貓兒和老鼠，",
+                "pinyin": "māo r hé lǎo shǔ ，",
+                "jyutping": "maau1 ji4 wo4 lou5 syu2 ，",
+                "tokens": [
+                    {
+                        "char": "貓",
+                        "pinyin": "māo",
+                        "jyutping": "maau1"
+                    },
+                    {
+                        "char": "兒",
+                        "pinyin": "r",
+                        "jyutping": "ji4"
+                    },
+                    {
+                        "char": "和",
+                        "pinyin": "hé",
+                        "jyutping": "wo4"
+                    },
+                    {
+                        "char": "老",
+                        "pinyin": "lǎo",
+                        "jyutping": "lou5"
+                    },
+                    {
+                        "char": "鼠",
+                        "pinyin": "shǔ",
+                        "jyutping": "syu2"
+                    },
+                    {
+                        "char": "，",
+                        "pinyin": "，",
+                        "jyutping": "，"
+                    }
+                ]
+            },
+            {
+                "index": 7,
+                "text": "也成了朋友。",
+                "pinyin": "yě chéng le péng you 。",
+                "jyutping": "jaa5 sing4 liu5 pang4 jau5 。",
+                "tokens": [
+                    {
+                        "char": "也",
+                        "pinyin": "yě",
+                        "jyutping": "jaa5"
+                    },
+                    {
+                        "char": "成",
+                        "pinyin": "chéng",
+                        "jyutping": "sing4"
+                    },
+                    {
+                        "char": "了",
+                        "pinyin": "le",
+                        "jyutping": "liu5"
+                    },
+                    {
+                        "char": "朋",
+                        "pinyin": "péng",
+                        "jyutping": "pang4"
+                    },
+                    {
+                        "char": "友",
+                        "pinyin": "you",
+                        "jyutping": "jau5"
+                    },
+                    {
+                        "char": "。",
+                        "pinyin": "。",
+                        "jyutping": "。"
+                    }
+                ]
+            }
+        ],
+        "grade": "小學一年級 (Grade 1)",
+        "category": "Reading",
+        "fullText": "八月十五是中秋， 提着花燈街上遊。 我的黑貓雄赳赳， 你的白鼠像雪球。 我和你， 手拉手。 貓兒和老鼠， 也成了朋友。"
+    }
+];
+
 class AuthManager {
     static currentUser = null;
     static initialized = false;
@@ -2015,8 +5186,57 @@ static async getCommunitySentences(wordId = null, word = null) {
                 }
             } catch (e) {}
         }
-        this.pushToServer({ action: 'reset' });
+                this.pushToServer({ action: 'reset' });
         return DEFAULT_PROFILES;
+    }
+
+    static async getReadingChapters() {
+        try {
+            const res = await fetch('/api/reading/chapters');
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    if (typeof localStorage !== 'undefined') {
+                        try {
+                            localStorage.setItem('cantonese_reading_chapters_v1', JSON.stringify(data));
+                        } catch (e) {}
+                    }
+                    return data;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to fetch reading chapters from API:', e);
+        }
+
+        if (typeof localStorage !== 'undefined') {
+            try {
+                const raw = localStorage.getItem('cantonese_reading_chapters_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+        }
+
+        if (typeof DEFAULT_READING_CHAPTERS !== 'undefined') {
+            return DEFAULT_READING_CHAPTERS;
+        }
+        return [];
+    }
+
+    static async getReadingChapter(id) {
+        try {
+            const res = await fetch('/api/reading/chapters/' + encodeURIComponent(id));
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.id) return data;
+            }
+        } catch (e) {
+            console.warn('Failed to fetch reading chapter ' + id + ':', e);
+        }
+
+        const all = await this.getReadingChapters();
+        return all.find(c => c.id === id) || all[0] || null;
     }
 }
 
@@ -2028,6 +5248,7 @@ class SpeechEngine {
     constructor() {
         this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
         this.cantoneseVoice = null;
+        this.mandarinVoice = null;
         this.isVoiceAvailable = true; // Always true because backend /api/tts Cloud Audio Stream is active
         const savedRate = typeof localStorage !== 'undefined' ? parseFloat(localStorage.getItem('cantonese_audio_speed')) : 0.9;
         this.speechRate = !isNaN(savedRate) && savedRate > 0 ? savedRate : 0.9;
@@ -2055,11 +5276,30 @@ class SpeechEngine {
                 v.name.includes('HiuGaai')
             );
 
-            if (hkVoice) {
+                        if (hkVoice) {
                 this.cantoneseVoice = hkVoice;
                 console.log('Native Cantonese (zh-HK) OS voice detected:', hkVoice.name);
             } else {
                 this.cantoneseVoice = null;
+            }
+
+            const cnVoice = voices.find(v => 
+                v.lang.toLowerCase().includes('zh-cn') ||
+                v.lang.toLowerCase().includes('zh_cn') ||
+                v.lang.toLowerCase().includes('cmn') ||
+                v.name.toLowerCase().includes('mandarin') ||
+                v.name.toLowerCase().includes('putonghua') ||
+                v.name.includes('Xiaoxiao') ||
+                v.name.includes('Yunxi') ||
+                v.name.includes('Huihui') ||
+                v.name.includes('Yaoyao')
+            );
+
+            if (cnVoice) {
+                this.mandarinVoice = cnVoice;
+                console.log('Native Mandarin (zh-CN) OS voice detected:', cnVoice.name);
+            } else {
+                this.mandarinVoice = null;
             }
         }
 
@@ -2068,20 +5308,24 @@ class SpeechEngine {
         }
     }
 
-    speak(text, onStartCallback = null, onEndCallback = null) {
+        speak(text, onStartCallback = null, onEndCallback = null, lang = 'zh-HK') {
         if (!text) return;
         this.stop();
 
-        // 1. Try Native OS SpeechSynthesis if Cantonese voice is installed
-        if (this.synth && this.cantoneseVoice) {
+        const isMandarin = lang && (lang.toLowerCase().includes('cn') || lang.toLowerCase().includes('cmn'));
+        const targetVoice = isMandarin ? this.mandarinVoice : this.cantoneseVoice;
+        const targetLang = isMandarin ? 'zh-CN' : 'zh-HK';
+
+        // 1. Try Native OS SpeechSynthesis if corresponding voice is installed
+        if (this.synth && targetVoice) {
             try {
                 if (this.synth.paused) {
                     this.synth.resume();
                 }
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'zh-HK';
+                utterance.lang = targetLang;
                 utterance.rate = this.speechRate;
-                utterance.voice = this.cantoneseVoice;
+                utterance.voice = targetVoice;
 
                 let speechStarted = false;
                 utterance.onstart = () => {
@@ -2092,27 +5336,29 @@ class SpeechEngine {
                     if (onEndCallback) onEndCallback();
                 };
                 utterance.onerror = (e) => {
-                    console.warn('Native speech error, switching to Audio Stream:', e);
-                    this.playCloudAudio(text, onStartCallback, onEndCallback);
+                    console.warn(`Native speech error (${targetLang}), switching to Audio Stream:`, e);
+                    this.playCloudAudio(text, onStartCallback, onEndCallback, targetLang);
                 };
 
                 this.synth.speak(utterance);
                 return;
             } catch (err) {
-                console.warn('Native speech exception, falling back:', err);
+                console.warn(`Native speech exception (${targetLang}), falling back:`, err);
             }
         }
 
-        // 2. High-Fidelity Cantonese Audio Stream (via /api/tts proxy or direct fallback)
-        this.playCloudAudio(text, onStartCallback, onEndCallback);
+        // 2. High-Fidelity Audio Stream (via /api/tts proxy or direct fallback)
+        this.playCloudAudio(text, onStartCallback, onEndCallback, targetLang);
     }
 
-    playCloudAudio(text, onStartCallback = null, onEndCallback = null) {
+    playCloudAudio(text, onStartCallback = null, onEndCallback = null, lang = 'zh-HK') {
         this.stop();
 
+        const isMandarin = lang && (lang.toLowerCase().includes('cn') || lang.toLowerCase().includes('cmn'));
+        const targetLang = isMandarin ? 'zh-CN' : 'zh-HK';
         const encodedText = encodeURIComponent(text);
-        const serverEndpoint = `/api/tts?text=${encodedText}`;
-        const directCloudUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-HK&client=tw-ob&q=${encodedText}`;
+        const serverEndpoint = `/api/tts?tl=${targetLang}&text=${encodedText}`;
+        const directCloudUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${targetLang}&client=tw-ob&q=${encodedText}`;
 
         const audio = new Audio();
         audio.referrerPolicy = 'no-referrer';
@@ -2654,7 +5900,7 @@ class UIManager {
             isFinished: false
         };
 
-        this.dictationState = {
+                this.dictationState = {
             items: [],
             currentIndex: 0,
             isRevealed: false,
@@ -2670,6 +5916,17 @@ class UIManager {
             elapsedSeconds: 0,
             stopwatchTimer: null,
             filterScope: 'all'
+        };
+
+        this.readingState = {
+            chapters: [],
+            activeChapterId: 'ch-1',
+            annotationMode: 'pinyin',
+            fontSizeLevel: 1,
+            isPlayingAudio: false,
+            currentAudioLang: 'zh-HK',
+            currentLineIndex: -1,
+            audioTimer: null
         };
 
         try {
@@ -2722,8 +5979,10 @@ class UIManager {
         this.viewToneQuiz = document.getElementById('view-tone-quiz');
         this.viewScenarios = document.getElementById('view-scenarios');
         this.viewSentenceBuilder = document.getElementById('view-sentence-builder');
-        this.viewAdminPortal = document.getElementById('view-admin-portal');
+                this.viewAdminPortal = document.getElementById('view-admin-portal');
         this.viewPrintSheet = document.getElementById('view-print-sheet');
+        this.viewReading = document.getElementById('view-reading');
+        this.navReadingBtn = document.getElementById('nav-reading-btn');
 
         this.speechWarningBanner = document.getElementById('speech-warning-banner');
         this.modalCreateProfile = document.getElementById('modal-create-profile');
@@ -2750,8 +6009,11 @@ class UIManager {
     }
 
     bindEvents() {
-        if (this.navDashboardBtn) {
+                if (this.navDashboardBtn) {
             this.navDashboardBtn.addEventListener('click', () => this.switchView('dashboard'));
+        }
+        if (this.navReadingBtn) {
+            this.navReadingBtn.addEventListener('click', () => this.switchView('reading'));
         }
         if (this.navNewProfileBtn) {
             this.navNewProfileBtn.addEventListener('click', () => this.openCreateProfileModal());
@@ -3186,9 +6448,13 @@ class UIManager {
         if (this.viewDictationMode) this.viewDictationMode.classList.add('hidden');
         if (this.viewToneQuiz) this.viewToneQuiz.classList.add('hidden');
         if (this.viewScenarios) this.viewScenarios.classList.add('hidden');
-        if (this.viewSentenceBuilder) this.viewSentenceBuilder.classList.add('hidden');
+                if (this.viewSentenceBuilder) this.viewSentenceBuilder.classList.add('hidden');
         if (this.viewAdminPortal) this.viewAdminPortal.classList.add('hidden');
         if (this.viewPrintSheet) this.viewPrintSheet.classList.add('hidden');
+        if (this.viewReading) this.viewReading.classList.add('hidden');
+        if (targetView !== 'reading') {
+            this.stopReadingAudio();
+        }
 
         // Stop dictation auto-play and hands-free voice if leaving dictation view
         if (targetView !== 'dictation-mode') {
@@ -3261,9 +6527,12 @@ class UIManager {
         } else if (targetView === 'scenarios') {
             this.initScenariosMode();
             if (this.viewScenarios) this.viewScenarios.classList.remove('hidden');
-        } else if (targetView === 'sentence-builder') {
+                } else if (targetView === 'sentence-builder') {
             this.initSentenceBuilderMode();
             if (this.viewSentenceBuilder) this.viewSentenceBuilder.classList.remove('hidden');
+        } else if (targetView === 'reading') {
+            this.initReadingMode(params.chapterId);
+            if (this.viewReading) this.viewReading.classList.remove('hidden');
         }
     }
 
@@ -8178,6 +11447,323 @@ class UIManager {
         if (!str) return '';
         return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
+
+    // ==========================================
+    // Grade 1 Chinese Reading Mode (課文朗讀與拼音)
+    // ==========================================
+    async initReadingMode(targetChapterId = null) {
+        try {
+            if (!this.readingState.chapters || this.readingState.chapters.length === 0) {
+                this.readingState.chapters = await StorageManager.getReadingChapters();
+            }
+        } catch (e) {
+            console.warn('Error loading reading chapters:', e);
+        }
+
+        if (!this.readingState.chapters || this.readingState.chapters.length === 0) {
+            if (typeof DEFAULT_READING_CHAPTERS !== 'undefined') {
+                this.readingState.chapters = DEFAULT_READING_CHAPTERS;
+            }
+        }
+
+        if (targetChapterId) {
+            this.readingState.activeChapterId = targetChapterId;
+        } else if (!this.readingState.activeChapterId && this.readingState.chapters.length > 0) {
+            this.readingState.activeChapterId = this.readingState.chapters[0].id;
+        }
+
+        this.renderReadingChapterPills();
+        this.renderReadingChapterText();
+        this.updateReadingFontSizeLabel();
+        this.applyReadingFontSize();
+    }
+
+    renderReadingChapterPills() {
+        const pillsContainer = document.getElementById('reading-chapter-pills');
+        if (!pillsContainer) return;
+        pillsContainer.innerHTML = '';
+
+        const chapters = this.readingState.chapters || [];
+        chapters.forEach((ch) => {
+            const isActive = ch.id === this.readingState.activeChapterId;
+            const btn = document.createElement('button');
+            btn.className = isActive
+                ? 'px-3 py-1.5 rounded-xl border text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm shrink-0'
+                : 'px-3 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border-slate-800 hover:text-slate-200 shrink-0';
+            btn.innerHTML = `<span class="text-[10px] font-mono opacity-70">第${ch.chapterNumber}課</span> <span>${ch.title}</span>`;
+            btn.onclick = () => this.switchReadingChapter(ch.id);
+            pillsContainer.appendChild(btn);
+
+            if (isActive) {
+                setTimeout(() => {
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }, 50);
+            }
+        });
+    }
+
+    switchReadingChapter(chapterId) {
+        this.stopReadingAudio();
+        this.readingState.activeChapterId = chapterId;
+        this.renderReadingChapterPills();
+        this.renderReadingChapterText();
+
+        const card = document.getElementById('reading-text-card');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    navigateReadingChapter(dir) {
+        const chapters = this.readingState.chapters || [];
+        if (chapters.length === 0) return;
+        let currentIndex = chapters.findIndex(c => c.id === this.readingState.activeChapterId);
+        if (currentIndex === -1) currentIndex = 0;
+
+        let nextIndex = currentIndex + dir;
+        if (nextIndex < 0) nextIndex = chapters.length - 1;
+        if (nextIndex >= chapters.length) nextIndex = 0;
+
+        this.switchReadingChapter(chapters[nextIndex].id);
+    }
+
+    setReadingAnnotation(mode) {
+        this.readingState.annotationMode = mode;
+
+        const btnPinyin = document.getElementById('btn-annot-pinyin');
+        const btnJyutping = document.getElementById('btn-annot-jyutping');
+        const btnNone = document.getElementById('btn-annot-none');
+
+        const activeClass = 'px-2.5 py-1.5 rounded-lg font-semibold transition-all bg-sky-500/20 text-sky-300 border border-sky-500/30';
+        const inactiveClass = 'px-2.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-slate-200 transition-all border border-transparent';
+
+        if (btnPinyin) btnPinyin.className = mode === 'pinyin' ? activeClass : inactiveClass;
+        if (btnJyutping) btnJyutping.className = mode === 'jyutping' ? activeClass : inactiveClass;
+        if (btnNone) btnNone.className = mode === 'none' ? activeClass : inactiveClass;
+
+        this.renderReadingChapterText();
+    }
+
+    adjustReadingFontSize(delta) {
+        this.readingState.fontSizeLevel = Math.max(0, Math.min(3, this.readingState.fontSizeLevel + delta));
+        this.updateReadingFontSizeLabel();
+        this.applyReadingFontSize();
+    }
+
+    updateReadingFontSizeLabel() {
+        const labels = ['小', '中', '大', '特大'];
+        const el = document.getElementById('reading-font-size-label');
+        if (el) el.textContent = labels[this.readingState.fontSizeLevel] || '中';
+    }
+
+    applyReadingFontSize() {
+        const container = document.getElementById('reading-lines-container');
+        if (!container) return;
+        const fontClasses = [
+            ['text-base', 'sm:text-lg'],
+            ['text-lg', 'sm:text-xl'],
+            ['text-xl', 'sm:text-2xl'],
+            ['text-2xl', 'sm:text-3xl']
+        ];
+        fontClasses.flat().forEach(cls => container.classList.remove(cls));
+        fontClasses[this.readingState.fontSizeLevel].forEach(cls => container.classList.add(cls));
+    }
+
+    renderReadingChapterText() {
+        const chapters = this.readingState.chapters || [];
+        if (chapters.length === 0) return;
+        const chapter = chapters.find(c => c.id === this.readingState.activeChapterId) || chapters[0];
+        if (!chapter) return;
+
+        const numTag = document.getElementById('reading-chapter-num-tag');
+        if (numTag) numTag.textContent = `第 ${chapter.chapterNumber} 課`;
+
+        const titleEl = document.getElementById('reading-chapter-title');
+        if (titleEl) titleEl.textContent = chapter.title;
+
+        const authorEl = document.getElementById('reading-chapter-author');
+        if (authorEl) authorEl.textContent = `作者：${chapter.author || '佚名'}`;
+
+        const badgeEl = document.getElementById('reading-chapter-badge');
+        if (badgeEl) {
+            const curIdx = chapters.findIndex(c => c.id === chapter.id) + 1;
+            badgeEl.textContent = `第 ${curIdx} / ${chapters.length} 課`;
+        }
+
+        const linesContainer = document.getElementById('reading-lines-container');
+        if (!linesContainer) return;
+        linesContainer.innerHTML = '';
+
+        const mode = this.readingState.annotationMode || 'pinyin';
+        const punctRegex = /^[，。！？：、「」『』《》…—～·s	]$/;
+
+        (chapter.lines || []).forEach((line, lineIdx) => {
+            const row = document.createElement('div');
+            row.id = `reading-line-${lineIdx}`;
+            row.className = 'reading-line-row group flex items-start gap-3 rounded-2xl p-2.5 sm:p-3 hover:bg-slate-800/40 transition-all cursor-pointer border border-transparent';
+            row.title = '點擊朗讀本句 (Click to read line)';
+
+            // Line index / speaker indicator
+            const idxBox = document.createElement('div');
+            idxBox.className = 'shrink-0 w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 group-hover:text-sky-300 group-hover:border-sky-500/40 flex items-center justify-center text-[11px] font-mono font-bold transition-all mt-1';
+            idxBox.textContent = lineIdx + 1;
+            row.appendChild(idxBox);
+
+            // Tokens content
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'reading-line-content flex flex-wrap items-end gap-x-1 gap-y-2.5 flex-1';
+
+            (line.tokens || []).forEach(token => {
+                const char = token.char;
+                if (punctRegex.test(char)) {
+                    const span = document.createElement('span');
+                    span.className = 'reading-punct text-slate-400 select-none pb-0.5';
+                    span.textContent = char;
+                    contentDiv.appendChild(span);
+                } else if (mode === 'pinyin') {
+                    const ruby = document.createElement('ruby');
+                    ruby.className = 'reading-ruby rt-pinyin';
+                    const rb = document.createElement('rb');
+                    rb.textContent = char;
+                    const rt = document.createElement('rt');
+                    rt.textContent = token.pinyin || '';
+                    ruby.appendChild(rb);
+                    ruby.appendChild(rt);
+                    contentDiv.appendChild(ruby);
+                } else if (mode === 'jyutping') {
+                    const ruby = document.createElement('ruby');
+                    ruby.className = 'reading-ruby rt-jyutping';
+                    const rb = document.createElement('rb');
+                    rb.textContent = char;
+                    const rt = document.createElement('rt');
+                    rt.textContent = token.jyutping || '';
+                    ruby.appendChild(rb);
+                    ruby.appendChild(rt);
+                    contentDiv.appendChild(ruby);
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'reading-char inline-block text-slate-100 font-medium px-0.5';
+                    span.textContent = char;
+                    contentDiv.appendChild(span);
+                }
+            });
+
+            row.appendChild(contentDiv);
+            row.onclick = () => this.playReadingLine(lineIdx, this.readingState.currentAudioLang);
+            linesContainer.appendChild(row);
+        });
+    }
+
+    playReadingAudio(lang = 'zh-HK') {
+        const chapters = this.readingState.chapters || [];
+        const chapter = chapters.find(c => c.id === this.readingState.activeChapterId) || chapters[0];
+        if (!chapter || !chapter.lines || chapter.lines.length === 0) return;
+
+        this.stopReadingAudio();
+        this.readingState.isPlayingAudio = true;
+        this.readingState.currentAudioLang = lang;
+
+        const langName = lang === 'zh-HK' ? '粵語 (Cantonese)' : '普通話 (Mandarin)';
+        this.updateReadingAudioStatus(`🔊 正在連續朗讀全文 • ${langName}...`);
+
+        const btnHK = document.getElementById('btn-reading-play-cantonese');
+        const btnCN = document.getElementById('btn-reading-play-mandarin');
+        if (lang === 'zh-HK' && btnHK) btnHK.classList.add('ring-2', 'ring-sky-300');
+        if (lang === 'zh-CN' && btnCN) btnCN.classList.add('ring-2', 'ring-emerald-300');
+
+        const playLineAtIndex = (index) => {
+            if (!this.readingState.isPlayingAudio || this.readingState.currentAudioLang !== lang) {
+                return;
+            }
+            if (index >= chapter.lines.length) {
+                this.stopReadingAudio();
+                this.updateReadingAudioStatus(`✅ 全文朗讀完畢 (${langName})`);
+                return;
+            }
+
+            this.readingState.currentLineIndex = index;
+            this.highlightReadingLine(index);
+
+            const line = chapter.lines[index];
+            this.speechEngine.speak(
+                line.text,
+                null,
+                () => {
+                    if (this.readingState.isPlayingAudio) {
+                        this.readingState.audioTimer = setTimeout(() => {
+                            playLineAtIndex(index + 1);
+                        }, 400);
+                    }
+                },
+                lang
+            );
+        };
+
+        playLineAtIndex(0);
+    }
+
+    playReadingLine(lineIndex, lang = this.readingState.currentAudioLang) {
+        const chapters = this.readingState.chapters || [];
+        const chapter = chapters.find(c => c.id === this.readingState.activeChapterId) || chapters[0];
+        if (!chapter || !chapter.lines || !chapter.lines[lineIndex]) return;
+
+        this.stopReadingAudio();
+        this.readingState.isPlayingAudio = true;
+        this.readingState.currentAudioLang = lang;
+        this.readingState.currentLineIndex = lineIndex;
+        this.highlightReadingLine(lineIndex);
+
+        const langName = lang === 'zh-HK' ? '粵語' : '普通話';
+        this.updateReadingAudioStatus(`🔊 單句朗讀 (第 ${lineIndex + 1} 句 • ${langName})`);
+
+        this.speechEngine.speak(
+            chapter.lines[lineIndex].text,
+            null,
+            () => {
+                this.highlightReadingLine(-1);
+                this.readingState.isPlayingAudio = false;
+                this.readingState.currentLineIndex = -1;
+                this.updateReadingAudioStatus('課文朗讀完畢');
+            },
+            lang
+        );
+    }
+
+    stopReadingAudio() {
+        if (this.readingState.audioTimer) {
+            clearTimeout(this.readingState.audioTimer);
+            this.readingState.audioTimer = null;
+        }
+        this.speechEngine.stop();
+        this.readingState.isPlayingAudio = false;
+        this.readingState.currentLineIndex = -1;
+        this.highlightReadingLine(-1);
+
+        const btnHK = document.getElementById('btn-reading-play-cantonese');
+        const btnCN = document.getElementById('btn-reading-play-mandarin');
+        if (btnHK) btnHK.classList.remove('ring-2', 'ring-sky-300');
+        if (btnCN) btnCN.classList.remove('ring-2', 'ring-emerald-300');
+
+        this.updateReadingAudioStatus('粵語 / 普通話雙音頻');
+    }
+
+    highlightReadingLine(index) {
+        const rows = document.querySelectorAll('.reading-line-row');
+        rows.forEach((r, idx) => {
+            if (idx === index) {
+                r.classList.add('reading-line-active');
+                r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                r.classList.remove('reading-line-active');
+            }
+        });
+    }
+
+    updateReadingAudioStatus(text) {
+        const statusEl = document.getElementById('reading-status-audio-lang');
+        if (statusEl) {
+            statusEl.textContent = text || '粵語 / 普通話雙音頻';
+        }
+    }
+
 }
 
 // Global App Initialization

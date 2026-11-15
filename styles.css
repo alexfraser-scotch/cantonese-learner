@@ -173,3 +173,57 @@ body {
     transform: scale(0.96);
 }
 
+/* Reading View & Ruby Pinyin / Jyutping Styles */
+.reading-ruby {
+    display: inline-flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    vertical-align: bottom;
+    margin: 0 1px;
+    line-height: 1.1;
+}
+
+.reading-ruby rb {
+    display: block;
+    line-height: 1.25;
+}
+
+.reading-ruby rt {
+    display: block;
+    font-size: 0.52em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 3px;
+    letter-spacing: -0.02em;
+    user-select: none;
+}
+
+.reading-ruby.rt-pinyin rt {
+    color: #38bdf8; /* Sky blue for Mandarin Pinyin */
+}
+
+.reading-ruby.rt-jyutping rt {
+    color: #c084fc; /* Purple for Cantonese Jyutping */
+}
+
+.reading-line-row {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.reading-line-row:hover {
+    background: rgba(30, 41, 59, 0.6);
+}
+
+.reading-line-active {
+    background: rgba(14, 165, 233, 0.15) !important;
+    border: 1px solid rgba(56, 189, 248, 0.4) !important;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+    transform: translateX(4px);
+}
+
+

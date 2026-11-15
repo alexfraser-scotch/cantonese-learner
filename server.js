@@ -680,6 +680,29 @@ function writeScenarios(scenarios) {
 }
 
 const USER_PROGRESS_FILE = path.join(DATA_DIR, 'user_progress.json');
+
+const READING_CHAPTERS_FILE = path.join(DATA_DIR, 'reading_chapters.json');
+let inMemoryReadingChapters = null;
+
+function readReadingChapters() {
+    ensureDataFile();
+    if (inMemoryReadingChapters && inMemoryReadingChapters.length > 0) {
+        return inMemoryReadingChapters;
+    }
+    try {
+        if (fs.existsSync(READING_CHAPTERS_FILE)) {
+            const raw = fs.readFileSync(READING_CHAPTERS_FILE, 'utf-8');
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                inMemoryReadingChapters = parsed;
+                return inMemoryReadingChapters;
+            }
+        }
+    } catch (e) {
+        console.error('Error reading reading_chapters file:', e);
+    }
+    return inMemoryReadingChapters || [];
+}
 const COMMUNITY_SENTENCES_FILE = path.join(DATA_DIR, 'community_sentences.json');
 let inMemorySentencesStore = null;
 
@@ -795,7 +818,9 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        const cacheKey = text.slice(0, 200);
+        const rawTl = (queryParams.get('tl') || queryParams.get('lang') || 'zh-HK').trim().toLowerCase();
+        const targetLang = (rawTl === 'zh-cn' || rawTl === 'zh' || rawTl === 'mandarin' || rawTl === 'cmn') ? 'zh-CN' : 'zh-HK';
+        const cacheKey = `${targetLang}:${text.slice(0, 200)}`;
         if (ttsAudioCache.has(cacheKey)) {
             const cachedBuffer = ttsAudioCache.get(cacheKey);
             res.writeHead(200, {
@@ -807,7 +832,7 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-HK&client=tw-ob&q=${encodeURIComponent(text)}`;
+        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${targetLang}&client=tw-ob&q=${encodeURIComponent(text)}`;
         https.get(ttsUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -1290,6 +1315,38 @@ const server = http.createServer((req, res) => {
     }
 
 
+
+    // ==========================================
+    // API ENDPOINT: READING CHAPTERS (/api/reading/chapters)
+    // ==========================================
+    if (pathName === '/api/reading/chapters' || pathName.startsWith('/api/reading/chapters/')) {
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        if (req.method === 'GET') {
+            const chapters = readReadingChapters();
+            const segments = pathName.split('/');
+            if (segments.length > 4 && segments[4]) {
+                const targetId = segments[4];
+                const chapter = chapters.find(c => c.id === targetId || String(c.chapterNumber) === targetId);
+                if (chapter) {
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify(chapter));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ error: 'Chapter not found' }));
+                }
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify(chapters));
+            return;
+        }
+
+        res.writeHead(405, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Method not allowed' }));
+        return;
+    }
+
     // ==========================================
     // API ENDPOINT: COMMUNITY EXAMPLE SENTENCES
     // ==========================================
@@ -1711,6 +1768,8 @@ module.exports = {
     isAuthorizedAdmin,
     COMMUNITY_SENTENCES_FILE,
     readCommunitySentences,
-    writeCommunitySentences
+    writeCommunitySentences,
+    READING_CHAPTERS_FILE,
+    readReadingChapters
 };
 

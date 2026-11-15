@@ -2,7 +2,7 @@
 // 粵語通 CANTONESE LEARNER - SERVICE WORKER (PWA)
 // ==========================================
 
-const CACHE_NAME = 'cantonese-learner-v1.8.0';
+const CACHE_NAME = 'cantonese-learner-v1.12.0';
 
 const PRECACHE_ASSETS = [
     '/',
@@ -12,7 +12,8 @@ const PRECACHE_ASSETS = [
     '/manifest.json',
     '/icons/icon.svg',
     '/data/profiles.json',
-    '/data/scenarios.json'
+    '/data/scenarios.json',
+    '/data/reading_chapters.json'
 ];
 
 // 1. Install Event: Cache Core Static Shell
